@@ -192,5 +192,8 @@
   "components": "components",
   "forms": "forms",
   "menu": "menu",
-  "home": "home"
+  "home": "home",
+  "transaction": "transaction",
+  "transaction_list": "transaction list",
+  "recent_transaction_list": "recent transaction list"
 }

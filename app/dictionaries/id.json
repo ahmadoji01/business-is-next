@@ -192,5 +192,8 @@
     "components": "komponen",
     "forms": "formulir",
     "menu": "menu",
-    "home": "beranda"
+    "home": "beranda",
+    "transaction": "transaksi",
+    "transaction_list": "daftar transaksi",
+    "recent_transaction_list": "daftar transaksi terakhir"
 }
