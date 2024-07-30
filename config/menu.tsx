@@ -1003,7 +1003,7 @@ export const menusConfig = {
       },
       {
         title: "assets",
-        icon: Buildings,
+        icon: Abs27,
         child: [
           {
             title: "Purchase Asset",
@@ -1035,17 +1035,17 @@ export const menusConfig = {
         title: "Organization Management",
       },
       {
-        title: "assets",
-        icon: Buildings2,
+        title: "assets list",
+        icon: Buildings,
         href: "/assets",
       },
       {
-        title: "liabilities",
+        title: "liabilities list",
         icon: CardIcon,
         href: "/liabilities",
       },
       {
-        title: "equity",
+        title: "equity list",
         icon: ChatMoney,
         href: "/equity",
       },
@@ -1137,16 +1137,6 @@ export const menusConfig = {
         title: "cashflow statement",
         icon: CashMoney,
         href: "/payroll",
-      },
-      {
-        title: "cash",
-        icon: Wallet,
-        href: "/cash",
-      },
-      {
-        title: "inventory",
-        icon: Garage,
-        href: "/inventory",
       },
       {
         title: "Invoice",
@@ -1213,17 +1203,17 @@ export const menusConfig = {
         title: "Organization Management",
       },
       {
-        title: "assets",
-        icon: Building,
+        title: "assets list",
+        icon: Buildings,
         href: "/assets",
       },
       {
-        title: "liabilities",
+        title: "liabilities list",
         icon: CardIcon,
         href: "/liabilities",
       },
       {
-        title: "equity",
+        title: "equity list",
         icon: ChatMoney,
         href: "/equity",
       },
@@ -1315,16 +1305,6 @@ export const menusConfig = {
         title: "cashflow statement",
         icon: CashMoney,
         href: "/payroll",
-      },
-      {
-        title: "cash",
-        icon: Wallet,
-        href: "/cash",
-      },
-      {
-        title: "inventory",
-        icon: Garage,
-        href: "/inventory",
       },
       {
         title: "Invoice",
