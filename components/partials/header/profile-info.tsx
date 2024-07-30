@@ -23,28 +23,24 @@ const ProfileInfo = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild className=" cursor-pointer">
         <div className=" flex items-center  ">
-          {session?.user?.image && (
-            <Image
-              src={session?.user?.image}
-              alt={session?.user?.name ?? ""}
-              width={36}
-              height={36}
-              className="rounded-full"
-            />
-          )}
+          <Image
+            src={session?.user?.image ? session.user.image : "/images/avatar-256.jpg"}
+            alt={session?.user?.name ?? ""}
+            width={36}
+            height={36}
+            className="rounded-full"
+          />
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 p-0" align="end">
         <DropdownMenuLabel className="flex gap-2 items-center mb-1 p-3">
-          {session?.user?.image && (
             <Image
-              src={session?.user?.image}
+              src={session?.user?.image ? session.user.image : "/images/avatar-256.jpg"}
               alt={session?.user?.name ?? ""}
               width={36}
               height={36}
               className="rounded-full"
             />
-          )}
           <div>
             <div className="text-sm font-medium text-default-800 capitalize ">
               {session?.user?.name ?? "Mcc Callem"}
