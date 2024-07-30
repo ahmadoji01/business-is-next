@@ -5,10 +5,8 @@ import ReportsSnapshot from "./components/reports-snapshot";
 import CountryMap from "./components/country-map";
 import UserDeviceReport from "./components/user-device-report";
 import UserStats from "./components/user-stats-chart";
-import UsersStat from "./components/users-stat";
 import ReportsArea from "./components/reports-area";
 import DashboardSelect from "@/components/dasboard-select";
-import TopTen from "./components/top-ten";
 import TopPage from "./components/top-page";
 import DatePickerWithRange from "@/components/date-picker-with-range";
 
@@ -26,13 +24,21 @@ const DashboardPageView = ({ trans }: DashboardPageViewProps) => {
         </div>
         <DatePickerWithRange />
       </div>
-      {/* reports area */}
       <div className="grid grid-cols-12  gap-6 ">
-        <div className="col-span-12 lg:col-span-8">
+        <div className="col-span-12 lg:col-span-12">
           <ReportsSnapshot />
         </div>
-        <div className="col-span-12 lg:col-span-4">
-          <UsersStat />
+      </div>
+      <div className="grid grid-cols-12 gap-6">
+        <div className="col-span-12">
+          <Card>
+            <CardHeader className="border-none pb-0">
+              <CardTitle className="pt-2.5 capitalize">{ trans?.recent_transaction_list }</CardTitle>
+            </CardHeader>
+            <CardContent className="px-0">
+              <TopPage />
+            </CardContent>
+          </Card>
         </div>
       </div>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -78,21 +84,6 @@ const DashboardPageView = ({ trans }: DashboardPageViewProps) => {
             <CountryMap />
           </CardContent>
         </Card>
-      </div>
-      <div className="grid grid-cols-12 gap-6">
-        <div className="col-span-12 lg:col-span-4">
-          <TopTen />
-        </div>
-        <div className="col-span-12 lg:col-span-8">
-          <Card>
-            <CardHeader className="border-none pb-0">
-              <CardTitle className="pt-2.5">Top Page/Post</CardTitle>
-            </CardHeader>
-            <CardContent className="px-0">
-              <TopPage />
-            </CardContent>
-          </Card>
-        </div>
       </div>
     </div>
   );

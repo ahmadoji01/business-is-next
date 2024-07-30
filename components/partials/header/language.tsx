@@ -15,6 +15,7 @@ import { Check } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useRouter, usePathname } from "next/navigation";
 import { useThemeStore } from "@/store";
+import { useMediaQuery } from "@/hooks/use-media-query";
 const languages = [
   {
     name: "en",
@@ -35,6 +36,7 @@ const Language = () => {
   const router = useRouter();
   const pathname = usePathname();
   const { setRtl } = useThemeStore();
+  const isDesktop = useMediaQuery("(min-width: 1280px)");
   const found = pathname ? languages.find((lang) => pathname.includes(lang.name)) : null;
   const [selectedLanguage, setSelectedLanguage] = useState<Language>(
     found ?? languages[0]
@@ -55,16 +57,18 @@ const Language = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button type="button" className="bg-transparent hover:bg-transparent">
-          <span className="w-6 h-6 rounded-full me-1.5">
+          <span className="w-6 h-6 rounded-full">
             <Image
               src={selectedLanguage ? selectedLanguage.flag : flag1}
               alt=""
               className="w-full h-full object-cover rounded-full"
             />
           </span>
-          <span className="text-sm text-default-600 capitalize">
-            {selectedLanguage ? selectedLanguage.name : "En"}
-          </span>
+          { isDesktop &&
+            <span className="text-sm text-default-600 capitalize ml-1.5">
+              {selectedLanguage ? selectedLanguage.name : "En"}
+            </span>
+          }
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="p-2">

@@ -88,7 +88,25 @@ export { default as Sun } from "./duel-tone/sun.svg";
 export { default as Moon } from "./duel-tone/moon.svg";
 export { default as Device } from "./duel-tone/device.svg";
 
-export { default as Home } from "./dual-tone/gen001.svg";
+export { default as Home } from "./dual-tone/home.svg";
+export { default as Abs27 } from "./dual-tone/abs027.svg";
+export { default as CardReceive } from "./dual-tone/card-receive.svg";
+export { default as MoneyBag } from "./dual-tone/money-bag.svg";
+export { default as CardIcon } from "./dual-tone/card.svg";
+export { default as Wallet } from "./dual-tone/wallet.svg";
+export { default as Garage } from "./dual-tone/garage.svg";
+export { default as Customer } from "./dual-tone/user-id.svg";
+export { default as Devices } from "./dual-tone/devices.svg";
+export { default as CardSend } from "./dual-tone/card-send.svg";
+export { default as UserRounded } from "./dual-tone/user-rounded.svg";
+export { default as DocumentsIcon } from "./dual-tone/documents.svg";
+export { default as BalanceIcon } from "./dual-tone/balance-scale.svg";
+export { default as CashMoney } from "./dual-tone/cash-money.svg";
+export { default as CashRegister } from "./dual-tone/cash-register.svg";
+export { default as Buildings } from "./dual-tone/buildings.svg";
+export { default as Buildings2 } from "./dual-tone/buildings-2.svg";
+export { default as CoinDollar } from "./dual-tone/dollar-minimalistic.svg";
+export { default as ChatMoney } from "./dual-tone/chat-round-money.svg";
 
 // sidebar icon
 export { default as FolderTree } from "./home/foldertree.svg";
