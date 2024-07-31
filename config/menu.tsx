@@ -3,7 +3,6 @@ import {
     Application,
     Chart,
     Components,
-    DashBoard,
     Stacks2,
     Map,
     Grid,
@@ -19,9 +18,6 @@ import {
     Flag,
     Book,
     Note,
-    ClipBoard2,
-    Note2,
-    Note3,
     BarLeft,
     BarTop,
     ChartBar,
@@ -29,11 +25,8 @@ import {
     PretentionChartLine2,
     Pointer,
     Map2,
-    MenuBar,
     Icons,
     ChartArea,
-    Building,
-    Building2,
     Sheild,
     Error,
     Diamond,
@@ -43,7 +36,6 @@ import {
     Mail,
     Home,
     Abs27,
-    File11,
     CardReceive,
     MoneyBag,
     CardIcon,
@@ -51,7 +43,6 @@ import {
     Wallet,
     Garage,
     Customer,
-    Devices,
     CardSend,
     UserRounded,
     CoinDollar,
@@ -59,23 +50,236 @@ import {
     BalanceIcon,
     CashMoney,
     CashRegister,
-    Buildings2,
     Buildings,
   } from "@/components/svg";
+import { ROLES } from "@/modules/users/domain/users.constants";
   
   
-  export interface MenuItemProps {
-    title: string;
-    icon: any;
-    href?: string;
-    child?: MenuItemProps[];
-    megaMenu?: MenuItemProps[];
-    multi_menu? : MenuItemProps[]
-    nested?: MenuItemProps[]
-    onClick: () => void;
-  
-    
-  }
+export interface MenuItemProps {
+  title: string;
+  icon: any;
+  href?: string;
+  child?: MenuItemProps[];
+  megaMenu?: MenuItemProps[];
+  multi_menu? : MenuItemProps[]
+  nested?: MenuItemProps[]
+  onClick: () => void; 
+}
+
+interface HomeMenu {
+  image?: string,
+  isHeader?: boolean,
+  title: string,
+  url?: string,
+}
+
+export interface HomeMenuItem {
+  role: string,
+  homeMenus: HomeMenu[],
+}
+
+export const homeMenuItems: HomeMenuItem[] = [
+    {
+        role: ROLES.administrator,
+        homeMenus: [
+          {
+            isHeader: true,
+            title: 'manage sales/bills',
+          },
+          {
+            image: '/icons/menu/bill.png',
+            title: 'sell/bill customers',
+            url: '/sales',
+          },
+          {
+            image: '/icons/menu/cash-register.png',
+            title: 'manage cashier (point of sales)',
+            url: '/cashier',
+          },
+          {
+            image: '/icons/menu/invoice.png',
+            title: 'print invoice for customers',
+            url: '/invoices',
+          },
+          {
+            image: '/icons/menu/customers.png',
+            title: 'see customers list',
+            url: '/customers',
+          },
+          {
+            image: '/icons/menu/receivables.png',
+            title: 'see receivables from customers',
+            url: '/receivables',
+          },
+          {
+            isHeader: true,
+            title: 'manage assets',
+          },
+          {
+            image: '/icons/menu/purchase.png',
+            title: 'create items/services purchase report',
+            url: '/purchases',
+          },
+          {
+            image: '/icons/menu/buy-assets.png',
+            title: 'purchase asset',
+            url: '/assets/buy',
+          },
+          {
+            image: '/icons/menu/sell-assets.png',
+            title: 'sell asset',
+            url: '/assets/sell',
+          },
+          {
+            image: '/icons/menu/assets.png',
+            title: 'see assets list',
+            url: '/assets',
+          },
+          {
+            image: '/icons/menu/inventory.png',
+            title: 'manage inventory',
+            url: '/inventory',
+          },
+          {
+            isHeader: true,
+            title: 'manage liabilities and equity',
+          },
+          {
+            image: '/icons/menu/debt-1.png',
+            title: 'create new debt report',
+            url: '/debts/add',
+          },
+          {
+            image: '/icons/menu/payables.png',
+            title: 'see assets payables',
+            url: '/assets/payables',
+          },
+          {
+            image: '/icons/menu/debt-2.png',
+            title: 'see liabilities list',
+            url: '/liabilities',
+          },
+          {
+            image: '/icons/menu/equity-1.png',
+            title: 'create equity report',
+            url: '/equity/create',
+          },
+          {
+            image: '/icons/menu/equity-2.png',
+            title: 'see equity list',
+            url: '/equity',
+          },
+          {
+            isHeader: true,
+            title: 'manage cash',
+          },
+          {
+            image: '/icons/menu/wallet.png',
+            title: 'see cash details',
+            url: '/cash',
+          },
+          {
+            image: '/icons/menu/adjust-cash.png',
+            title: 'adjust cash',
+            url: '/cash/adjust',
+          },
+          {
+            isHeader: true,
+            title: 'financial statement',
+          },
+          {
+            image: '/icons/menu/income-statement.png',
+            title: 'income statement',
+            url: '/income-statement',
+          },
+          {
+            image: '/icons/menu/balance-sheet.png',
+            title: 'balance sheet',
+            url: '/balance-sheet',
+          },
+          {
+            image: '/icons/menu/cashflow.png',
+            title: 'cashflow statement',
+            url: '/cashflow-statement',
+          },
+          {
+            image: '/icons/menu/analysis.png',
+            title: 'business analysis',
+            url: '/analysis',
+          },
+        ]
+    },
+    {
+        role: ROLES.front_desk,
+        homeMenus: [
+            {
+                image: '/icons/menu/queue-manager.png',
+                title: 'home_menu.manage_queue',
+                url: '/operational/front-desk/queue-manager',
+            },
+            {
+                image: '/icons/menu/queue-display.png',
+                title: 'home_menu.display_queue',
+                url: '/operational/front-desk/queue-display',
+            },
+            {
+                image: '/icons/menu/patient-registration.png',
+                title: 'home_menu.patient_registration',
+                url: '/operational/front-desk/patient-registration',
+            },
+            {
+                image: '/icons/menu/profile.png',
+                title: 'home_menu.edit_profile',
+                url: '/profile',
+            },
+            {
+                image: '/icons/menu/open.png',
+                title: 'home_menu.open_close_clinic',
+                url: '/operational/front-desk',
+            }
+        ]
+    },
+    {
+        role: ROLES.doctor,
+        homeMenus: [
+            {
+                image: '/icons/menu/examine.png',
+                title: 'home_menu.examine_patient',
+                url: '/operational/doctor/patients-list',
+            },
+            {
+                image: '/icons/menu/profile.png',
+                title: 'home_menu.edit_profile',
+                url: '/profile',
+            }
+        ]
+    },
+    {
+        role: ROLES.cashier,
+        homeMenus: [
+            {
+                image: '/icons/menu/order.png',
+                title: 'home_menu.print_sales',
+                url: '/dashboard/orders',
+            },
+            {
+                image: '/icons/menu/profile.png',
+                title: 'home_menu.edit_profile',
+                url: '/profile',
+            },
+            {
+                image: '/icons/menu/cashier.png',
+                title: 'home_menu.manage_cashier',
+                url: '/cashier',
+            },
+            {
+                image: '/icons/menu/analysis.png',
+                title: 'home_menu.clinic_analysis',
+                url: '/dashboard/analysis',
+            }
+        ]
+    }
+]
   
 export const menusConfig = {
   mainNav: [

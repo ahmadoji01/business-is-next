@@ -9,6 +9,11 @@ import ReportsArea from "./components/reports-area";
 import DashboardSelect from "@/components/dasboard-select";
 import TopPage from "./components/top-page";
 import DatePickerWithRange from "@/components/date-picker-with-range";
+import MenuCard from "./components/menu-card";
+import Image from "next/image";
+import Link from "next/link";
+import { homeMenuItems } from "@/config/menu";
+import { translate } from "@/lib/utils";
 
 interface DashboardPageViewProps {
   trans: {
@@ -18,6 +23,37 @@ interface DashboardPageViewProps {
 const DashboardPageView = ({ trans }: DashboardPageViewProps) => {
   return (
     <div className="space-y-6">
+      <div className="flex items-center flex-wrap justify-between gap-4">
+        <div className="text-2xl font-medium text-default-800 ">
+          {trans.home_welcome}
+        </div>
+      </div>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 lg:grid-cols-3 2xl:gap-7.5">
+        { homeMenuItems[0]?.homeMenus.map( (item, key) => (
+          <>
+            { item.isHeader && 
+              <div className="col-span-1 md:col-span-2 lg:col-span-3 text-2xl font-medium text-default-800 capitalize">
+                { translate(item.title, trans) }
+              </div>
+            }
+
+            { (!item.isHeader 
+                && typeof(item.url) !== 'undefined' 
+                && typeof(item.image) !== 'undefined') &&  
+              <Link href={item.url} key={key}>
+                <MenuCard title={translate(item.title, trans)}>
+                  <Image
+                    src={item.image}
+                    alt="Logo"
+                    width={64}
+                    height={64}
+                    />
+                </MenuCard>
+              </Link>
+            }
+          </>
+        ))}
+      </div>
       <div className="flex items-center flex-wrap justify-between gap-4">
         <div className="text-2xl font-medium text-default-800 ">
           Analytics {trans?.dashboard}
