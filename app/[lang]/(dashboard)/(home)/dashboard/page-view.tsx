@@ -9,6 +9,11 @@ import ReportsArea from "./components/reports-area";
 import DashboardSelect from "@/components/dasboard-select";
 import TopPage from "./components/top-page";
 import DatePickerWithRange from "@/components/date-picker-with-range";
+import MenuCard from "./components/menu-card";
+import Image from "next/image";
+import Link from "next/link";
+import { homeMenuItems } from "@/config/menu";
+import { translate } from "@/lib/utils";
 
 interface DashboardPageViewProps {
   trans: {
@@ -18,6 +23,25 @@ interface DashboardPageViewProps {
 const DashboardPageView = ({ trans }: DashboardPageViewProps) => {
   return (
     <div className="space-y-6">
+      <div className="flex items-center flex-wrap justify-between gap-4">
+        <div className="text-2xl font-medium text-default-800 ">
+          Welcome, please choose one of the menu below to start!
+        </div>
+      </div>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-6 xl:grid-cols-3 2xl:gap-7.5">
+        { homeMenuItems[0]?.homeMenus.map( (item, key) => (
+          <Link href={item.url} key={key}>
+            <MenuCard title={translate(item.title, trans)}>
+              <Image
+                src={item.image}
+                alt="Logo"
+                width={64}
+                height={64}
+                />
+            </MenuCard>
+          </Link>
+        ))}
+      </div>
       <div className="flex items-center flex-wrap justify-between gap-4">
         <div className="text-2xl font-medium text-default-800 ">
           Analytics {trans?.dashboard}

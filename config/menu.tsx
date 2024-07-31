@@ -62,20 +62,163 @@ import {
     Buildings2,
     Buildings,
   } from "@/components/svg";
+import { ROLES } from "@/modules/users/domain/users.constants";
   
   
-  export interface MenuItemProps {
-    title: string;
-    icon: any;
-    href?: string;
-    child?: MenuItemProps[];
-    megaMenu?: MenuItemProps[];
-    multi_menu? : MenuItemProps[]
-    nested?: MenuItemProps[]
-    onClick: () => void;
-  
-    
-  }
+export interface MenuItemProps {
+  title: string;
+  icon: any;
+  href?: string;
+  child?: MenuItemProps[];
+  megaMenu?: MenuItemProps[];
+  multi_menu? : MenuItemProps[]
+  nested?: MenuItemProps[]
+  onClick: () => void; 
+}
+
+interface HomeMenu {
+  image: string,
+  title: string,
+  url: string,
+}
+
+export interface HomeMenuItem {
+  role: string,
+  homeMenus: HomeMenu[],
+}
+
+export const homeMenuItems: HomeMenuItem[] = [
+    {
+        role: ROLES.administrator,
+        homeMenus: [
+            {
+                image: '/icons/menu/order.png',
+                title: 'home_menu.print_sales',
+                url: '/dashboard/orders',
+            },
+            {
+                image: '/icons/menu/queue-manager.png',
+                title: 'home_menu.manage_queue',
+                url: '/operational/front-desk/queue-manager',
+            },
+            {
+                image: '/icons/menu/queue-display.png',
+                title: 'home_menu.display_queue',
+                url: '/operational/front-desk/queue-display',
+            },
+            {
+                image: '/icons/menu/patient-registration.png',
+                title: 'home_menu.patient_registration',
+                url: '/operational/front-desk/patient-registration',
+            },
+            {
+                image: '/icons/menu/examine.png',
+                title: 'home_menu.examine_patient',
+                url: '/operational/doctor/patients-list',
+            },
+            {
+                image: '/icons/menu/profile.png',
+                title: 'home_menu.edit_profile',
+                url: '/profile',
+            },
+            {
+                image: '/icons/menu/cashier.png',
+                title: 'home_menu.manage_cashier',
+                url: '/cashier',
+            },
+            {
+                image: '/icons/menu/treatment.png',
+                title: 'home_menu.add_treatment',
+                url: '/dashboard/treatments/create',
+            },
+            {
+                image: '/icons/menu/medicine.png',
+                title: 'home_menu.add_medicine',
+                url: '/dashboard/medicines/create',
+            },
+            {
+                image: '/icons/menu/open.png',
+                title: 'home_menu.open_close_clinic',
+                url: '/operational/front-desk',
+            },
+            {
+                image: '/icons/menu/analysis.png',
+                title: 'home_menu.clinic_analysis',
+                url: '/dashboard/analysis',
+            }
+        ]
+    },
+    {
+        role: ROLES.front_desk,
+        homeMenus: [
+            {
+                image: '/icons/menu/queue-manager.png',
+                title: 'home_menu.manage_queue',
+                url: '/operational/front-desk/queue-manager',
+            },
+            {
+                image: '/icons/menu/queue-display.png',
+                title: 'home_menu.display_queue',
+                url: '/operational/front-desk/queue-display',
+            },
+            {
+                image: '/icons/menu/patient-registration.png',
+                title: 'home_menu.patient_registration',
+                url: '/operational/front-desk/patient-registration',
+            },
+            {
+                image: '/icons/menu/profile.png',
+                title: 'home_menu.edit_profile',
+                url: '/profile',
+            },
+            {
+                image: '/icons/menu/open.png',
+                title: 'home_menu.open_close_clinic',
+                url: '/operational/front-desk',
+            }
+        ]
+    },
+    {
+        role: ROLES.doctor,
+        homeMenus: [
+            {
+                image: '/icons/menu/examine.png',
+                title: 'home_menu.examine_patient',
+                url: '/operational/doctor/patients-list',
+            },
+            {
+                image: '/icons/menu/profile.png',
+                title: 'home_menu.edit_profile',
+                url: '/profile',
+            }
+        ]
+    },
+    {
+        role: ROLES.cashier,
+        homeMenus: [
+            {
+                image: '/icons/menu/order.png',
+                title: 'home_menu.print_sales',
+                url: '/dashboard/orders',
+            },
+            {
+                image: '/icons/menu/profile.png',
+                title: 'home_menu.edit_profile',
+                url: '/profile',
+            },
+            {
+                image: '/icons/menu/cashier.png',
+                title: 'home_menu.manage_cashier',
+                url: '/cashier',
+            },
+            {
+                image: '/icons/menu/analysis.png',
+                title: 'home_menu.clinic_analysis',
+                url: '/dashboard/analysis',
+            }
+        ]
+    }
+]
   
 export const menusConfig = {
   mainNav: [

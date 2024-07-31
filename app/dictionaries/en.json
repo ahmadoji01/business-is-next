@@ -224,5 +224,6 @@
   "balance sheet": "balance sheet",
   "cashflow statement": "cashflow statement",
   "purchase asset": "purchase asset",
-  "sell asset": "sell asset"
+  "sell asset": "sell asset",
+  "print_sales": "Print Sales History"
 }

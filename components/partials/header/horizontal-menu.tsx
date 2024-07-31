@@ -29,7 +29,7 @@ export default function MainMenu({ trans }: { trans: any }) {
     <div>
       <NavigationMenu.Root
         onValueChange={setValue}
-        className=" flex relative  justify-start group "
+        className="flex relative justify-start group "
       >
         <NavigationMenu.List
           ref={setList}
