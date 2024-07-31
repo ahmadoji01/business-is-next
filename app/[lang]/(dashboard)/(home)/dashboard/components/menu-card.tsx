@@ -16,7 +16,7 @@ const MenuCard = ({ children=(<></>), title="" }) => {
 
                 <div className="flex-col my-auto w-3/4 items-center justify-center">
                     <div>
-                        <h4 className="font-bold text-black dark:text-white">
+                        <h4 className="font-bold text-black dark:text-white capitalize">
                             {title}
                         </h4>
                     </div>
