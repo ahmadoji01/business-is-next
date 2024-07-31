@@ -122,8 +122,13 @@ export const homeMenuItems: HomeMenuItem[] = [
           },
           {
             image: '/icons/menu/buy-assets.png',
-            title: 'buy/sell assets',
-            url: '/assets/transaction',
+            title: 'purchase asset',
+            url: '/assets/buy',
+          },
+          {
+            image: '/icons/menu/sell-assets.png',
+            title: 'sell asset',
+            url: '/assets/sell',
           },
           {
             image: '/icons/menu/assets.png',
