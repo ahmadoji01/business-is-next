@@ -7,7 +7,7 @@ import { directusClient, websocketClient } from '@/utils/request-handler';
 import { WebSocketClient } from '@directus/sdk';
 import { useRouter, usePathname } from 'next/navigation';
 import { Dispatch, SetStateAction, createContext, useContext, useEffect, useState } from 'react';
- 
+
 interface UserContextType {
     accessToken: string,
     user: User,
@@ -15,6 +15,7 @@ interface UserContextType {
     organization: Organization,
     fontSize: string,
     wsClient: WebSocketClient<any>,
+    isLoggedIn: boolean,
     setUser: Dispatch<SetStateAction<User>>,
     setOrganization: Dispatch<SetStateAction<Organization>>,
     setFontSize: Dispatch<SetStateAction<string>>,
@@ -22,6 +23,8 @@ interface UserContextType {
     setWSClient: Dispatch<SetStateAction<WebSocketClient<any>>>,
     setLoading: Dispatch<SetStateAction<boolean>>,
     fetchOrganization: () => void,
+    setIsLoggedIn: Dispatch<SetStateAction<boolean>>,
+    signOut: () => void,
 }
 
 let EXPIRY_MS = 1000;
@@ -33,6 +36,7 @@ export const UserContext = createContext<UserContextType | null>({
     organization: defaultOrganization,
     fontSize: "100%",
     wsClient: websocketClient(""),
+    isLoggedIn: false,
     setUser: () => {},
     setOrganization: () => {},
     setFontSize: () => {},
@@ -40,6 +44,8 @@ export const UserContext = createContext<UserContextType | null>({
     setWSClient: () => {},
     setLoading: () => {},
     fetchOrganization: () => {},
+    setIsLoggedIn: () => {},
+    signOut: () => {},
 });
  
 export const UserProvider = ({
@@ -73,15 +79,26 @@ export const UserProvider = ({
       document.body.style.fontSize = size;
     }, [size]);
 
+    const signOut = () => {
+        directusClient.logout().then( () => {
+            setAccessToken('');
+            window.location.assign('/auth/login');
+        });
+    }
+
     const connectWS = (token:string) => {
         let client = websocketClient(token);
         setWSClient(client);
         client.connect();
     }
 
+    const redirectIfError = () => {
+        window.location.assign('/auth/login');
+    }
+
     const refreshToken = async (interval:NodeJS.Timeout, isLooping:boolean) => {
         let isError = false;
-
+        
         if (accessToken === "")
             isError = true;
 
@@ -109,7 +126,7 @@ export const UserProvider = ({
                 return;
             });
         }
-
+        
         if (!isError) {
             connectWS(accessToken);
             return;
@@ -117,7 +134,7 @@ export const UserProvider = ({
 
         await directusClient.refresh().then( (res) => {
             if (res.access_token === null) {
-                router.push('/');
+                window.location.assign("/auth/login");
                 return;
             }
             let token = res.access_token? res.access_token : '';
@@ -130,7 +147,7 @@ export const UserProvider = ({
                 setUser(usr);
             }).catch( () => {
                 if (pathname !== '/') {
-                    router.push('/');
+                    window.location.assign("/auth/login");
                 }
                 return;
             });
@@ -150,8 +167,8 @@ export const UserProvider = ({
                 clearInterval(interval);
             return;
         }).catch( err => {
-            if (pathname !== '/' && ( err?.response?.status === 400 || err?.response?.status === 401 || err?.response?.status === 403)) {
-                window.location.href = '/';
+            if (pathname !== '/auth/login' && ( err?.response?.status === 400 || err?.response?.status === 401 || err?.response?.status === 403)) {
+                window.location.href = '/auth/login';
             }
             setLoading(false);
             clearInterval(interval);
@@ -209,7 +226,7 @@ export const UserProvider = ({
     }, [user.role_name])
 
     return (
-        <UserContext.Provider value={{ wsClient, setWSClient, accessToken, setAccessToken, user, setUser, organization, setOrganization, loading, setLoading, fontSize, setFontSize, fetchOrganization }}>
+        <UserContext.Provider value={{ wsClient, setWSClient, signOut, accessToken, setAccessToken, user, setUser, organization, setOrganization, loading, setLoading, fontSize, setFontSize, fetchOrganization }}>
             {children}
         </UserContext.Provider>
     );

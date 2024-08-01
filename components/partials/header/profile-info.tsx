@@ -1,5 +1,4 @@
 "use client";
-import { useSession, signOut } from "next-auth/react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,16 +15,30 @@ import {
 import { Icon } from "@iconify/react";
 import Image from "next/image";
 import Link from "next/link";
+import { useUserContext } from "@/provider/user.provider";
+import { directusClient, imageHandler } from "@/utils/request-handler";
+import toast from "react-hot-toast";
 
 const ProfileInfo = () => {
-  const { data: session } = useSession();
+
+  const { user } = useUserContext();
+
+  const signOut = async () => {
+    try {
+      await directusClient.logout();
+      window.location.assign('/auth/login');
+    } catch(e) {
+      toast.error("Oops, something went wrong");
+    }
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild className=" cursor-pointer">
         <div className=" flex items-center  ">
           <Image
-            src={session?.user?.image ? session.user.image : "/images/avatar-256.jpg"}
-            alt={session?.user?.name ?? ""}
+            src={user?.avatar ? imageHandler(user.avatar.id, user.avatar.filename_download) : "/images/avatar-256.jpg"}
+            alt={user?.first_name ?? ""}
             width={36}
             height={36}
             className="rounded-full"
@@ -35,15 +48,15 @@ const ProfileInfo = () => {
       <DropdownMenuContent className="w-56 p-0" align="end">
         <DropdownMenuLabel className="flex gap-2 items-center mb-1 p-3">
             <Image
-              src={session?.user?.image ? session.user.image : "/images/avatar-256.jpg"}
-              alt={session?.user?.name ?? ""}
+              src={user?.avatar ? imageHandler(user.avatar.id, user.avatar.filename_download) : "/images/avatar-256.jpg"}
+              alt={user?.first_name ?? ""}
               width={36}
               height={36}
               className="rounded-full"
             />
           <div>
             <div className="text-sm font-medium text-default-800 capitalize ">
-              {session?.user?.name ?? "Mcc Callem"}
+              {user?.first_name? user.first_name + " " + user.last_name : "Guest"}
             </div>
             <Link
               href="/dashboard"
