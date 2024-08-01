@@ -1,5 +1,5 @@
 import { ITEM_TYPE } from "@/modules/items/domain/item.constants";
-import { OrderItem } from "./order-item";
+import { SalesItem } from "./sales-item";
 import moment from "moment";
 
 export function visitFilter(id:string):object {
@@ -30,7 +30,7 @@ export function dateRangeFilter(from:Date, to:Date) {
     return { "date_created": { _between: [moment(from).format("YYYY-MM-DD"), moment(to).format("YYYY-MM-DD")]  } }
 }
 
-export function orderItemDisplayName(orderItem:OrderItem):string {
+export function orderItemDisplayName(orderItem:SalesItem):string {
     if (orderItem.type !== ITEM_TYPE.treatment) {
         return orderItem.item.name + " (" + orderItem.quantity + ")";
     }

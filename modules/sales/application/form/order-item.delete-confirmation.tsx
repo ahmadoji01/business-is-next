@@ -1,10 +1,10 @@
-import { OrderItem } from "../../domain/order-item";
+import { SalesItem } from "../../domain/sales-item";
 import { useTranslations } from "next-intl";
 
 interface OrderItemDeleteConfirmationProps {
     handleClose: () => void,
     handleDelete: () => void,
-    orderItem: OrderItem,
+    orderItem: SalesItem,
 }
 
 const OrderItemDeleteConfirmation = ({ handleClose, handleDelete, orderItem }: OrderItemDeleteConfirmationProps) => {

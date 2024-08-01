@@ -1,12 +1,12 @@
 'use client';
 
-import { Order } from "../domain/order";
+import { Sales } from "../domain/sales";
 import { orderItemDisplayName } from "../domain/order.specifications";
 import Currency from "@/components/Currency";
 import { useTranslations } from "next-intl";
 
 interface OrderViewProps {
-    order: Order,
+    order: Sales,
 }
 
 const OrderView = ({ order }:OrderViewProps) => {

@@ -1,10 +1,10 @@
 import { aggregate, createItem, deleteItem, readItem, readItems, updateItem, withToken } from "@directus/sdk";
 import { directusClient } from "@/utils/request-handler";
-import { OrderCreator } from "./order";
+import { SalesCreator } from "./sales";
 import { LIMIT_PER_PAGE } from "@/constants/request";
 
 export const getAllOrders = (token:string, page:number) => directusClient.request( withToken(token, readItems('orders', { fields: ['*.*.*'], limit: LIMIT_PER_PAGE, page })) );
-export const createAnOrder = (token:string, order:OrderCreator) => 
+export const createAnOrder = (token:string, order:SalesCreator) => 
 	directusClient.request( withToken(token, createItem('orders', order)) );
 
 export const getAllOrdersWithFilter = (token:string, filter:object, fields?:string[]) => 

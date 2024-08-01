@@ -2,7 +2,7 @@ import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faTrash } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
-import { OrderItem } from "../../domain/order-item";
+import { SalesItem } from "../../domain/sales-item";
 import Currency from "@/components/Currency";
 import { FocusEvent, useEffect, useRef, useState } from "react";
 import { ORDER_ITEM_TYPE } from "../../domain/order.constants";
@@ -10,15 +10,15 @@ import { ITEM_TYPE } from "@/modules/items/domain/item.constants";
 import { useTranslations } from "next-intl";
 
 interface OrderItemListProps {
-  orderItems: OrderItem[]|undefined,
+  orderItems: SalesItem[]|undefined,
   handleQtyChange: (action:string, itemIndex:number, qty:number) => void,
-  handleDelete: (item:OrderItem, index:number) => void,
+  handleDelete: (item:SalesItem, index:number) => void,
   examFee?: number
 }
 
 const OrderItemList = ({ orderItems, handleDelete, handleQtyChange, examFee = 0 }:OrderItemListProps) => {
 
-  const [items, setItems] = useState<OrderItem[]|undefined>(orderItems);
+  const [items, setItems] = useState<SalesItem[]|undefined>(orderItems);
   const [fee, setFee] = useState<number>(0);
   const qtyRef = useRef<HTMLInputElement>(null)
   const [quantity, setQuantity] = useState(0);

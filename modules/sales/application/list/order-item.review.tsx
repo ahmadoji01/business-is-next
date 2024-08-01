@@ -1,10 +1,10 @@
-import { OrderItem } from "../../domain/order-item";
+import { SalesItem } from "../../domain/sales-item";
 import Currency from "@/components/Currency";
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
 interface OrderItemReviewProps {
-  orderItems: OrderItem[]|undefined,
+  orderItems: SalesItem[]|undefined,
   total: number,
   examFee?: number,
 }

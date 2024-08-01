@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPrint, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { Order } from "../../domain/order";
+import { Sales } from "../../domain/sales";
 import Currency from "@/components/Currency";
 import moment from 'moment/min/moment-with-locales';
 import { Pagination } from "@mui/material";
@@ -12,11 +12,11 @@ import { useTranslations } from "next-intl";
 
 interface OrderListTableProps {
   handleModal: (closeModal:boolean, whichModal:boolean) => void,
-  orders: Order[],
+  orders: Sales[],
   totalPages: number,
   handlePageChange: (event: React.ChangeEvent<unknown>, value: number) => void,
-  setActiveOrder: Dispatch<SetStateAction<Order|undefined>>,
-  handleDocument?: (order:Order) => void,
+  setActiveOrder: Dispatch<SetStateAction<Sales|undefined>>,
+  handleDocument?: (order:Sales) => void,
 }
 
 const OrderListTable = ({ orders, setActiveOrder, totalPages, handleModal, handlePageChange, handleDocument }: OrderListTableProps) => {
