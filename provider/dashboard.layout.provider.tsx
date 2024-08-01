@@ -16,14 +16,14 @@ import LayoutLoader from "@/components/layout-loader";
 import { UserProvider } from "./user.provider";
 
 const DashBoardLayoutProvider = ({ children, trans }: { children: React.ReactNode, trans: any }) => {
-  const { collapsed, sidebarType, setCollapsed, subMenu } = useSidebar();
+  const { collapsed } = useSidebar();
   const [open, setOpen] = React.useState(false);
   const location = usePathname();
   const isMobile = useMediaQuery("(min-width: 768px)");
   const mounted = useMounted();
 
   if (!mounted) {
-    return <LayoutLoader />;
+    return <UserProvider><LayoutLoader /></UserProvider>;
   }
   return (
     <UserProvider>
