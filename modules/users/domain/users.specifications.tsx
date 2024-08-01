@@ -3,9 +3,9 @@ import { ROLES } from "./users.constants";
 export const allowedURL = (role:string) => {
     switch (role) {
         case ROLES.administrator:
-            return ['/dashboard', '/operational/front-desk', '/operational/doctor', '/cashier', '/profile', '/documents', '/info'];
+            return ['/dashboard', '/sales', '/operational/front-desk', '/operational/doctor', '/cashier', '/profile', '/documents', '/info'];
         case ROLES.cashier:
-            return ['/dashboard', '/cashier', '/profile', '/documents', '/info'];
+            return ['/dashboard', '/sales', '/cashier', '/profile', '/documents', '/info'];
         case ROLES.doctor:
             return ['/dashboard', '/operational/doctor', '/profile', '/documents', '/info'];
         case ROLES.front_desk:
