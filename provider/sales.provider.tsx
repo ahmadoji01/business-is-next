@@ -1,14 +1,11 @@
-import { Customer, defaultCustomer } from '@/modules/customers/domain/customer';
-import { Organization, defaultOrganization, organizationMapper } from '@/modules/organizations/domain/organization';
-import { getOrganization } from '@/modules/organizations/domain/organizations.actions';
+'use client';
+
+import { Customer, customerMapper, defaultCustomer } from '@/modules/customers/domain/customer';
 import { Sales } from '@/modules/sales/domain/sales';
-import { User, defaultUser, userMapper } from '@/modules/users/domain/user';
-import { getUserMe } from '@/modules/users/domain/users.actions';
-import { isURLAllowed, redirectURL } from '@/modules/users/domain/users.specifications';
-import { directusClient, websocketClient } from '@/utils/request-handler';
-import { WebSocketClient } from '@directus/sdk';
-import { useRouter, usePathname } from 'next/navigation';
 import { Dispatch, SetStateAction, createContext, useContext, useEffect, useState } from 'react';
+import { useUserContext } from './user.provider';
+import { getAllCustomers } from '@/modules/customers/domain/customers.actions';
+import toast from 'react-hot-toast';
 
 interface SalesContextType {
     customers: Customer[],
@@ -42,6 +39,23 @@ export const SalesProvider = ({
     const [selectedCustomers, setSelectedCustomers] = useState<Customer[]>([]);
     const [filter, setFilter] = useState<object>({});
     const [sales, setSales] = useState<Sales[]>([]);
+    const {accessToken} = useUserContext();
+
+    const fetchCustomers = async (page:number) => {
+        try {
+            let res = await getAllCustomers(accessToken, page);
+            let custs:Customer[] = [];
+            res.map( customer => { custs.push(customerMapper(customer)) });
+            console.log(custs);
+            setCustomers(custs);
+        } catch(e) {
+            toast.error("Oops! Something went wrong")
+        }
+    }
+
+    useEffect(() => {
+        fetchCustomers(1);
+    }, []);
 
     return (
         <SalesContext.Provider value={{ customers, setCustomers, selectedCustomers, setSelectedCustomers, filter, setFilter, sales, setSales }}>

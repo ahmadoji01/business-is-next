@@ -28,7 +28,7 @@ const ProfileInfo = () => {
       await directusClient.logout();
       window.location.assign('/auth/login');
     } catch(e) {
-      toast.error("Oops, something went wrong");
+      toast.error("Oops! Something went wrong");
     }
   }
 

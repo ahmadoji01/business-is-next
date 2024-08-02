@@ -3,7 +3,7 @@ import { directusClient } from "@/utils/request-handler";
 import { SalesCreator } from "./sales";
 import { LIMIT_PER_PAGE } from "@/constants/request";
 
-export const getAllOrders = (token:string, page:number) => directusClient.request( withToken(token, readItems('orders', { fields: ['*.*.*'], limit: LIMIT_PER_PAGE, page })) );
+export const getAllSales = (token:string, page:number) => directusClient.request( withToken(token, readItems('sales', { fields: ['*.*.*'], limit: LIMIT_PER_PAGE, page })) );
 export const createAnOrder = (token:string, order:SalesCreator) => 
 	directusClient.request( withToken(token, createItem('orders', order)) );
 
