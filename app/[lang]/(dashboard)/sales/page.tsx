@@ -1,7 +1,7 @@
 "use client";
 
 import Card from "@/components/ui/card-snippet";
-import CheckboxWithAction from "./checkbox-with-action";
+import CustomersToBillTable from "./customers-to-bill-table";
 import { Input } from "@/components/ui/input";
 import { translate } from "@/lib/utils";
 import { SalesProvider } from "@/provider/sales.provider";
@@ -21,7 +21,7 @@ const SalesPageView = () => {
               className="h-8 min-w-[200px] max-w-sm"
             />
           </div>
-          <CheckboxWithAction />
+          <CustomersToBillTable />
         </Card>
       </div>
     </SalesProvider>
