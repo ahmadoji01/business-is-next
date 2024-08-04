@@ -19,6 +19,7 @@ import { imageHandler } from "@/utils/request-handler";
 import { translate } from "@/lib/utils";
 import { useLanguageContext } from "@/provider/language.provider";
 import BillDialog from "./components/bill-dialog";
+import { Pagination } from "@mui/material";
 
 const CustomersToBillTable = () => {
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
@@ -140,6 +141,14 @@ const CustomersToBillTable = () => {
           ))}
         </TableBody>
       </Table>
+      <div className="flex items-center flex-wrap gap-4 px-4 py-4">
+        <div className="flex-1 text-sm text-muted-foreground whitespace-nowrap">
+          ...row(s) selected.
+        </div>
+        <div className="flex gap-2 items-center">
+          <Pagination count={10} variant="outlined" shape="rounded" />
+        </div>
+      </div>
     </>
   );
 };
