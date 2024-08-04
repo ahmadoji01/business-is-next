@@ -7,6 +7,7 @@ import "simplebar-react/dist/simplebar.min.css";
 import TanstackProvider from "@/provider/providers.client";
 import "flatpickr/dist/themes/light.css";
 import { LanguageProvider } from "@/provider/language.provider";
+import { getDictionary } from "../dictionaries";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -18,11 +19,16 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children, params: { lang } }: { children: React.ReactNode; params: { lang: any } }) {
+  
+  const trans = await getDictionary(lang);
+  
   return (
     <html lang={lang}>
       <TanstackProvider>
         <Providers>
-          <div dir="ltr">{children}</div>
+          <LanguageProvider translate={trans}>
+            <div dir="ltr">{children}</div>
+          </LanguageProvider>
         </Providers>
       </TanstackProvider>
     </html>

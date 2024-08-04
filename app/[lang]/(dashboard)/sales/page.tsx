@@ -1,18 +1,30 @@
-import SalesPageView from "./page-view";
-import { getDictionary } from "@/app/dictionaries";
+"use client";
 
-interface SalesPageProps {
-  params: {
-    lang: any;
-  };
-}
+import Card from "@/components/ui/card-snippet";
+import CheckboxWithAction from "./checkbox-with-action";
+import { Input } from "@/components/ui/input";
+import { translate } from "@/lib/utils";
+import { SalesProvider } from "@/provider/sales.provider";
+import { useLanguageContext } from "@/provider/language.provider";
 
-const SalesPageProps = async ({ params: { lang } }:SalesPageProps) => {
+const SalesPageView = () => {
 
-  let trans = await getDictionary(lang);
+  const {trans} = useLanguageContext();
 
   return (
-    <SalesPageView trans={trans} />
+    <SalesProvider>
+      <div className="space-y-6">
+        <Card title={translate("customers to bill", trans)}>
+          <div className="flex flex-1 flex-wrap items-center gap-2">
+            <Input
+              placeholder="Filter tasks..."
+              className="h-8 min-w-[200px] max-w-sm"
+            />
+          </div>
+          <CheckboxWithAction />
+        </Card>
+      </div>
+    </SalesProvider>
   );
 };
 

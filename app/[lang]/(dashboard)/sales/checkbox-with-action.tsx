@@ -17,16 +17,12 @@ import { useSalesContext } from "@/provider/sales.provider";
 import { Customer } from "@/modules/customers/domain/customer";
 import { imageHandler } from "@/utils/request-handler";
 import { translate } from "@/lib/utils";
+import { useLanguageContext } from "@/provider/language.provider";
 
-interface CheckboxWithActionProps {
-  trans: {
-    [key: string]: string;
-  };
-}
-
-const CheckboxWithAction = ({ trans }:CheckboxWithActionProps) => {
+const CheckboxWithAction = () => {
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const {customers} = useSalesContext();
+  const {trans} = useLanguageContext();
 
   const handleSelectAll = () => {
     if (selectedRows?.length === customers?.length) {

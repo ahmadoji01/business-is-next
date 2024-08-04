@@ -1,6 +1,7 @@
 import { SalesProvider } from "@/provider/sales.provider";
 
-const Layout = ({ children }: { children: React.ReactNode }) => {
+const Layout = async ({ children }: { children: React.ReactNode }) => {
+  
   return (
     <SalesProvider>
       {children}

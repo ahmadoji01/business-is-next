@@ -1,5 +1,5 @@
-import { getDictionary } from '@/app/dictionaries';
-import { createContext, useContext } from 'react';
+'use client';
+import { createContext, useContext, useEffect, useState } from 'react';
 interface LanguageContextType {
     trans: {
         [key: string]: string;
@@ -10,14 +10,18 @@ export const LanguageContext = createContext<LanguageContextType | null>({
     trans: {},
 });
  
-export const LanguageProvider = async ({
-    children, lang
+export const LanguageProvider = ({
+    children, translate
 }: {
     children: React.ReactNode;
-    lang: "en" | "id";
+    translate: object;
 }) => {
 
-    let trans = await getDictionary(lang);
+    const [trans, setTrans] = useState({});
+   
+    useEffect(() => {
+        setTrans(translate);
+    }, [translate]);
 
     return (
         <LanguageContext.Provider value={{ trans }}>

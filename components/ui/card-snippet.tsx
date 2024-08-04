@@ -51,7 +51,7 @@ const CardSnippet = ({ title, code, children }: CardSnippetProps) => {
     <Card>
       <CardHeader className="flex flex-row items-center">
         {title && (
-          <CardTitle className="flex-1 leading-normal"> {title}</CardTitle>
+          <CardTitle className="flex-1 leading-normal capitalize"> {title}</CardTitle>
         )}
         {code && (
           <div className="flex-none">
