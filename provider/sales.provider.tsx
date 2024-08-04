@@ -46,7 +46,6 @@ export const SalesProvider = ({
             let res = await getAllCustomers(accessToken, page);
             let custs:Customer[] = [];
             res.map( customer => { custs.push(customerMapper(customer)) });
-            console.log(custs);
             setCustomers(custs);
         } catch(e) {
             toast.error("Oops! Something went wrong")
@@ -54,8 +53,16 @@ export const SalesProvider = ({
     }
 
     useEffect(() => {
+        if (accessToken === "")
+            return;
         fetchCustomers(1);
     }, []);
+
+    useEffect(() => {
+        if (accessToken === "")
+            return;
+        fetchCustomers(1);
+    }, [accessToken]);
 
     return (
         <SalesContext.Provider value={{ customers, setCustomers, selectedCustomers, setSelectedCustomers, filter, setFilter, sales, setSales }}>

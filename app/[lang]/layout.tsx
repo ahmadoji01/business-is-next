@@ -6,8 +6,7 @@ import Providers from "@/provider/providers";
 import "simplebar-react/dist/simplebar.min.css";
 import TanstackProvider from "@/provider/providers.client";
 import "flatpickr/dist/themes/light.css";
-import DirectionProvider from "@/provider/direction.provider";
-import { UserProvider } from "@/provider/user.provider";
+import { LanguageProvider } from "@/provider/language.provider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
@@ -18,12 +17,12 @@ export const metadata = {
   description: siteConfig.description,
 };
 
-export default function RootLayout({ children, params: { lang } }: { children: React.ReactNode; params: { lang: string } }) {
+export default async function RootLayout({ children, params: { lang } }: { children: React.ReactNode; params: { lang: any } }) {
   return (
     <html lang={lang}>
       <TanstackProvider>
         <Providers>
-          <DirectionProvider lang={lang}>{children}</DirectionProvider>
+          <div dir="ltr">{children}</div>
         </Providers>
       </TanstackProvider>
     </html>

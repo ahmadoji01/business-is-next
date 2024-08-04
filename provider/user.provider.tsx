@@ -92,10 +92,6 @@ export const UserProvider = ({
         client.connect();
     }
 
-    const redirectIfError = () => {
-        window.location.assign('/auth/login');
-    }
-
     const refreshToken = async (interval:NodeJS.Timeout, isLooping:boolean) => {
         let isError = false;
         
