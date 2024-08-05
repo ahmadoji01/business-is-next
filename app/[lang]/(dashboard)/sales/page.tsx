@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { translate } from "@/lib/utils";
 import { SalesProvider } from "@/provider/sales.provider";
 import { useLanguageContext } from "@/provider/language.provider";
+import ScrollButton from "@/components/scroll-button";
 
 const SalesPageView = () => {
 
@@ -24,6 +25,7 @@ const SalesPageView = () => {
           <CustomersToBillTable />
         </Card>
       </div>
+      <ScrollButton />
     </SalesProvider>
   );
 };
