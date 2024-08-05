@@ -18,17 +18,20 @@ import Link from "next/link";
 import { useUserContext } from "@/provider/user.provider";
 import { directusClient, imageHandler } from "@/utils/request-handler";
 import toast from "react-hot-toast";
+import { useLanguageContext } from "@/provider/language.provider";
+import { translate } from "@/lib/utils";
 
 const ProfileInfo = () => {
 
   const { user } = useUserContext();
+  const { trans } = useLanguageContext();
 
   const signOut = async () => {
     try {
       await directusClient.logout();
       window.location.assign('/auth/login');
     } catch(e) {
-      toast.error("Oops! Something went wrong");
+      toast.error(translate("server_error", trans));
     }
   }
 

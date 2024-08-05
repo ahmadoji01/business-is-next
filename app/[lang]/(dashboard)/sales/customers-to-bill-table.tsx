@@ -49,7 +49,7 @@ const CustomersToBillTable = () => {
       res.map( customer => { custs.push(customerMapper(customer)) });
       setCustomers(custs);
     } catch(e) {
-      toast.error("Oops! Something went wrong");
+      toast.error(translate("something_wrong", trans));
     }
   }
 
@@ -59,7 +59,7 @@ const CustomersToBillTable = () => {
       let pages = pagesCount(res[0].count, LIMIT_PER_PAGE);
       setTotalPages(pages);
     } catch(e) {
-      toast.error("Oops! Something went wrong");
+      toast.error(translate("something_wrong", trans));
     }
   }
 
