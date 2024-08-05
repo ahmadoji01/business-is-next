@@ -13,8 +13,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { useSalesContext } from "@/provider/sales.provider";
-import { Customer, customerMapper, mapCustomers } from "@/modules/customers/domain/customer";
+import { Customer, mapCustomers } from "@/modules/customers/domain/customer";
 import { imageHandler, pagesCount } from "@/utils/request-handler";
 import { translate } from "@/lib/utils";
 import { useLanguageContext } from "@/provider/language.provider";
@@ -25,6 +24,9 @@ import { getTotalSearchCustomersWithFilter, searchCustomersWithFilter } from "@/
 import toast from "react-hot-toast";
 import { LIMIT_PER_PAGE } from "@/constants/request";
 import { Input } from "@/components/ui/input";
+import { DataFilter } from "./components/filter";
+import { statuses } from "../(tables)/data-table/advanced/data/data";
+import { customerStatuses } from "@/modules/customers/domain/customer.constants";
 
 let activeTimeout:any = null;
 
@@ -98,7 +100,7 @@ const CustomersToBillTable = () => {
     }, 1000);
   }
 
-  const handleSearch = async (query:string) => {    
+  const handleSearch = (query:string) => {    
     if (query.length > 1 && query.length <= 3)
       return;
 
@@ -109,6 +111,21 @@ const CustomersToBillTable = () => {
 
   const billCustomers = async () => {
 
+  }
+
+  const handleStatusChange = (values:string[]) => {
+    let result = {};
+    if (values.length > 0) {
+      let statusesFilter:object[] = [];
+      values?.map( value => {
+        statusesFilter.push({ "status": { _eq: value } });     
+      })
+      result = { _or: statusesFilter };
+    }
+    setFilter(result);
+    fetchCustomers(searchQuery, result, 1);
+    fetchTotal(searchQuery, result);
+    return;
   }
 
   return (
@@ -123,6 +140,12 @@ const CustomersToBillTable = () => {
           onChange={ e => handleChange(e.target.value) }
           placeholder={translate("search for customers...", trans)}
           className="h-8 min-w-[200px] max-w-sm"
+          />
+        
+        <DataFilter
+          title="Status"
+          options={customerStatuses}
+          handleStatusChange={handleStatusChange}
           />
       </div>
       <Table>
@@ -179,7 +202,7 @@ const CustomersToBillTable = () => {
                   onCheckedChange={() => handleRowSelect(customer.id)}
                 />
               </TableCell>
-              <TableCell className="  font-medium  text-card-foreground/80">
+              <TableCell className="font-medium  text-card-foreground/80">
                 <div className="flex gap-3 items-center">
                   <Avatar className=" rounded-full">
                     <AvatarImage src={customer.photo? imageHandler(customer.photo.id, customer.photo.filename_download) : "/images/avatar-256.jpg"} />
