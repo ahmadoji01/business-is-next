@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -14,18 +14,58 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useSalesContext } from "@/provider/sales.provider";
-import { Customer } from "@/modules/customers/domain/customer";
-import { imageHandler } from "@/utils/request-handler";
+import { Customer, customerMapper } from "@/modules/customers/domain/customer";
+import { imageHandler, pagesCount } from "@/utils/request-handler";
 import { translate } from "@/lib/utils";
 import { useLanguageContext } from "@/provider/language.provider";
 import BillDialog from "./components/bill-dialog";
 import { Pagination } from "@mui/material";
+import { useUserContext } from "@/provider/user.provider";
+import { getAllCustomers, getCustomersWithFilter, getTotalCustomersWithFilter, getTotalSearchCustomersWithFilter, searchCustomersWithFilter } from "@/modules/customers/domain/customers.actions";
+import toast from "react-hot-toast";
+import { LIMIT_PER_PAGE } from "@/constants/request";
 
 const CustomersToBillTable = () => {
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
-  const {customers} = useSalesContext();
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [totalPages, setTotalPages] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
   const {trans} = useLanguageContext();
+  const {accessToken} = useUserContext();
+  
+  useEffect(() => {
+      if (accessToken === "")
+        return;
+
+      fetchCustomers(1);
+      fetchTotal();
+  }, [accessToken]);
+
+  const fetchCustomers = async (page:number) => {
+    try {
+      let res = await searchCustomersWithFilter(accessToken, searchQuery, {}, page);
+      let custs:Customer[] = [];
+      res.map( customer => { custs.push(customerMapper(customer)) });
+      setCustomers(custs);
+    } catch(e) {
+      toast.error("Oops! Something went wrong");
+    }
+  }
+
+  const fetchTotal = async () => {
+    try {
+      let res = await getTotalSearchCustomersWithFilter(accessToken, searchQuery, {});
+      let pages = pagesCount(res[0].count, LIMIT_PER_PAGE);
+      setTotalPages(pages);
+    } catch(e) {
+      toast.error("Oops! Something went wrong");
+    }
+  }
+
+  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    fetchCustomers(value);
+  }
 
   const handleSelectAll = () => {
     if (selectedRows?.length === customers?.length) {
@@ -146,7 +186,7 @@ const CustomersToBillTable = () => {
           ...row(s) selected.
         </div>
         <div className="flex gap-2 items-center">
-          <Pagination count={10} variant="outlined" shape="rounded" />
+          <Pagination count={totalPages} onChange={handlePageChange} variant="outlined" color="primary" shape="rounded" />
         </div>
       </div>
     </>

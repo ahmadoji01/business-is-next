@@ -39,30 +39,6 @@ export const SalesProvider = ({
     const [selectedCustomers, setSelectedCustomers] = useState<Customer[]>([]);
     const [filter, setFilter] = useState<object>({});
     const [sales, setSales] = useState<Sales[]>([]);
-    const {accessToken} = useUserContext();
-
-    const fetchCustomers = async (page:number) => {
-        try {
-            let res = await getAllCustomers(accessToken, page);
-            let custs:Customer[] = [];
-            res.map( customer => { custs.push(customerMapper(customer)) });
-            setCustomers(custs);
-        } catch(e) {
-            toast.error("Oops! Something went wrong")
-        }
-    }
-
-    useEffect(() => {
-        if (accessToken === "")
-            return;
-        fetchCustomers(1);
-    }, []);
-
-    useEffect(() => {
-        if (accessToken === "")
-            return;
-        fetchCustomers(1);
-    }, [accessToken]);
 
     return (
         <SalesContext.Provider value={{ customers, setCustomers, selectedCustomers, setSelectedCustomers, filter, setFilter, sales, setSales }}>
