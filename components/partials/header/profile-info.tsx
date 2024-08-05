@@ -31,7 +31,7 @@ const ProfileInfo = () => {
       await directusClient.logout();
       window.location.assign('/auth/login');
     } catch(e) {
-      toast.error(translate("server_error", trans));
+      toast.error(translate("something_wrong", trans));
     }
   }
 

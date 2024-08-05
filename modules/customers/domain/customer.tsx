@@ -41,3 +41,9 @@ export function customerMapper(res:Record<string,any>) {
     }
     return customer;
 }
+
+export function mapCustomers(res:Record<string,any>) {
+    let custs:Customer[] = [];
+    res?.map( (customer:any) => { custs.push(customerMapper(customer)) });
+    return custs;
+}

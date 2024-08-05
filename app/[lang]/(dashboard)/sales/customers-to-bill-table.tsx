@@ -14,16 +14,19 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useSalesContext } from "@/provider/sales.provider";
-import { Customer, customerMapper } from "@/modules/customers/domain/customer";
+import { Customer, customerMapper, mapCustomers } from "@/modules/customers/domain/customer";
 import { imageHandler, pagesCount } from "@/utils/request-handler";
 import { translate } from "@/lib/utils";
 import { useLanguageContext } from "@/provider/language.provider";
 import BillDialog from "./components/bill-dialog";
 import { Pagination } from "@mui/material";
 import { useUserContext } from "@/provider/user.provider";
-import { getAllCustomers, getCustomersWithFilter, getTotalCustomersWithFilter, getTotalSearchCustomersWithFilter, searchCustomersWithFilter } from "@/modules/customers/domain/customers.actions";
+import { getTotalSearchCustomersWithFilter, searchCustomersWithFilter } from "@/modules/customers/domain/customers.actions";
 import toast from "react-hot-toast";
 import { LIMIT_PER_PAGE } from "@/constants/request";
+import { Input } from "@/components/ui/input";
+
+let activeTimeout:any = null;
 
 const CustomersToBillTable = () => {
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
@@ -31,6 +34,7 @@ const CustomersToBillTable = () => {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
+  const [filter, setFilter] = useState({});
   const {trans} = useLanguageContext();
   const {accessToken} = useUserContext();
   
@@ -38,24 +42,23 @@ const CustomersToBillTable = () => {
       if (accessToken === "")
         return;
 
-      fetchCustomers(1);
-      fetchTotal();
+      fetchCustomers("", {}, 1);
+      fetchTotal("", {});
   }, [accessToken]);
 
-  const fetchCustomers = async (page:number) => {
+  const fetchCustomers = async (query:string, filter:object, page:number) => {
     try {
-      let res = await searchCustomersWithFilter(accessToken, searchQuery, {}, page);
-      let custs:Customer[] = [];
-      res.map( customer => { custs.push(customerMapper(customer)) });
+      let res = await searchCustomersWithFilter(accessToken, query, filter, page);
+      let custs = mapCustomers(res);
       setCustomers(custs);
     } catch(e) {
       toast.error(translate("something_wrong", trans));
     }
   }
 
-  const fetchTotal = async () => {
+  const fetchTotal = async (query:string, filter:object) => {
     try {
-      let res = await getTotalSearchCustomersWithFilter(accessToken, searchQuery, {});
+      let res = await getTotalSearchCustomersWithFilter(accessToken, query, filter);
       let pages = pagesCount(res[0].count, LIMIT_PER_PAGE);
       setTotalPages(pages);
     } catch(e) {
@@ -64,7 +67,7 @@ const CustomersToBillTable = () => {
   }
 
   const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
-    fetchCustomers(value);
+    fetchCustomers(searchQuery, filter, value);
   }
 
   const handleSelectAll = () => {
@@ -85,6 +88,25 @@ const CustomersToBillTable = () => {
     setSelectedRows(updatedSelectedRows);
   };
 
+  const handleChange = (query:string) => {
+    if (activeTimeout) {
+      clearTimeout(activeTimeout);
+    }
+    
+    activeTimeout = setTimeout(() => {
+      handleSearch(query);
+    }, 1000);
+  }
+
+  const handleSearch = async (query:string) => {    
+    if (query.length > 1 && query.length <= 3)
+      return;
+
+    setSearchQuery(query);
+    fetchCustomers(query, filter, 1);
+    fetchTotal(query, filter);
+  }
+
   const billCustomers = async () => {
 
   }
@@ -96,6 +118,13 @@ const CustomersToBillTable = () => {
         onClose={() => setModalOpen(false)} 
         onConfirm={billCustomers} 
         defaultToast={false} />
+      <div className="flex flex-1 flex-wrap items-center gap-2 capitalize">
+        <Input
+          onChange={ e => handleChange(e.target.value) }
+          placeholder={translate("search for customers...", trans)}
+          className="h-8 min-w-[200px] max-w-sm"
+          />
+      </div>
       <Table>
         <TableHeader>
           <TableRow>
