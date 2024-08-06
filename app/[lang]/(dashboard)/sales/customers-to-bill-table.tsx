@@ -27,6 +27,8 @@ import { Input } from "@/components/ui/input";
 import { DataFilter } from "./components/filter";
 import { statuses } from "../(tables)/data-table/advanced/data/data";
 import { customerStatuses } from "@/modules/customers/domain/customer.constants";
+import { X } from "lucide-react";
+import { isEmptyObject } from "@/utils/generic-functions";
 
 let activeTimeout:any = null;
 
@@ -37,6 +39,7 @@ const CustomersToBillTable = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState({});
+  const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
   const {trans} = useLanguageContext();
   const {accessToken} = useUserContext();
   
@@ -114,6 +117,7 @@ const CustomersToBillTable = () => {
   }
 
   const handleStatusChange = (values:string[]) => {
+    setSelectedStatus(values);
     let result = {};
     if (values.length > 0) {
       let statusesFilter:object[] = [];
@@ -143,10 +147,21 @@ const CustomersToBillTable = () => {
           />
         
         <DataFilter
+          selected={selectedStatus}
           title="Status"
           options={customerStatuses}
           handleStatusChange={handleStatusChange}
           />
+        {!isEmptyObject(filter) && (
+          <Button
+            variant="outline"
+            onClick={() => handleStatusChange([])}
+            className="h-8 px-2 lg:px-3"
+            >
+            Reset
+            <X className="ltr:ml-2 rtl:mr-2 h-4 w-4" />
+          </Button>
+        )}
       </div>
       <Table>
         <TableHeader>

@@ -27,13 +27,13 @@ interface Option {
   icon?: React.ComponentType<{ className?: string }>;
 }
 interface DataTableProps {
+  selected: string[];
   title: string;
   options: Option[];
   handleStatusChange: (values:string[]) => void;
 }
-export function DataFilter({ title, options, handleStatusChange }: DataTableProps) {
-  const [selected, setSelected] = React.useState<string[]>([]);
-
+export function DataFilter({ selected, title, options, handleStatusChange }: DataTableProps) {
+  
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -91,10 +91,8 @@ export function DataFilter({ title, options, handleStatusChange }: DataTableProp
                       if (isSelected) {
                         let i = selected.findIndex( item => item === option.value);
                         newSelected.splice(i,1);
-                        setSelected(newSelected);
                       } else {
                         newSelected.push(option.value);
-                        setSelected(newSelected);
                       }
                       handleStatusChange(newSelected);
                     }}
@@ -123,7 +121,7 @@ export function DataFilter({ title, options, handleStatusChange }: DataTableProp
                 <CommandSeparator />
                 <CommandGroup>
                   <CommandItem
-                    onSelect={() => { setSelected([]); handleStatusChange([]); }}
+                    onSelect={() => { handleStatusChange([]); }}
                     className="justify-center text-center"
                   >
                     Clear filters
