@@ -267,5 +267,6 @@
     "on_leave": "keluar sementara",
     "customers to bill": "pelanggan yang akan tertagih",
     "something_wrong": "Mohon maaf terdapat kesalahan. Coba lagi",
-    "search for customers...": "cari pelanggan..."
+    "search for customers...": "cari pelanggan...",
+    "do you want to bill these customers?": "tagih pelanggan berikut?"
 }

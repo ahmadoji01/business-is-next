@@ -14,21 +14,21 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Customer, mapCustomers } from "@/modules/customers/domain/customer";
-import { imageHandler, pagesCount } from "@/utils/request-handler";
+import { imageHandler, pagesCount, totalCount } from "@/utils/request-handler";
 import { translate } from "@/lib/utils";
 import { useLanguageContext } from "@/provider/language.provider";
-import BillDialog from "./components/bill-dialog";
+import BillDialog from "./bill-dialog";
 import { Pagination } from "@mui/material";
 import { useUserContext } from "@/provider/user.provider";
 import { getTotalSearchCustomersWithFilter, searchCustomersWithFilter } from "@/modules/customers/domain/customers.actions";
 import toast from "react-hot-toast";
 import { LIMIT_PER_PAGE } from "@/constants/request";
 import { Input } from "@/components/ui/input";
-import { DataFilter } from "./components/filter";
-import { statuses } from "../(tables)/data-table/advanced/data/data";
+import { DataFilter } from "./filter";
 import { customerStatuses } from "@/modules/customers/domain/customer.constants";
-import { X } from "lucide-react";
+import { Router, X } from "lucide-react";
 import { isEmptyObject } from "@/utils/generic-functions";
+import { useRouter } from "next/navigation";
 
 let activeTimeout:any = null;
 
@@ -36,12 +36,15 @@ const CustomersToBillTable = () => {
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [filter, setFilter] = useState({});
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
+  const [selectedCustomers, setSelectedCustomers] = useState<Customer[]>([]);
   const {trans} = useLanguageContext();
   const {accessToken} = useUserContext();
+  const router = useRouter();
   
   useEffect(() => {
       if (accessToken === "")
@@ -66,6 +69,7 @@ const CustomersToBillTable = () => {
       let res = await getTotalSearchCustomersWithFilter(accessToken, query, filter);
       let pages = pagesCount(res[0].count, LIMIT_PER_PAGE);
       setTotalPages(pages);
+      setTotal(totalCount(res[0].count));
     } catch(e) {
       toast.error(translate("something_wrong", trans));
     }
@@ -113,7 +117,7 @@ const CustomersToBillTable = () => {
   }
 
   const billCustomers = async () => {
-
+    router.push("/bill");
   }
 
   const handleStatusChange = (values:string[]) => {
@@ -132,13 +136,27 @@ const CustomersToBillTable = () => {
     return;
   }
 
+  const openBillDialog = () => {
+    setModalOpen(true);
+    let custs:Customer[] = [];
+    selectedRows.map( (row) => {
+      let cust = customers.find( cust => cust.id === row );
+      if (typeof(cust) !== 'undefined')
+        custs.push(cust);
+    })
+    setSelectedCustomers(custs);
+  }
+
   return (
     <>
       <BillDialog 
         open={modalOpen} 
         onClose={() => setModalOpen(false)} 
         onConfirm={billCustomers} 
-        defaultToast={false} />
+        defaultToast={false} 
+        customers={selectedCustomers}
+        statuses={selectedStatus}
+        />
       <div className="flex flex-1 flex-wrap items-center gap-2 capitalize">
         <Input
           onChange={ e => handleChange(e.target.value) }
@@ -174,10 +192,10 @@ const CustomersToBillTable = () => {
             </TableHead>
 
             <TableHead className=" font-semibold">
-              {selectedRows.length > 0 ? (
+              {selectedRows.length > 0 || (!isEmptyObject(filter) && total !== 0) ? (
                 <div className=" flex gap-2">
                   <Button
-                    onClick={() => setModalOpen(true)}
+                    onClick={openBillDialog}
                     size="xs"
                     variant="outline"
                     className="text-xs"

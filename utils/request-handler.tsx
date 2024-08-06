@@ -27,3 +27,15 @@ export function pagesCount(total:number|string|null, itemPerPage:number) {
     let pages = Math.floor(tot/itemPerPage) + 1;
     return pages;
 }
+
+export function totalCount(total:number|string|null) {
+    let tot = 0;
+    
+    if (typeof(total) === "string")
+        tot = parseInt(total);
+
+    if (typeof(total) === "number")
+        tot = total;
+
+    return tot;
+}

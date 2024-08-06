@@ -11,16 +11,22 @@ import {
 } from "@/components/ui/alert-dialog";
 import { toast } from "react-hot-toast";
 import { Loader2 } from "lucide-react";
+import { useLanguageContext } from "@/provider/language.provider";
+import { translate } from "@/lib/utils";
+import { Customer } from "@/modules/customers/domain/customer";
 
 const BillDialog = ({ open, onClose, onConfirm, defaultToast = true, toastMessage = "Successfully deleted",
-}: {
+customers, statuses}: {
   open: boolean;
   onClose: () => void;
   onConfirm: () => Promise<void>;
   defaultToast?: boolean;
   toastMessage?: string;
+  customers: Customer[];
+  statuses: string[];
 }) => {
   const [isPending, startTransition] = useTransition();
+  const {trans} = useLanguageContext();
 
   const handleConfirm = async () => {
     await onConfirm();
@@ -36,10 +42,35 @@ const BillDialog = ({ open, onClose, onConfirm, defaultToast = true, toastMessag
     <AlertDialog open={open}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogTitle>
+            <span className="capitalize">
+              {translate("do you want to bill these customers?", trans)}
+            </span>
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete your
-            account and remove your data from our servers.
+              { customers.length > 0 && 
+                <ul>
+                  { customers.map( (customer, key) => {
+                      return (
+                        <li key={key}>{customer.name}</li>
+                      )
+                    })
+                  }
+                </ul>
+              }  
+              { statuses.length > 0 && 
+                <>
+                  <h5>Status:</h5>
+                  <ul className="capitalize">
+                    { statuses.map( (status, key) => {
+                        return (
+                          <li key={key}>{translate(status, trans)}</li>
+                        )
+                      })
+                    }
+                  </ul>
+                </>
+              }  
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

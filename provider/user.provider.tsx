@@ -14,16 +14,14 @@ interface UserContextType {
     loading: boolean,
     organization: Organization,
     fontSize: string,
-    wsClient: WebSocketClient<any>,
-    isLoggedIn: boolean,
+    wsClient: WebSocketClient<any>|undefined,
     setUser: Dispatch<SetStateAction<User>>,
     setOrganization: Dispatch<SetStateAction<Organization>>,
     setFontSize: Dispatch<SetStateAction<string>>,
     setAccessToken: Dispatch<SetStateAction<string>>,
-    setWSClient: Dispatch<SetStateAction<WebSocketClient<any>>>,
+    setWSClient: Dispatch<SetStateAction<WebSocketClient<any>|undefined>>,
     setLoading: Dispatch<SetStateAction<boolean>>,
     fetchOrganization: () => void,
-    setIsLoggedIn: Dispatch<SetStateAction<boolean>>,
     signOut: () => void,
 }
 
@@ -36,7 +34,6 @@ export const UserContext = createContext<UserContextType | null>({
     organization: defaultOrganization,
     fontSize: "100%",
     wsClient: websocketClient(""),
-    isLoggedIn: false,
     setUser: () => {},
     setOrganization: () => {},
     setFontSize: () => {},
@@ -44,7 +41,6 @@ export const UserContext = createContext<UserContextType | null>({
     setWSClient: () => {},
     setLoading: () => {},
     fetchOrganization: () => {},
-    setIsLoggedIn: () => {},
     signOut: () => {},
 });
  
@@ -205,19 +201,11 @@ export const UserProvider = ({
         if (user.role_name === "") {
             return;
         }
-
-        if (!isURLAllowed(pathname, user.role_name)) {
-            router.push(redirectURL(user.role_name));
-        }
     }, [pathname]);
 
     useEffect(() => {
         if (user.role_name === "") {
             return;
-        }
-
-        if (!isURLAllowed(pathname, user.role_name)) {
-            router.push(redirectURL(user.role_name));
         }
     }, [user.role_name])
 

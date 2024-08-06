@@ -1,7 +1,7 @@
 "use client";
 
 import Card from "@/components/ui/card-snippet";
-import CustomersToBillTable from "./customers-to-bill-table";
+import CustomersToBillTable from "./components/customers-to-bill-table";
 import { translate } from "@/lib/utils";
 import { useLanguageContext } from "@/provider/language.provider";
 import ScrollButton from "@/components/scroll-button";
