@@ -40,10 +40,6 @@ export const SalesProvider = ({
     const [filter, setFilter] = useState<object>({});
     const [sales, setSales] = useState<Sales[]>([]);
 
-    useEffect(() => {
-        console.log(selectedCustomers);
-    }, [selectedCustomers]);
-
     return (
         <SalesContext.Provider value={{ customers, setCustomers, selectedCustomers, setSelectedCustomers, filter, setFilter, sales, setSales }}>
             {children}
