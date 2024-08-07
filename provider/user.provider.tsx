@@ -2,7 +2,6 @@ import { Organization, defaultOrganization, organizationMapper } from '@/modules
 import { getOrganization } from '@/modules/organizations/domain/organizations.actions';
 import { User, defaultUser, userMapper } from '@/modules/users/domain/user';
 import { getUserMe } from '@/modules/users/domain/users.actions';
-import { isURLAllowed, redirectURL } from '@/modules/users/domain/users.specifications';
 import { directusClient, websocketClient } from '@/utils/request-handler';
 import { WebSocketClient } from '@directus/sdk';
 import { useRouter, usePathname } from 'next/navigation';
@@ -53,7 +52,7 @@ export const UserProvider = ({
     const router = useRouter();
     const pathname = usePathname();
     const userField = ['id', 'email', 'first_name', 'last_name', 'role.name', 'avatar.id', 'avatar.filename_download'];
-    const orgField = ['id', 'name', 'subscription_type', 'subscription_expiry', 'status', 'logo.id', 'logo.filename_download', 'tax_rate', 'satusehat_key', 'payment_methods.*'];
+    const orgField = ['id', 'email', 'phone', 'address', 'name', 'subscription_type', 'subscription_expiry', 'status', 'logo.id', 'logo.filename_download'];
     const [accessToken, setAccessToken] = useState<string>("");
     const [expiry, setExpiry] = useState(50);
     const [user, setUser] = useState(defaultUser);

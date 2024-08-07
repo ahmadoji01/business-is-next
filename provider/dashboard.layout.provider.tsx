@@ -35,40 +35,32 @@ const DashBoardLayoutProvider = ({ children, trans }: { children: React.ReactNod
   }, [theme]);
 
   if (!mounted) {
-    return <UserProvider><LayoutLoader /></UserProvider>;
+    return <LayoutLoader />;
   }
 
   return (
     <ThemeProvider theme={muiTheme}>
-      <UserProvider>
-        <Header handleOpenSearch={() => setOpen(true)} trans={trans} />
-        <Sidebar trans={trans} />
+      <Header handleOpenSearch={() => setOpen(true)} trans={trans} />
+      <Sidebar trans={trans} />
 
+      <div
+        className={cn("content-wrapper transition-all duration-150 ", {
+          "ltr:xl:ml-[300px] rtl:xl:mr-[300px]": !collapsed,
+          "ltr:xl:ml-[72px] rtl:xl:mr-[72px]": collapsed,
+        })}
+      >
         <div
-          className={cn("content-wrapper transition-all duration-150 ", {
-            "ltr:xl:ml-[300px] rtl:xl:mr-[300px]": !collapsed,
-            "ltr:xl:ml-[72px] rtl:xl:mr-[72px]": collapsed,
-          })}
-        >
-          <div
-            className={cn(
-              " layout-padding px-6 pt-6  page-min-height ",
+          className={cn(
+            " layout-padding px-6 pt-6  page-min-height ",
 
-            )}
-          >
-            <LayoutWrapper
-              isMobile={isMobile}
-              setOpen={setOpen}
-              open={open}
-              location={location}
-              trans={trans}
-            >
-              {children}
-            </LayoutWrapper>
-          </div>
+          )}
+        >
+          {children}
+          <MobileSidebar trans={trans} className="left-[300px]" />
+          <HeaderSearch open={open} setOpen={setOpen} />
         </div>
-        <Footer handleOpenSearch={() => setOpen(true)} />
-      </UserProvider>
+      </div>
+      <Footer handleOpenSearch={() => setOpen(true)} />
     </ThemeProvider>
   );
 };

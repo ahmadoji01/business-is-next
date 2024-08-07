@@ -26,9 +26,10 @@ import { LIMIT_PER_PAGE } from "@/constants/request";
 import { Input } from "@/components/ui/input";
 import { DataFilter } from "./filter";
 import { customerStatuses } from "@/modules/customers/domain/customer.constants";
-import { Router, X } from "lucide-react";
+import { X } from "lucide-react";
 import { isEmptyObject } from "@/utils/generic-functions";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
+import { useSalesContext } from "@/provider/sales.provider";
 
 let activeTimeout:any = null;
 
@@ -39,11 +40,10 @@ const CustomersToBillTable = () => {
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filter, setFilter] = useState({});
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
-  const [selectedCustomers, setSelectedCustomers] = useState<Customer[]>([]);
   const {trans} = useLanguageContext();
   const {accessToken} = useUserContext();
+  const {filter, setFilter, selectedCustomers, setSelectedCustomers} = useSalesContext();
   const router = useRouter();
   
   useEffect(() => {
@@ -116,8 +116,8 @@ const CustomersToBillTable = () => {
     fetchTotal(query, filter);
   }
 
-  const billCustomers = async () => {
-    router.push("/bill");
+  const billCustomers = () => {
+    router.push('/bill');
   }
 
   const handleStatusChange = (values:string[]) => {

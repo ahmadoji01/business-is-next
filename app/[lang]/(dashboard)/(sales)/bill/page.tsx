@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Icon } from "@iconify/react";
 import { Input } from "@/components/ui/input";
-import Flatpickr from "react-flatpickr";
 import { Label } from "@/components/ui/label";
 import { Euro, Plus, Trash2, Upload } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
@@ -26,8 +25,49 @@ import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Breadcrumbs, BreadcrumbItem } from "@/components/ui/breadcrumbs";
+import { useUserContext } from "@/provider/user.provider";
+import { useSalesContext } from "@/provider/sales.provider";
+import { useEffect, useState } from "react";
+import { isEmptyObject } from "@/utils/generic-functions";
+import { Customer, mapCustomers } from "@/modules/customers/domain/customer";
+import { getAllCustomersWithFilter, getCustomersWithFilter } from "@/modules/customers/domain/customers.actions";
+import toast from "react-hot-toast";
+import { translate } from "@/lib/utils";
+import { useLanguageContext } from "@/provider/language.provider";
+import { Badge } from "@/components/ui/badge";
 
-const InvoicePage = () => {
+const BillPage = () => {
+
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const custField = ['id', 'name', 'address', 'phone', 'email'];
+
+  const {accessToken, organization} = useUserContext();
+  const {selectedCustomers, filter} = useSalesContext();
+  const {trans} = useLanguageContext();
+
+  const fetchCustomers = async () => {
+    try {
+      let res = await getAllCustomersWithFilter(accessToken, filter, custField);
+      let custs = mapCustomers(res);
+      setCustomers(custs);
+      return;
+    } catch {
+      toast.error(translate("something_wrong", trans));
+    }
+  }
+
+  useEffect(() => {
+    if (selectedCustomers.length > 0) {
+      setCustomers(selectedCustomers);
+      return;
+    }
+
+    if (isEmptyObject(filter))
+      return;
+
+    fetchCustomers();
+  }, []);
+
   return (
     <div>
       <Breadcrumbs>
@@ -51,62 +91,60 @@ const InvoicePage = () => {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-wrap gap-4">
-                <div className="flex-1 min-w-[250px]">
-                  <div className="w-full md:w-[248px] space-y-2">
-                    <Input type="text" placeholder="Invoice Name" size="lg" />
-                    <Input type="text" placeholder="Invoice ID" size="lg" />
-                    <div className="relative">
-                      <Flatpickr
-                        className="w-full border border-default-300 bg-background text-default-500  focus:outline-none h-10 rounded-md px-2 placeholder:text-default-500"
-                        placeholder="Invoice Date"
-                      />
-                      <Icon icon="heroicons:calendar-days" className="w-5 h-5 absolute top-1/2 -translate-y-1/2 ltr:right-4 rtl:left-4 text-default-400" />
-                    </div>
-                    <div className="relative">
-                      <Flatpickr
-                        className="w-full border border-default-300 bg-background text-default-500  focus:outline-none h-10 rounded-md px-2 placeholder:text-default-500"
-                        placeholder="Due Date"
-                      />
-                      <Icon icon="heroicons:calendar-days" className="w-5 h-5 absolute top-1/2 -translate-y-1/2 ltr:right-4 rtl:left-4 text-default-400 " />
-                    </div>
-                    <div className="flex items-center gap-1.5 pt-2">
-                      <Button
-                        className="w-5 h-5 rounded-md bg-transparent hover:bg-transparent p-0"
-                        variant="outline">
-                        <Plus className="w-3.5 h-3.5 text-default-500" />
-                      </Button>
-                      <span className="text-xs font-medium text-default-600"> Add More Fields</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex-1 md:flex-none flex flex-col items-end w-[222px] min-w-[222px]">
-                  <Label
-                    htmlFor="uploadFile"
-                    className="cursor-pointer  w-full md:w-[220px] h-[180px] bg-default-100 dark:bg-default-50 rounded-md flex justify-center items-center">
-                    <div className="flex flex-col items-center w-full">
-                      <Upload className="ltr:mr-2 rtl:ml-2 h-7 w-7 mb-2 text-primary" />
-                      <span className="text-sm font-medium text-primary">Upload Logo</span>
-                    </div>
-                    <Input type="file" className="hidden" id="uploadFile" />
-                  </Label>
-                  <div className="mt-2 text-[10px] text-default-600">240 x 240 pixels @ 72 DPI, Maximum size of  1MB to 3.5MB.</div>
-                </div>
-              </div>
               <div className="mt-8 flex justify-between flex-wrap gap-4">
                 <div className="w-full 2xl:max-w-[400px] space-y-2">
                   <div className="text-base font-semibold text-default-800 pb-1">Billing From:</div>
-                  <Input type="text" placeholder="Company Name" />
-                  <Input type="email" placeholder="Company Email" />
-                  <Input type="number" placeholder="Company Phone No" />
-                  <Textarea placeholder="Comapny Address" />
+                  <Input type="text" placeholder="Company Name" value={organization?.name} />
+                  <Input type="email" placeholder="Company Email" value={organization?.email} />
+                  <Textarea placeholder="Company Address" value={organization?.address} />
                 </div>
                 <div className="w-full 2xl:max-w-[400px] space-y-2">
                   <div className="text-base font-semibold text-default-800 pb-1">Billing To:</div>
-                  <Input type="text" placeholder="Customer Name" />
-                  <Input type="email" placeholder="Customer Email" />
-                  <Input type="number" placeholder="Customer Phone No" />
-                  <Textarea placeholder="Customer Address" />
+                  <div className="overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead className="text-default-600 uppercase">Name</TableHead>
+                          <TableHead className="text-default-600 uppercase">Phone</TableHead>
+                          <TableHead className="text-default-600 uppercase">Address</TableHead>
+                          <TableHead className="text-default-600 uppercase text-end pr-7">Status</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody className="[&_tr:last-child]:border-1">
+                        { customers.map( (customer, key) => {
+                          return (
+                            <TableRow key={key}>
+                              <TableCell>
+                                {customer.name}
+                              </TableCell>
+                              <TableCell>
+                                {customer.phone}
+                              </TableCell>
+                              <TableCell>
+                                {customer.address}
+                              </TableCell>
+                              <TableCell>
+                                <div className="flex items-center gap-2 ">
+                                  <Badge
+                                    variant="soft"
+                                    color={
+                                      (customer.status === "blacklisted" && "destructive") ||
+                                      (customer.status === "graduated" && "warning") ||
+                                      (customer.status === "inactive" && "warning") || "default"
+                                    }
+                                    className=" capitalize"
+                                    >
+                                    {translate(customer.status, trans)}
+                                  </Badge>
+                                  <Trash2 className="w-4 h-4 text-warning" />
+                                </div>
+                              </TableCell>
+                            </TableRow>
+                          )
+                        })}
+                      </TableBody>
+                    </Table>
+                  </div>
                 </div>
               </div>
               <div className="border border-default-300 rounded-md mt-9">
@@ -355,4 +393,4 @@ const InvoicePage = () => {
   );
 };
 
-export default InvoicePage;
+export default BillPage;

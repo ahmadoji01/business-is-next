@@ -4,7 +4,8 @@ import { aggregate, readItems, withToken } from "@directus/sdk";
 
 export const getAllCustomers = (token:string, page:number, fields?:string[]) =>
     directusClient.request( withToken(token, readItems('customers', { fields: fields? fields:['*.*'], limit: LIMIT_PER_PAGE, page } )) );
-
+export const getAllCustomersWithFilter = (token:string, filter:object, fields?:string[]) =>
+    directusClient.request( withToken(token, readItems('customers', { filter, fields: fields? fields:['*.*'] } )) );
 export const getCustomersWithFilter = (token:string, filter:object, page:number, fields?:string[]) =>
 	directusClient.request( 
 		withToken(token, readItems('customers', { 
