@@ -1,10 +1,15 @@
+'use client';
+
+import AnimatedContainer from "@/components/animated-container";
 import { SalesProvider } from "@/provider/sales.provider";
 
-const Layout = async ({ children }: { children: React.ReactNode }) => {
+const Layout = ({ children }: { children: React.ReactNode }) => {
   
   return (
     <SalesProvider>
-      {children}
+      <AnimatedContainer>
+        <main>{children}</main>
+      </AnimatedContainer>
     </SalesProvider>
   )
 };

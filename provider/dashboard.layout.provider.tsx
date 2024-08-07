@@ -7,21 +7,16 @@ import { useSidebar, useThemeStore } from "@/store";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter, usePathname } from "next/navigation";
 import Footer from "@/components/partials/footer";
-import { useMediaQuery } from "@/hooks/use-media-query";
-import ThemeCustomize from "@/components/partials/customizer/theme-customizer";
 import MobileSidebar from "@/components/partials/sidebar/mobile-sidebar";
 import HeaderSearch from "@/components/header-search";
 import { useMounted } from "@/hooks/use-mounted";
 import LayoutLoader from "@/components/layout-loader";
-import { UserProvider } from "./user.provider";
 import { createTheme, PaletteMode, ThemeProvider } from "@mui/material";
 import { useTheme } from "next-themes";
 
 const DashBoardLayoutProvider = ({ children, trans }: { children: React.ReactNode, trans: any }) => {
   const { collapsed } = useSidebar();
   const [open, setOpen] = React.useState(false);
-  const location = usePathname();
-  const isMobile = useMediaQuery("(min-width: 768px)");
   const mounted = useMounted();
   const [muiTheme, setMUITheme] = React.useState(createTheme({ palette: { mode: "light" } }));
   const {theme} = useTheme();
