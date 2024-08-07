@@ -6,26 +6,31 @@ import { Dispatch, SetStateAction, createContext, useContext, useEffect, useStat
 import { useUserContext } from './user.provider';
 import { getAllCustomers } from '@/modules/customers/domain/customers.actions';
 import toast from 'react-hot-toast';
+import Item from '@/modules/items/domain/item';
 
 interface SalesContextType {
     customers: Customer[],
     selectedCustomers: Customer[],
+    selectedItems: Item[],
     filter: object,
     sales: Sales[],
     setSales: Dispatch<SetStateAction<Sales[]>>,
     setFilter: Dispatch<SetStateAction<object>>,
     setSelectedCustomers: Dispatch<SetStateAction<Customer[]>>,
+    setSelectedItems: Dispatch<SetStateAction<Item[]>>,
     setCustomers: Dispatch<SetStateAction<Customer[]>>,  
 }
 
 export const SalesContext = createContext<SalesContextType | null>({
     customers: [],
     selectedCustomers: [],
+    selectedItems: [],
     filter: {},
     sales: [],
     setSales: () => {},
     setFilter: () => {},
     setSelectedCustomers: () => {},
+    setSelectedItems: () => {},
     setCustomers: () => {},
 });
  
@@ -37,11 +42,12 @@ export const SalesProvider = ({
 
     const [customers, setCustomers] = useState<Customer[]>([]);
     const [selectedCustomers, setSelectedCustomers] = useState<Customer[]>([]);
+    const [selectedItems, setSelectedItems] = useState<Item[]>([]);
     const [filter, setFilter] = useState<object>({});
     const [sales, setSales] = useState<Sales[]>([]);
 
     return (
-        <SalesContext.Provider value={{ customers, setCustomers, selectedCustomers, setSelectedCustomers, filter, setFilter, sales, setSales }}>
+        <SalesContext.Provider value={{ selectedItems, setSelectedItems, customers, setCustomers, selectedCustomers, setSelectedCustomers, filter, setFilter, sales, setSales }}>
             {children}
         </SalesContext.Provider>
     );

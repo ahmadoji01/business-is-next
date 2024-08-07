@@ -11,10 +11,17 @@ import { translate } from "@/lib/utils";
 import Item, { mapItems } from "@/modules/items/domain/item";
 import { Category, mapCategories } from "@/modules/categories/domain/category";
 import { getAllCategories } from "@/modules/categories/domain/categories.actions";
+import { CircularProgress } from "@/components/ui/progress";
+import ItemCard from "./item-card";
+
+let activeTimeout:any = null;
+
 const AddItem = ({ open, setOpen }: { open: boolean; setOpen: any }) => {
     
+    const [loading, setLoading] = useState(true);
     const [items, setItems] = useState<Item[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
+    const [searchQuery, setSearchQuery] = useState("");
     const fields = ['id', 'name', 'category.id', 'category.name', 'price', 'stock', 'type', 'unit', 'photo.id', 'photo.filename_download']
 
     const {accessToken} = useUserContext();
@@ -25,34 +32,58 @@ const AddItem = ({ open, setOpen }: { open: boolean; setOpen: any }) => {
             let res = await getAllCategories(accessToken, 1);
             let cats = mapCategories(res);
             setCategories(cats);
+            setLoading(false);
         } catch {
             toast.error(translate("something_wrong", trans));
+            setLoading(false);
+        }
+    }
+
+    const fetchItems = async (query:string) => {
+        try {
+            let res = await searchItemsWithFilter(accessToken, query, {}, 1, fields);
+            let its = mapItems(res);
+            setItems(its);
+            setLoading(false);
+        } catch {
+            toast.error(translate("something_wrong", trans));
+            setLoading(false);
         }
     }
 
     useEffect(() => {
         fetchCategories();
+        fetchItems("");
     }, [])
 
-    const searchItems = async (query:string) => {
-        try {
-            let res = searchItemsWithFilter(accessToken, query, {}, 1, fields);
-            let its = mapItems(res);
-            setItems(its);
-        } catch {
-            toast.error(translate("something_wrong", trans));
+    const handleChange = (query:string) => {
+        if (activeTimeout) {
+          clearTimeout(activeTimeout);
         }
+        
+        activeTimeout = setTimeout(() => {
+          handleSearch(query);
+        }, 1000);
+    }
+    
+    const handleSearch = (query:string) => {    
+        if (query.length > 1 && query.length <= 3)
+          return;
+    
+        setSearchQuery(query);
+        setLoading(true);
+        fetchItems(query);
     }
   
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent size="xl" className="p-0 " hiddenCloseIcon>
+            <DialogContent size="2xl" className="p-0 " hiddenCloseIcon>
                 <div className="flex items-center border-b border-default-200">
                     <SearchIcon size={14} className="ml-4" />
                     <Input
                         placeholder=""
                         className="h-14 border-none"
-                        onChange={e => searchItems(e.target.value)}
+                        onChange={e => handleChange(e.target.value)}
                         />
                     <div className="flex-none flex items-center justify-center gap-1 pr-4">
                     <span className="text-sm text-default-500 font-normal select-none">
@@ -70,7 +101,7 @@ const AddItem = ({ open, setOpen }: { open: boolean; setOpen: any }) => {
                     </div>
                 </div>
                 <div className="grid grid-cols-1 gap-2">
-                    <div className="flex gap-2 overflow-x-auto">
+                    <div className="flex gap-2 overflow-x-auto p-4">
                         <Button color="dark" variant="outline">
                             All Items
                         </Button>
@@ -82,6 +113,18 @@ const AddItem = ({ open, setOpen }: { open: boolean; setOpen: any }) => {
                             )
                         }) }
                     </div>
+                </div>
+                { loading && 
+                    <div className="flex w-full justify-center items-center">
+                        <CircularProgress value={50} color="primary" loading />
+                    </div>
+                }
+                <div className="grid max-h-[400px] xl:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-5 p-4 overflow-y-auto">
+                    { items?.map( (item, key) => {
+                        return (
+                            <ItemCard key={key} price={item.price} categoryName={item.category.name} name={item.name} photo={item.photo} />
+                        )
+                    }) }
                 </div>
             </DialogContent>
         </Dialog>
