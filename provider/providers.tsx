@@ -7,6 +7,7 @@ import { Toaster as ReactToaster } from "@/components/ui/toaster";
 import { Toaster } from "react-hot-toast";
 import { SonnToaster } from "@/components/ui/sonner";
 import { UserProvider } from "./user.provider";
+import NextTopLoader from "nextjs-toploader";
 
 const inter = Inter({ subsets: ["latin"] });
 const Providers = ({ children }: { children: React.ReactNode }) => {
@@ -14,6 +15,7 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <UserProvider>
+      
       <body
         className={cn("dash-tail-app ", inter.className, "theme-" + theme)}
         style={{
@@ -27,6 +29,7 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
           defaultTheme="light"
         >
           <div className={cn("h-full  ")}>
+            <NextTopLoader />
             {children}
             <ReactToaster />
           </div>
