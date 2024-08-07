@@ -9,10 +9,11 @@ import toast from "react-hot-toast";
 import { useLanguageContext } from "@/provider/language.provider";
 import { translate } from "@/lib/utils";
 import Item, { mapItems } from "@/modules/items/domain/item";
-import { Category, mapCategories } from "@/modules/categories/domain/category";
+import { Category, defaultCategory, mapCategories } from "@/modules/categories/domain/category";
 import { getAllCategories } from "@/modules/categories/domain/categories.actions";
 import { CircularProgress } from "@/components/ui/progress";
 import ItemCard from "./item-card";
+import { categoryNameEquals } from "@/modules/items/domain/item.specifications";
 
 let activeTimeout:any = null;
 
@@ -21,13 +22,16 @@ const AddItem = ({ open, setOpen }: { open: boolean; setOpen: any }) => {
     const [loading, setLoading] = useState(true);
     const [items, setItems] = useState<Item[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
+    const [selectedCategory, setSelectedCategory] = useState("");
     const [searchQuery, setSearchQuery] = useState("");
+    const [filter, setFilter] = useState({});
     const fields = ['id', 'name', 'category.id', 'category.name', 'price', 'stock', 'type', 'unit', 'photo.id', 'photo.filename_download']
 
     const {accessToken} = useUserContext();
     const {trans} = useLanguageContext();
 
     const fetchCategories = async () => {
+        setLoading(true);
         try {
             let res = await getAllCategories(accessToken, 1);
             let cats = mapCategories(res);
@@ -39,9 +43,10 @@ const AddItem = ({ open, setOpen }: { open: boolean; setOpen: any }) => {
         }
     }
 
-    const fetchItems = async (query:string) => {
+    const fetchItems = async (query:string, filter:object) => {
+        setLoading(true);
         try {
-            let res = await searchItemsWithFilter(accessToken, query, {}, 1, fields);
+            let res = await searchItemsWithFilter(accessToken, query, filter, 1, fields);
             let its = mapItems(res);
             setItems(its);
             setLoading(false);
@@ -53,7 +58,7 @@ const AddItem = ({ open, setOpen }: { open: boolean; setOpen: any }) => {
 
     useEffect(() => {
         fetchCategories();
-        fetchItems("");
+        fetchItems("", {});
     }, [])
 
     const handleChange = (query:string) => {
@@ -72,7 +77,20 @@ const AddItem = ({ open, setOpen }: { open: boolean; setOpen: any }) => {
     
         setSearchQuery(query);
         setLoading(true);
-        fetchItems(query);
+        fetchItems(query, filter);
+    }
+
+    const categoryClick = (name:string) => {
+        if (selectedCategory === name)
+            return;
+
+        let newFilter = {};
+        if (name !== "")
+            newFilter = categoryNameEquals(name);
+
+        setSelectedCategory(name);
+        setFilter(newFilter);
+        fetchItems(searchQuery, newFilter);
     }
   
     return (
@@ -102,12 +120,12 @@ const AddItem = ({ open, setOpen }: { open: boolean; setOpen: any }) => {
                 </div>
                 <div className="grid grid-cols-1 gap-2">
                     <div className="flex gap-2 overflow-x-auto p-4">
-                        <Button color="dark" variant="outline">
+                        <Button color="dark" onClick={() => categoryClick("")} variant={selectedCategory !== ""? "outline" : null}>
                             All Items
                         </Button>
                         { categories?.map( (category, key) => {
                             return (
-                                <Button key={key} color="dark" variant="outline">
+                                <Button key={key} color="dark" onClick={() => categoryClick(category.name)} variant={selectedCategory !== category.name? "outline" : null}>
                                     {category.name}
                                 </Button>
                             )
