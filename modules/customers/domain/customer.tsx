@@ -35,7 +35,7 @@ export function customerMapper(res:Record<string,any>) {
         name: res.name? res.name:'', 
         status: res.status? res.status:'',
         address: res.address? res.address:'',
-        email: res.email? res.email:new Date, 
+        email: res.email? res.email:'', 
         phone: res.phone? res.phone:'',
         photo: res.photo? res.photo:null,
     }

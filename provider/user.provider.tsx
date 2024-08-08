@@ -157,7 +157,6 @@ export const UserProvider = ({
                 clearInterval(interval);
             return;
         }).catch( err => {
-            console.log(err.errors[0]);
             let e = errorMapper(err.errors[0]);
             if (!pathname?.includes('auth/login') && ( e.code === "INVALID_PAYLOAD" || err?.response?.status === 401 || err?.response?.status === 403)) {
                 window.location.href = '/auth/login';
