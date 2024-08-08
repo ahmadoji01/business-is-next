@@ -5,14 +5,20 @@ import { Icon } from "@iconify/react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import item from "@/public/icons/items/premium.png";
+import premium from "@/public/icons/items/premium.png";
 import Image from "next/image";
 import { imageHandler } from "@/utils/request-handler";
-import { Photo } from "@/modules/items/domain/item";
+import Item, { Photo } from "@/modules/items/domain/item";
 import { currency } from "@/utils/generic-functions";
 import { useState } from "react";
 
-const ItemCard = ({ categoryName, name, price, photo }: { categoryName:string, name:string, price:number, photo:Photo|null }) => {
+interface ItemCardProps {
+  isSelected?:boolean, 
+  item:Item,
+  handleAddItem: (item:Item) => void,
+}
+
+const ItemCard = ({ isSelected, item, handleAddItem }:ItemCardProps) => {
     const [count, setCount] = useState<number>(5);
     return (
         <Card className="p-4 rounded-md">
@@ -22,7 +28,7 @@ const ItemCard = ({ categoryName, name, price, photo }: { categoryName:string, n
                 <Image
                   alt=""
                   className="  h-full w-full  object-contain p-6  transition-all duration-300 group-hover:scale-105"
-                  src={photo? imageHandler(photo.id, photo.filename_download):item}
+                  src={item.photo? imageHandler(item.photo.id, item.photo.filename_download):premium}
                 />
               </div>
             </div>
@@ -31,15 +37,15 @@ const ItemCard = ({ categoryName, name, price, photo }: { categoryName:string, n
           <div>
             <div className="flex justify-between items-center mb-2">
               <p className="text-xs	text-secondary-foreground uppercase font-normal">
-                {categoryName}
+                {item.category?.name}
               </p>
             </div>
             <h6 className="text-secondary-foreground text-base	font-medium	mb-[6px] truncate	">
-              <Link href="#">{name}</Link>
+              <Link href="#">{item.name}</Link>
             </h6>
             <p className="mb-4 space-x-4 rtl:space-x-reverse">
               <span className="text-secondary-foreground text-base	font-medium mt-2">
-                { currency(price) }
+                { currency(item.price) }
               </span>
             </p>
             <div className="flex flex-wrap gap-4">
@@ -65,9 +71,8 @@ const ItemCard = ({ categoryName, name, price, photo }: { categoryName:string, n
                   </button>
                 </div>
               </div>
-              <Button className="w-full">
-                <Icon icon="heroicons:shopping-bag" className="w-4 h-4 ltr:mr-2 rtl:ml-2 " />
-                Add to Billing
+              <Button className="w-full" onClick={() => handleAddItem(item)} disabled={isSelected? true:false}>
+                {isSelected? "Item Selected":"Add to Billing"}
               </Button>
             </div>
           </div>

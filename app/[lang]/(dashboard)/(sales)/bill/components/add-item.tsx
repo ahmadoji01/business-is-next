@@ -14,6 +14,7 @@ import { getAllCategories } from "@/modules/categories/domain/categories.actions
 import { CircularProgress } from "@/components/ui/progress";
 import ItemCard from "./item-card";
 import { categoryNameEquals } from "@/modules/items/domain/item.specifications";
+import { useSalesContext } from "@/provider/sales.provider";
 
 let activeTimeout:any = null;
 
@@ -29,6 +30,7 @@ const AddItem = ({ open, setOpen }: { open: boolean; setOpen: any }) => {
 
     const {accessToken} = useUserContext();
     const {trans} = useLanguageContext();
+    const {selectedItems, setSelectedItems} = useSalesContext();
 
     const fetchCategories = async () => {
         setLoading(true);
@@ -78,6 +80,16 @@ const AddItem = ({ open, setOpen }: { open: boolean; setOpen: any }) => {
         setSearchQuery(query);
         setLoading(true);
         fetchItems(query, filter);
+    }
+
+    const handleAddItem = (item:Item) => {
+        if (typeof(selectedItems.find( itm => itm.id === item.id )) !== 'undefined')
+            return;
+
+        let newSelectedItems = [...selectedItems];
+        newSelectedItems.push(item);
+        setSelectedItems(newSelectedItems);
+        toast.success(translate("item_added", trans))
     }
 
     const categoryClick = (name:string) => {
@@ -139,8 +151,14 @@ const AddItem = ({ open, setOpen }: { open: boolean; setOpen: any }) => {
                 }
                 <div className="grid max-h-[400px] xl:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-5 p-4 overflow-y-auto">
                     { items?.map( (item, key) => {
+                        let isSelected = false;
+                        if (typeof(selectedItems.find( itm => itm.id === item.id )) !== 'undefined')
+                            isSelected = true;
                         return (
-                            <ItemCard key={key} price={item.price} categoryName={item.category.name} name={item.name} photo={item.photo} />
+                            <ItemCard
+                                isSelected={isSelected} 
+                                item={item} 
+                                handleAddItem={handleAddItem} />
                         )
                     }) }
                 </div>

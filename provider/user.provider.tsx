@@ -132,13 +132,13 @@ export const UserProvider = ({
             let expiry = res.expires? res.expires : 0;
             setAccessToken(token);
             setExpiry(expiry);
-            getUserMe(token, userField).then(res => {
+            getUserMe(token).then(res => {
                 let usr = defaultUser;
                 usr = userMapper(res);
                 setUser(usr);
             }).catch( () => {
                 if (pathname !== '/') {
-                    window.location.assign("/auth/login");
+                    //window.location.assign("/auth/login");
                 }
                 return;
             });
@@ -158,7 +158,7 @@ export const UserProvider = ({
                 clearInterval(interval);
             return;
         }).catch( err => {
-            if (pathname !== '/auth/login' && ( err?.response?.status === 400 || err?.response?.status === 401 || err?.response?.status === 403)) {
+            if (pathname !== '/auth/login' && ( err?.response?.status === 401 || err?.response?.status === 403)) {
                 window.location.href = '/auth/login';
             }
             setLoading(false);
