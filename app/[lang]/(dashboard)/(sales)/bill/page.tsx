@@ -44,9 +44,9 @@ const BillPage = () => {
   const [open, setOpen] = useState(false);
   const custField = ['id', 'name', 'address', 'phone', 'email'];
 
-  const {accessToken, organization} = useUserContext();
-  const {selectedCustomers, filter} = useSalesContext();
-  const {trans} = useLanguageContext();
+  const { accessToken, organization } = useUserContext();
+  const { selectedCustomers, filter } = useSalesContext();
+  const { trans } = useLanguageContext();
   const router = useRouter();
 
   const fetchCustomers = async () => {
@@ -102,13 +102,13 @@ const BillPage = () => {
               </CardHeader>
               <CardContent>
                 <div className="mt-8 flex justify-between flex-wrap gap-4">
-                  <div className="w-full 2xl:max-w-[400px] space-y-2">
+                  <div className="w-full space-y-2">
                     <div className="text-base font-semibold text-default-800 pb-1">Billing From:</div>
                     <Input type="text" placeholder="Company Name" value={organization?.name} />
                     <Input type="email" placeholder="Company Email" value={organization?.email} />
                     <Textarea placeholder="Company Address" value={organization?.address} />
                   </div>
-                  <div className="w-full 2xl:max-w-[400px] space-y-2">
+                  <div className="w-full space-y-2">
                     <div className="text-base font-semibold text-default-800 pb-1">Billing To:</div>
                     <div className="overflow-x-auto">
                       <Table>
@@ -121,7 +121,7 @@ const BillPage = () => {
                           </TableRow>
                         </TableHeader>
                         <TableBody className="[&_tr:last-child]:border-1">
-                          { customers.map( (customer, key) => {
+                          {customers.map((customer, key) => {
                             return (
                               <TableRow key={key}>
                                 <TableCell>
@@ -134,7 +134,7 @@ const BillPage = () => {
                                   {customer.address}
                                 </TableCell>
                                 <TableCell>
-                                  <div className="flex items-center gap-2 ">
+                                  <div className="flex gap-2 text-end pr-7">
                                     <Badge
                                       variant="soft"
                                       color={
@@ -143,7 +143,7 @@ const BillPage = () => {
                                         (customer.status === "inactive" && "warning") || "default"
                                       }
                                       className=" capitalize"
-                                      >
+                                    >
                                       {translate(customer.status, trans)}
                                     </Badge>
                                     <Trash2 className="w-4 h-4 text-warning" />
@@ -164,7 +164,6 @@ const BillPage = () => {
                         <TableRow>
                           <TableHead className="text-default-600 uppercase">Item</TableHead>
                           <TableHead className="text-default-600 uppercase">Quantity</TableHead>
-                          <TableHead className="text-default-600 uppercase">Rate</TableHead>
                           <TableHead className="text-default-600 uppercase text-end pr-7">Total</TableHead>
                         </TableRow>
                       </TableHeader>
@@ -196,79 +195,8 @@ const BillPage = () => {
                             </div>
                           </TableCell>
                           <TableCell>
-                            <div className="max-w-[130px] flex">
-                              <Input
-                                className="w-[70px] appearance-none accent-transparent rounded ltr:rounded-r-none ltr:border-r-0 rtl:rounded-l-none rtl:border-l-0"
-                                type="number"
-                                defaultValue="20"
-                              />
-                              <Select>
-                                <SelectTrigger className="rounded ltr:rounded-l-none rtl:rounded-r-none h-9  pr-1 [&>svg]:h-4 [&>svg]:w-4 [&>svg]:mt-1 ">
-                                  <SelectValue placeholder="usd" />
-                                </SelectTrigger>
-                                <SelectContent >
-                                  <SelectItem value="usd">usd</SelectItem>
-                                  <SelectItem value="eur">eur</SelectItem>
-                                  <SelectItem value="jpy">jpy</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          </TableCell>
-                          <TableCell>
                             <div className="flex items-center gap-2 ">
                               <Input defaultValue="$1663.00" className="text-end font-medium  text-default-900 rounded min-w-[140px]" />
-                              <Trash2 className="w-4 h-4 text-warning" />
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell className="min-w-[220px] w-full max-w-[432px]">
-                            <Input
-                              type="text"
-                              placeholder="Description of item"
-                              className="text-default-800 rounded "
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <div className="max-w-[130px] flex">
-                              <Input
-                                className="w-[70px] appearance-none accent-transparent rounded ltr:rounded-r-none ltr:border-r-0 rtl:rounded-l-none rtl:border-l-0"
-                                type="number"
-                                defaultValue="1"
-                              />
-                              <Select>
-                                <SelectTrigger className="rounded ltr:rounded-l-none rtl:rounded-r-none h-9  pr-1 [&>svg]:h-4 [&>svg]:w-4 [&>svg]:mt-1 ">
-                                  <SelectValue placeholder="pcs" />
-                                </SelectTrigger>
-                                <SelectContent >
-                                  <SelectItem value="pcs">pcs</SelectItem>
-                                  <SelectItem value="kg">kg</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="max-w-[130px] flex">
-                              <Input
-                                className="w-[70px] appearance-none accent-transparent rounded ltr:rounded-r-none ltr:border-r-0 rtl:rounded-l-none rtl:border-l-0"
-                                type="number"
-                                defaultValue="20"
-                              />
-                              <Select>
-                                <SelectTrigger className="rounded ltr:rounded-l-none rtl:rounded-r-none h-9  pr-1 [&>svg]:h-4 [&>svg]:w-4 [&>svg]:mt-1 ">
-                                  <SelectValue placeholder="usd" />
-                                </SelectTrigger>
-                                <SelectContent >
-                                  <SelectItem value="usd">usd</SelectItem>
-                                  <SelectItem value="eur">eur</SelectItem>
-                                  <SelectItem value="jpy">jpy</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2 ">
-                              <Input defaultValue="$0.00" className="text-end font-medium  text-default-900 rounded min-w-[140px]" />
                               <Trash2 className="w-4 h-4 text-warning" />
                             </div>
                           </TableCell>
@@ -286,25 +214,6 @@ const BillPage = () => {
                         <Input defaultValue="$1663.00" className="text-xs font-medium  text-default-900 rounded w-full sm:w-[148px]" />
                       </div>
                       <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3">
-                        <div className="text-sm font-medium text-default-600">Coupon Discount:</div>
-                        <div className="w-full sm:w-[148px] flex">
-                          <Input
-                            className=" text-xs font-medium  text-default-900 appearance-none accent-transparent rounded ltr:rounded-r-none rtl:rounded-l-none rtl:border-l-0  ltr:border-r-0"
-                            type="number"
-                            defaultValue="34.36"
-                          />
-                          <Select>
-                            <SelectTrigger className="w-14 rounded ltr:rounded-l-none rtl:rounded-r-none h-9 pr-1 [&>svg]:h-4 [&>svg]:w-4 [&>svg]:mt-1">
-                              <SelectValue placeholder="$" />
-                            </SelectTrigger>
-                            <SelectContent >
-                              <SelectItem value="$">$</SelectItem>
-                              <SelectItem value="eur"><Euro className="w-3 h-3" /></SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3">
                         <div className="text-sm font-medium text-default-600">Tax:</div>
                         <div className="w-full sm:w-[148px] flex">
                           <Input
@@ -318,30 +227,13 @@ const BillPage = () => {
                             </SelectTrigger>
                             <SelectContent >
                               <SelectItem value="%">%</SelectItem>
-                              <SelectItem value="flat">$</SelectItem>
                             </SelectContent>
                           </Select>
                         </div>
                       </div>
                       <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3">
-                        <div className="text-sm font-medium text-default-600">Shipping:</div>
-                        <Input defaultValue="$14.12" className="text-xs font-medium  text-default-900 rounded w-full sm:w-[148px]" />
-                      </div>
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3">
-                        <div className="text-sm font-medium text-default-600">Due Till Date:</div>
-                        <Input defaultValue="$0.00" className="text-xs font-medium  text-default-900 rounded w-full sm:w-[148px]" />
-                      </div>
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3">
                         <div className="text-sm font-medium text-default-600">Total:</div>
                         <Input defaultValue="$1243.00" className="text-xs font-medium  text-default-900 rounded w-full sm:w-[148px]" />
-                      </div>
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3">
-                        <div className="text-sm font-medium text-default-600">Amount Paid:</div>
-                        <Input defaultValue="$1000.00" className="text-xs font-medium  text-default-900 rounded w-full sm:w-[148px]" />
-                      </div>
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3">
-                        <div className="text-sm font-medium text-default-600">Balance Due:</div>
-                        <Input defaultValue="$243.00" className="text-xs font-medium  text-default-900 rounded w-full sm:w-[148px]" />
                       </div>
                     </div>
                   </div>
@@ -369,9 +261,9 @@ const BillPage = () => {
               </CardFooter>
             </Card>
             <div className="col-span-12 xl:col-span-4">
-              <Card>
+              <Card className="sticky top-20">
                 <CardHeader>
-                  <CardTitle>Payment Method</CardTitle>
+                  <CardTitle>Payment</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
