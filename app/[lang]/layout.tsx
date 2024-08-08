@@ -8,7 +8,7 @@ import TanstackProvider from "@/provider/providers.client";
 import "flatpickr/dist/themes/light.css";
 import { LanguageProvider } from "@/provider/language.provider";
 import { getDictionary } from "../dictionaries";
-const inter = Inter({ subsets: ["latin"] });
+import '@/styles/satoshi.css';
 
 export const metadata = {
   title: {

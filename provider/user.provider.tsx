@@ -1,3 +1,4 @@
+import { errorMapper } from '@/modules/errors/domains/error';
 import { Organization, defaultOrganization, organizationMapper } from '@/modules/organizations/domain/organization';
 import { getOrganization } from '@/modules/organizations/domain/organizations.actions';
 import { User, defaultUser, userMapper } from '@/modules/users/domain/user';
@@ -48,8 +49,6 @@ export const UserProvider = ({
 }: {
     children: React.ReactNode;
 }) => {
-
-    const router = useRouter();
     const pathname = usePathname();
     const userField = ['id', 'email', 'first_name', 'last_name', 'role.name', 'avatar.id', 'avatar.filename_download'];
     const orgField = ['id', 'email', 'phone', 'address', 'name', 'subscription_type', 'subscription_expiry', 'status', 'logo.id', 'logo.filename_download'];
@@ -138,7 +137,7 @@ export const UserProvider = ({
                 setUser(usr);
             }).catch( () => {
                 if (pathname !== '/') {
-                    //window.location.assign("/auth/login");
+                    window.location.assign("/auth/login");
                 }
                 return;
             });
@@ -158,7 +157,9 @@ export const UserProvider = ({
                 clearInterval(interval);
             return;
         }).catch( err => {
-            if (pathname !== '/auth/login' && ( err?.response?.status === 401 || err?.response?.status === 403)) {
+            console.log(err.errors[0]);
+            let e = errorMapper(err.errors[0]);
+            if (!pathname?.includes('auth/login') && ( e.code === "INVALID_PAYLOAD" || err?.response?.status === 401 || err?.response?.status === 403)) {
                 window.location.href = '/auth/login';
             }
             setLoading(false);
