@@ -46,7 +46,8 @@ const ItemTable = () => {
                     <TableHead className="text-default-600 uppercase">Item</TableHead>
                     <TableHead className="text-default-600 uppercase">Unit Cost</TableHead>
                     <TableHead className="text-default-600 uppercase">Quantity</TableHead>
-                    <TableHead className="text-default-600 uppercase text-end pr-7">Total</TableHead>
+                    <TableHead className="text-default-600 uppercase">Total</TableHead>
+                    <TableHead className="text-default-600 uppercase">Actions</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody className="[&_tr:last-child]:border-1">
@@ -62,7 +63,7 @@ const ItemTable = () => {
                                 />
                             </TableCell>
                             <TableCell>
-                                <div className="flex items-center gap-2 ">
+                                <div className="max-w-[130px] flex items-center gap-2">
                                     <Input value={item.unit_cost} className="text-end font-medium  text-default-900 rounded min-w-[140px]" disabled />
                                 </div>
                             </TableCell>
@@ -86,8 +87,12 @@ const ItemTable = () => {
                                 </div>
                             </TableCell>
                             <TableCell>
-                                <div className="flex items-center gap-2 ">
+                                <div className="max-w-[130px] flex items-center gap-2 ">
                                     <Input value={item.total} className="text-end font-medium  text-default-900 rounded min-w-[140px]" />
+                                </div>
+                            </TableCell>
+                            <TableCell>
+                                <div className="flex items-center gap-2 ">
                                     <Trash2 className="w-4 h-4 text-warning" />
                                 </div>
                             </TableCell>

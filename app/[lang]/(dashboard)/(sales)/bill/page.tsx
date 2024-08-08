@@ -123,7 +123,8 @@ const BillPage = () => {
                             <TableHead className="text-default-600 uppercase">Name</TableHead>
                             <TableHead className="text-default-600 uppercase">Phone</TableHead>
                             <TableHead className="text-default-600 uppercase">Address</TableHead>
-                            <TableHead className="text-default-600 uppercase text-end pr-7">Status</TableHead>
+                            <TableHead className="text-default-600 uppercase">Status</TableHead>
+                            <TableHead className="text-default-600 uppercase text-end">Actions</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody className="[&_tr:last-child]:border-1">
@@ -152,6 +153,10 @@ const BillPage = () => {
                                     >
                                       {translate(customer.status, trans)}
                                     </Badge>
+                                  </div>
+                                </TableCell>
+                                <TableCell>
+                                  <div className="flex gap-2">
                                     <Trash2 className="w-4 h-4 text-warning" />
                                   </div>
                                 </TableCell>
@@ -214,14 +219,6 @@ const BillPage = () => {
                   </div>
                 </div>
               </CardContent>
-              <CardFooter className="flex-wrap justify-end gap-4">
-                <Button asChild className="bg-default-200 text-xs font-semibold text-default-600 group hover:text-primary-foreground whitespace-nowrap">
-                  <Link href="/invoice-details"><Icon icon="heroicons:eye" className="w-5 h-5 text-default-500 ltr:mr-2 rtl:ml-2 group-hover:text-primary-foreground" /> Preview</Link>
-                </Button>
-                <Button asChild className="group hover:bg-default-200 hover:text-default-900 text-xs font-semibold whitespace-nowrap">
-                  <Link href=""><Icon icon="heroicons:paper-airplane" className="w-5 h-5 ltr:mr-2 rtl:ml-2 group-hover:text-default-900" /> Send Invoice</Link>
-                </Button>
-              </CardFooter>
             </Card>
             <div className="col-span-12 xl:col-span-4">
               <Card className="sticky top-20">
@@ -284,6 +281,18 @@ const BillPage = () => {
                   </div>
                 </CardContent>
               </Card>
+            </div>
+          </div>
+          <div className="sticky bottom-2 mt-4 flex w-full gap-2">
+            <div className="flex-1">
+              <Button asChild className="p-8 text-2xl w-full bg-default-200 font-semibold text-default-600 group hover:text-primary-foreground whitespace-nowrap">
+                <Link href="/invoice-details"><Icon icon="heroicons:eye" className="w-5 h-5 text-default-500 ltr:mr-2 rtl:ml-2 group-hover:text-primary-foreground" /> Preview</Link>
+              </Button>
+            </div>
+            <div className="flex-1">
+              <Button asChild className="p-8 text-2xl w-full group hover:bg-default-200 hover:text-default-900 font-semibold whitespace-nowrap">
+                <Link href=""><Icon icon="heroicons:paper-airplane" className="w-5 h-5 ltr:mr-2 rtl:ml-2 group-hover:text-default-900" /> Send Invoice</Link>
+              </Button>
             </div>
           </div>
         </div>
