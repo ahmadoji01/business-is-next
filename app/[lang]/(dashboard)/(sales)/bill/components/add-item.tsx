@@ -15,6 +15,8 @@ import { CircularProgress } from "@/components/ui/progress";
 import ItemCard from "./item-card";
 import { categoryNameEquals } from "@/modules/items/domain/item.specifications";
 import { useSalesContext } from "@/provider/sales.provider";
+import { SalesItem, SalesItemCreator } from "@/modules/sales/domain/sales-item";
+import { defaultSales } from "@/modules/sales/domain/sales";
 
 let activeTimeout:any = null;
 
@@ -28,9 +30,9 @@ const AddItem = ({ open, setOpen }: { open: boolean; setOpen: any }) => {
     const [filter, setFilter] = useState({});
     const fields = ['id', 'name', 'category.id', 'category.name', 'price', 'stock', 'type', 'unit', 'photo.id', 'photo.filename_download']
 
-    const {accessToken} = useUserContext();
+    const {accessToken, organization} = useUserContext();
     const {trans} = useLanguageContext();
-    const {selectedItems, setSelectedItems} = useSalesContext();
+    const {salesItems, setSalesItems} = useSalesContext();
 
     const fetchCategories = async () => {
         setLoading(true);
@@ -82,13 +84,22 @@ const AddItem = ({ open, setOpen }: { open: boolean; setOpen: any }) => {
         fetchItems(query, filter);
     }
 
-    const handleAddItem = (item:Item) => {
-        if (typeof(selectedItems.find( itm => itm.id === item.id )) !== 'undefined')
+    const handleAddItem = (item:Item, quantity:number) => {
+        if (typeof(salesItems.find( itm => itm.item.id === item.id )) !== 'undefined')
             return;
 
-        let newSelectedItems = [...selectedItems];
-        newSelectedItems.push(item);
-        setSelectedItems(newSelectedItems);
+        let newSalesItems = [...salesItems];
+        let salesItem:SalesItem = { 
+            id: '',
+            quantity, 
+            total: quantity * item.price,
+            item: item,
+            type: item.type,
+            sales: defaultSales,
+            unit_cost: item.price,
+        }
+        newSalesItems.push(salesItem);
+        setSalesItems(newSalesItems);
         toast.success(translate("item_added", trans))
     }
 
@@ -152,7 +163,7 @@ const AddItem = ({ open, setOpen }: { open: boolean; setOpen: any }) => {
                 <div className="grid max-h-[400px] xl:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-5 p-4 overflow-y-auto">
                     { items?.map( (item, key) => {
                         let isSelected = false;
-                        if (typeof(selectedItems.find( itm => itm.id === item.id )) !== 'undefined')
+                        if (typeof(salesItems.find( itm => itm.item.id === item.id )) !== 'undefined')
                             isSelected = true;
                         return (
                             <ItemCard

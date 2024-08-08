@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { SalesItem } from "../../domain/sales-item";
 import Currency from "@/components/Currency";
 import { FocusEvent, useEffect, useRef, useState } from "react";
-import { ORDER_ITEM_TYPE } from "../../domain/order.constants";
+import { ORDER_ITEM_TYPE } from "../../domain/sales.constants";
 import { ITEM_TYPE } from "@/modules/items/domain/item.constants";
 import { useTranslations } from "next-intl";
 

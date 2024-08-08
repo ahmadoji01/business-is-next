@@ -4,7 +4,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/componen
 import { Icon } from "@iconify/react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Euro, Plus, Trash2, Upload } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -24,7 +24,6 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Breadcrumbs, BreadcrumbItem } from "@/components/ui/breadcrumbs";
 import { useUserContext } from "@/provider/user.provider";
 import { useSalesContext } from "@/provider/sales.provider";
@@ -38,6 +37,7 @@ import { useLanguageContext } from "@/provider/language.provider";
 import { Badge } from "@/components/ui/badge";
 import AddItem from "./components/add-item";
 import { useRouter } from "next/navigation";
+import ItemTable from "./components/item-table";
 
 const BillPage = () => {
 
@@ -165,50 +165,7 @@ const BillPage = () => {
                 </div>
                 <div className="border border-default-300 rounded-md mt-9">
                   <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead className="text-default-600 uppercase">Item</TableHead>
-                          <TableHead className="text-default-600 uppercase">Quantity</TableHead>
-                          <TableHead className="text-default-600 uppercase text-end pr-7">Total</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody className="[&_tr:last-child]:border-1">
-                        <TableRow>
-                          <TableCell className="min-w-[220px] w-full max-w-[432px]">
-                            <Input
-                              type="text"
-                              placeholder="Gaming Mouse & Keyboard Combo"
-                              className="text-default-800 rounded "
-                            />
-                          </TableCell>
-                          <TableCell>
-                            <div className="max-w-[130px] flex">
-                              <Input
-                                className="w-[70px] appearance-none accent-transparent rounded ltr:rounded-r-none ltr:border-r-0 rtl:rounded-l-none rtl:border-l-0"
-                                type="number"
-                                defaultValue="1"
-                              />
-                              <Select>
-                                <SelectTrigger className="rounded ltr:rounded-l-none rtl:rounded-r-none h-9  pr-1 [&>svg]:h-4 [&>svg]:w-4 [&>svg]:mt-1 ">
-                                  <SelectValue placeholder="pcs" />
-                                </SelectTrigger>
-                                <SelectContent >
-                                  <SelectItem value="pcs">pcs</SelectItem>
-                                  <SelectItem value="kg">kg</SelectItem>
-                                </SelectContent>
-                              </Select>
-                            </div>
-                          </TableCell>
-                          <TableCell>
-                            <div className="flex items-center gap-2 ">
-                              <Input defaultValue="$1663.00" className="text-end font-medium  text-default-900 rounded min-w-[140px]" />
-                              <Trash2 className="w-4 h-4 text-warning" />
-                            </div>
-                          </TableCell>
-                        </TableRow>
-                      </TableBody>
-                    </Table>
+                    <ItemTable />
                   </div>
                   <div className="flex flex-col sm:flex-row gap-4 py-5 px-6">
                     <div className="flex-1">

@@ -15,11 +15,19 @@ import { useState } from "react";
 interface ItemCardProps {
   isSelected?:boolean, 
   item:Item,
-  handleAddItem: (item:Item) => void,
+  handleAddItem: (item:Item, quantity:number) => void,
 }
 
 const ItemCard = ({ isSelected, item, handleAddItem }:ItemCardProps) => {
-    const [count, setCount] = useState<number>(5);
+    const [count, setCount] = useState<number>(1);
+
+    const handleCount = (value:number) => {
+      if (value <= 0)
+        return;
+    
+      setCount(value);
+    }
+
     return (
         <Card className="p-4 rounded-md">
           <Link href="#">
@@ -54,7 +62,7 @@ const ItemCard = ({ isSelected, item, handleAddItem }:ItemCardProps) => {
                   <button
                     type="button"
                     className="flex-none px-4 text-primary hover:bg-primary hover:text-primary-300  disabled:cursor-not-allowed disabled:opacity-50 "
-                    onClick={() => setCount(prevCount => prevCount - 1)}
+                    onClick={() => handleCount(count-1)}
                   >
                     <Icon icon="eva:minus-fill" />
                   </button>
@@ -65,13 +73,13 @@ const ItemCard = ({ isSelected, item, handleAddItem }:ItemCardProps) => {
                   <button
                     type="button"
                     className="flex-none px-4 text-primary hover:bg-primary hover:text-primary-300 disabled:cursor-not-allowed disabled:opacity-50 "
-                    onClick={() => setCount(prevCount => prevCount + 1)}
+                    onClick={() => setCount(count+1)}
                   >
                     <Icon icon="eva:plus-fill" />
                   </button>
                 </div>
               </div>
-              <Button className="w-full" onClick={() => handleAddItem(item)} disabled={isSelected? true:false}>
+              <Button className="w-full" onClick={() => handleAddItem(item, count)} disabled={isSelected? true:false}>
                 {isSelected? "Item Selected":"Add to Billing"}
               </Button>
             </div>

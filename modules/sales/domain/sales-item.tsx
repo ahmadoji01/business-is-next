@@ -1,21 +1,23 @@
-import { MedicalRecordItem } from "@/modules/medical-records/domain/medical-record";
-import { Item, defaultItem, itemMapper } from "@/modules/items/domain/item";
+import Item, { defaultItem, itemMapper } from "@/modules/items/domain/item";
+import { defaultSales, Sales, salesMapper } from "./sales";
 
 export interface SalesItem {
-    id: string,
-    item: Item,
-    price: number,
-    quantity: number,
-    type: string,
-    total: number,
+  id: string,
+  item: Item,
+  quantity: number,
+  type: string,
+  sales: Sales,
+  unit_cost: number,
+  total: number,
 }
 
 export const defaultSalesItem:SalesItem = {
   id: "",
   item: defaultItem,
-  price: 0,
   quantity: 0,
   type: "",
+  sales: {},
+  unit_cost: 0,
   total: 0,
 }
 
@@ -24,9 +26,10 @@ export const salesItemMapper = (res:Record<string,any>) => {
   salesItem = { 
     id: res.id, 
     item: res.item? itemMapper(res.item):defaultItem,
-    price: res.price,
     quantity: res.quantity,
     type: res.type,
+    sales: res.sales? salesMapper(res.sales):defaultSales,
+    unit_cost: res.unit_cost,
     total: res.total,
   }
   return salesItem;
@@ -40,22 +43,23 @@ export const salesItemsMapper = (sales_items:Record<string, any>) => {
   return results;
 }
 
-export type SalesItemCreator = Omit<SalesItem, 'id'|'item'> & { item:string, organization: number };
-export const salesItemCreatorMapper = (mrItem:MedicalRecordItem, orgID:number) => {
+export type SalesItemCreator = Omit<SalesItem, 'id'|'item'|'sales'> & { item:string, sales:string, organization: number };
+export const salesItemCreatorMapper = (salesItem:SalesItem, orgID:number) => {
   
-  let price = mrItem.items_id.price;
-  let total = mrItem.items_id.price * mrItem.quantity;
-  let quantity = mrItem.quantity;
+  let unit_cost = salesItem.item.price;
+  let quantity = salesItem.quantity;
+  let total = unit_cost * quantity;
 
-  let orderItemCreator:SalesItemCreator = {
-    price: price,
+  let salesItemCreator:SalesItemCreator = {
     quantity: quantity,
     total: total,
-    item: mrItem.items_id.id,
-    type: mrItem.type,
+    item: salesItem.item.id,
+    type: salesItem.type,
+    sales: salesItem.sales? salesItem.sales.id:'',
+    unit_cost: unit_cost,
     organization: orgID,
   }
-  return orderItemCreator;
+  return salesItemCreator;
 }
 
 export const salesItemPatcherMapper = (orderItem:SalesItem, orgID:number) => {

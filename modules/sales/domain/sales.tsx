@@ -1,7 +1,5 @@
-import { Patient, defaultPatient, patientMapper } from "@/modules/patients/domain/customer";
-import { defaultSalesItem, SalesItem, SalesItemCreator, orderItemPatcherMapper, salesItemsMapper, salesItemPatcherMapper } from "./sales-item";
-import { Visit, defaultVisit, visitMapper } from "@/modules/visits/domain/visit";
-import { DOCTOR_PAID, ORDER_STATUS } from "./sales.constants";
+import { SalesItem, SalesItemCreator, salesItemsMapper, salesItemPatcherMapper } from "./sales-item";
+import { ORDER_STATUS } from "./sales.constants";
 import { Customer, customerMapper, defaultCustomer } from "@/modules/customers/domain/customer";
 
 export interface Sales {
@@ -15,7 +13,7 @@ export interface Sales {
     date_updated: Date,
 }
 
-export const defaultOrder: Sales = {
+export const defaultSales: Sales = {
     id: "",
     description: "",
     customer: defaultCustomer,
@@ -27,7 +25,7 @@ export const defaultOrder: Sales = {
 }
 
 export function salesMapper(res:Record<string,any>) {
-    let sales = defaultOrder;
+    let sales = defaultSales;
     sales = { 
         id: res.id? res.id:"",
         description: res.description? res.description:"", 
