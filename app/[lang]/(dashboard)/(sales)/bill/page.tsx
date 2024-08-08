@@ -120,17 +120,20 @@ const BillPage = () => {
                       <Table>
                         <TableHeader>
                           <TableRow>
+                            <TableHead className="text-default-600 uppercase"></TableHead>
                             <TableHead className="text-default-600 uppercase">Name</TableHead>
                             <TableHead className="text-default-600 uppercase">Phone</TableHead>
                             <TableHead className="text-default-600 uppercase">Address</TableHead>
                             <TableHead className="text-default-600 uppercase">Status</TableHead>
-                            <TableHead className="text-default-600 uppercase text-end">Actions</TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody className="[&_tr:last-child]:border-1">
                           {customers.map((customer, key) => {
                             return (
                               <TableRow key={key}>
+                                <TableCell>
+                                  <Trash2 className="w-4 h-4 text-warning" />
+                                </TableCell>
                                 <TableCell>
                                   {customer.name}
                                 </TableCell>
@@ -153,11 +156,6 @@ const BillPage = () => {
                                     >
                                       {translate(customer.status, trans)}
                                     </Badge>
-                                  </div>
-                                </TableCell>
-                                <TableCell>
-                                  <div className="flex gap-2">
-                                    <Trash2 className="w-4 h-4 text-warning" />
                                   </div>
                                 </TableCell>
                               </TableRow>

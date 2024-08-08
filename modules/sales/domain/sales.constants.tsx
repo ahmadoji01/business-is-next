@@ -4,6 +4,8 @@ export const ORDER_STATUS = {
     cancelled: 'cancelled',
     paid: 'paid',
     waiting_to_pay: 'waiting_to_pay',
+    installment: 'installment',
+    unpaid: 'unpaid',
 }
 
 export const DOCTOR_PAID = {

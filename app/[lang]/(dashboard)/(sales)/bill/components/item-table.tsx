@@ -19,6 +19,7 @@ import { useEffect, useState } from "react";
 import Item from "@/modules/items/domain/item";
 import { useSalesContext } from "@/provider/sales.provider";
 import { SalesItem } from "@/modules/sales/domain/sales-item";
+import { Label } from "@/components/ui/label";
 
 const ItemTable = () => {
 
@@ -43,17 +44,22 @@ const ItemTable = () => {
         <Table>
             <TableHeader>
                 <TableRow>
+                    <TableHead className="text-default-600 uppercase"></TableHead>
                     <TableHead className="text-default-600 uppercase">Item</TableHead>
                     <TableHead className="text-default-600 uppercase">Unit Cost</TableHead>
                     <TableHead className="text-default-600 uppercase">Quantity</TableHead>
                     <TableHead className="text-default-600 uppercase">Total</TableHead>
-                    <TableHead className="text-default-600 uppercase">Actions</TableHead>
                 </TableRow>
             </TableHeader>
             <TableBody className="[&_tr:last-child]:border-1">
                 { items?.map( (item,key) => {
                     return (
                         <TableRow key={key}>
+                            <TableCell>
+                                <div className="flex items-center gap-2 ">
+                                    <Trash2 className="w-4 h-4 text-warning" />
+                                </div>
+                            </TableCell>
                             <TableCell className="min-w-[220px] w-full max-w-[432px]">
                                 <Input
                                     value={item.item.name}
@@ -63,8 +69,9 @@ const ItemTable = () => {
                                 />
                             </TableCell>
                             <TableCell>
-                                <div className="max-w-[130px] flex items-center gap-2">
-                                    <Input value={item.unit_cost} className="text-end font-medium  text-default-900 rounded min-w-[140px]" disabled />
+                                <div className="flex gap-2 items-center">
+                                    <Label>Rp</Label>
+                                    <Input type="text" value={item.unit_cost} className="text-end font-medium  text-default-900 rounded min-w-[140px]" disabled />
                                 </div>
                             </TableCell>
                             <TableCell>
@@ -87,13 +94,9 @@ const ItemTable = () => {
                                 </div>
                             </TableCell>
                             <TableCell>
-                                <div className="max-w-[130px] flex items-center gap-2 ">
-                                    <Input value={item.total} className="text-end font-medium  text-default-900 rounded min-w-[140px]" />
-                                </div>
-                            </TableCell>
-                            <TableCell>
-                                <div className="flex items-center gap-2 ">
-                                    <Trash2 className="w-4 h-4 text-warning" />
+                                <div className="flex gap-2 items-center">
+                                    <Label>Rp</Label>
+                                    <Input type="text" value={item.total} className="text-end font-medium  text-default-900 rounded min-w-[140px]" disabled />
                                 </div>
                             </TableCell>
                         </TableRow>
