@@ -5,6 +5,7 @@ import { Icon } from "@iconify/react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Euro, Plus, Trash2, Upload } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
 import {
   Table,
@@ -42,6 +43,7 @@ const BillPage = () => {
 
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState<string>("cr_1");
   const custField = ['id', 'name', 'address', 'phone', 'email'];
 
   const { accessToken, organization } = useUserContext();
@@ -58,6 +60,10 @@ const BillPage = () => {
     } catch {
       toast.error(translate("something_wrong", trans));
     }
+  }
+  
+  const handleValueChange = (value: string) => {
+    setSelected(value)
   }
 
   useEffect(() => {
@@ -267,23 +273,58 @@ const BillPage = () => {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3">
+                    <RadioGroup
+                      defaultValue="block_1"
+                      onValueChange={handleValueChange}
+                      >
+                      <Label
+                        className="flex gap-2.5 items-center w-full rounded-md p-2 hover:bg-default-50 group"
+                        htmlFor="block_1"
+                        >
+                        <div className="h-10 w-10 rounded-full bg-default-100 flex justify-center items-center group-hover:bg-default-200">
+                          <Icon icon="codicon:account" className="text-2xl" />
+                        </div>
+                        <div className="flex-1">
+                          <h2 className="text-sm font-bold text-default-900 mb-1">Unpaid</h2>
+                          <ul className="space-y-[2px]">
+                            <li className="text-xs text-default-500">Customer has not paid the bill yet.</li>
+                          </ul>
+                        </div>
+                        <RadioGroupItem
+                          value="block_1"
+                          id="block_1"
+                          color="primary"
+                        ></RadioGroupItem>
+                      </Label>
+                      <Label
+                        className="flex gap-2.5 items-center w-full rounded-md p-2 hover:bg-default-50 group"
+                        htmlFor="block_2"
+                        >
+                        <div className="h-10 w-10 rounded-full bg-default-100 flex justify-center items-center group-hover:bg-default-200">
+                          <Icon icon="ant-design:message-outlined" className="text-2xl" />
+                        </div>
+                        <div className="flex-1">
+                          <h2 className="text-sm font-bold text-default-900 mb-1">Paid</h2>
+                          <ul className="space-y-[2px]">
+                            <li className="text-xs text-default-500">Customer has paid prior to invoice creation.</li>
+                          </ul>
+                        </div>
+                        <RadioGroupItem
+                          value="block_2"
+                          id="block_2"
+                          color="primary"
+                        ></RadioGroupItem>
+                      </Label>
+                    </RadioGroup>
+                  </div>
+                  <div className="mt-4 space-y-3">
+                    <div className="text-xl font-bold">Payment Method</div>
                     <Checkbox defaultChecked id="bank" className="border-default-300"> Bank Account</Checkbox>
                     <Checkbox id="paypal" className="border-default-300"> Paypal</Checkbox>
                     <Checkbox id="credit" className="border-default-300"> Credit/Debit Card</Checkbox>
                     <Checkbox id="transfer" className="border-default-300"> UPI Transfer</Checkbox>
                     <Checkbox id="cod" className="border-default-300"> Cash On Delivery (COD)</Checkbox>
                   </div>
-                  <div className="mt-6">
-                    <Label htmlFor="name" className="mb-2 text-xs font-medium text-default-600">Card Holder Name:</Label>
-                    <Input type="text" id="name" placeholder="Enter name" />
-                  </div>
-                  <div className="mt-3">
-                    <Label htmlFor="cardNumber" className="mb-2 text-xs font-medium text-default-600">Card Number:</Label>
-                    <Input type="number" id="cardNumber" placeholder="Enter Card Number" />
-                  </div>
-                  <Alert color="warning" variant="soft" className="mt-6 border border-orange-300">
-                    <AlertDescription>Please make sure to pay the invoice bill within 20 to 30 days before it expires.</AlertDescription>
-                  </Alert>
                 </CardContent>
               </Card>
             </div>

@@ -116,7 +116,7 @@ const CustomersToBillTable = () => {
     fetchTotal(query, filter);
   }
 
-  const billCustomers = () => {
+  const billCustomers = async () => {
     router.push('/bill');
   }
 
