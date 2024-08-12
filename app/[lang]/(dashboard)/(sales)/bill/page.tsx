@@ -75,7 +75,6 @@ const BillPage = () => {
   }
 
   const insertBills = async (transactToCreate:Transaction[], salesToCreate:SalesCreator[], ledgersToCreate:LedgerCreator[]) => {
-    console.log(transactToCreate, salesToCreate, ledgersToCreate);
     try {
       let res = await createManyTransactions(accessToken, transactToCreate);
       res = await createManySales(accessToken, salesToCreate);
@@ -135,14 +134,14 @@ const BillPage = () => {
     let ledgersToInsert:LedgerCreator[] = [];
 
     accounts?.map( account => {
-      let ledger:LedgerEntry = defaultLedgerEntry;
+      let ledger:LedgerEntry = {...defaultLedgerEntry};
       let typeIndex = entries.findIndex( action => action.code === account.code);
       ledger.type = entries[typeIndex]?.type?.toLowerCase();
       ledger.account = account;
       ledger.total = sales.total;
       ledgerEntries.push(ledger);
     });
-
+    
     customers?.map( cust => {
       let transactID = crypto.randomUUID();
       let transactDesc = desc;
@@ -155,7 +154,7 @@ const BillPage = () => {
       });
       transactToCreate.push(createTransactionMapper(transact, new Date(), organization.id));
 
-      let sls = sales;
+      let sls = {...sales};
       sls.customer = cust;
       let saleToCreate = salesCreatorMapper(sls, organization.id, transactID);  
       salesToInsert.push(saleToCreate);
