@@ -6,8 +6,11 @@ interface Logo {
 }
 
 export interface Organization {
-    id: number,
+    id: string,
     name: string,
+    email: string,
+    address: string,
+    phone: string,
     type: string,
     subscription_type: string,
     subscription_expiry: Date,
@@ -19,8 +22,11 @@ export interface Organization {
 }
 
 export const defaultOrganization:Organization = {
-    id: 0,
+    id: "",
     name: "",
+    email: "",
+    address: "",
+    phone: "",
     type: "",
     subscription_type: "",
     subscription_expiry: new Date,
@@ -36,6 +42,9 @@ export function organizationMapper(res:Record<string,any>) {
     organization = { 
         id: res.id,
         name: res.name,
+        email: res.email? res.email : "",
+        address: res.address? res.address : "",
+        phone: res.phone? res.phone : "",
         type: res.type? res.type : "",
         subscription_type: res.subscription_type,
         subscription_expiry: new Date,
@@ -48,12 +57,15 @@ export function organizationMapper(res:Record<string,any>) {
     return organization;
 }
 
-export type OrganizationPatcher = Omit<Organization, 'subscription_type'|'subscription_expiry'|'domain_name'|'slug'|'status'|'logo'|'type'>;
+export type OrganizationPatcher = Omit<Organization, |'subscription_type'|'subscription_expiry'|'domain_name'|'slug'|'status'|'logo'|'type'>;
 export function organizationPatcherMapper(organization:Organization) {
 
     let organizationPatcher: OrganizationPatcher = {
         id: organization.id,
         name: organization.name,
+        email: organization.email,
+        address: organization.address,
+        phone: organization.phone,
         tax_rate: organization.tax_rate? organization.tax_rate : 0,
     }
     return organizationPatcher;

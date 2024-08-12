@@ -88,7 +88,7 @@ export const homeMenuItems: HomeMenuItem[] = [
           },
           {
             image: '/icons/menu/bill.png',
-            title: 'sell/bill customers',
+            title: 'sell to/bill customers',
             url: '/sales',
           },
           {
@@ -1203,6 +1203,43 @@ export const menusConfig = {
       },
       {
         isHeader: true,
+        title: "Sales",
+      },
+      {
+        title: "customers",
+        icon: Customer,
+        child: [
+          {
+            title: "add a customer",
+            href: "/customers/add",
+          },
+          {
+            title: "customers list",
+            href: "/customers",
+          },
+        ]
+      },
+      {
+        title: "manage sales",
+        icon: CashRegister,
+        child: [
+          {
+            title: "point of sales",
+            href: "/cashier",
+          },
+          {
+            title: "sales list",
+            href: "/sales",
+          },
+        ]
+      },
+      {
+        title: "receivables",
+        icon: CardSend,
+        href: "/receivables",
+      },
+      {
+        isHeader: true,
         title: "Transaction",
       },
       {
@@ -1262,43 +1299,6 @@ export const menusConfig = {
         title: "inventory",
         icon: Garage,
         href: "/inventory",
-      },
-      {
-        isHeader: true,
-        title: "Sales",
-      },
-      {
-        title: "customers",
-        icon: Customer,
-        child: [
-          {
-            title: "add a customer",
-            href: "/customers/add",
-          },
-          {
-            title: "customers list",
-            href: "/customers",
-          },
-        ]
-      },
-      {
-        title: "manage sales",
-        icon: CashRegister,
-        child: [
-          {
-            title: "point of sales",
-            href: "/cashier",
-          },
-          {
-            title: "sales list",
-            href: "/sales",
-          },
-        ]
-      },
-      {
-        title: "receivables",
-        icon: CardSend,
-        href: "/receivables",
       },
       {
         isHeader: true,
@@ -1371,6 +1371,43 @@ export const menusConfig = {
       },
       {
         isHeader: true,
+        title: "Sales",
+      },
+      {
+        title: "customers",
+        icon: Customer,
+        child: [
+          {
+            title: "add a customer",
+            href: "/customers/add",
+          },
+          {
+            title: "customers list",
+            href: "/customers",
+          },
+        ]
+      },
+      {
+        title: "manage sales",
+        icon: CashRegister,
+        child: [
+          {
+            title: "point of sales",
+            href: "/cashier",
+          },
+          {
+            title: "sales list",
+            href: "/sales",
+          },
+        ]
+      },
+      {
+        title: "receivables",
+        icon: CardSend,
+        href: "/receivables",
+      },
+      {
+        isHeader: true,
         title: "Transaction",
       },
       {
@@ -1430,43 +1467,6 @@ export const menusConfig = {
         title: "inventory",
         icon: Garage,
         href: "/inventory",
-      },
-      {
-        isHeader: true,
-        title: "Sales",
-      },
-      {
-        title: "customers",
-        icon: Customer,
-        child: [
-          {
-            title: "add a customer",
-            href: "/customers/add",
-          },
-          {
-            title: "customers list",
-            href: "/customers",
-          },
-        ]
-      },
-      {
-        title: "manage sales",
-        icon: CashRegister,
-        child: [
-          {
-            title: "point of sales",
-            href: "/cashier",
-          },
-          {
-            title: "sales list",
-            href: "/sales",
-          },
-        ]
-      },
-      {
-        title: "receivables",
-        icon: CardSend,
-        href: "/receivables",
       },
       {
         isHeader: true,

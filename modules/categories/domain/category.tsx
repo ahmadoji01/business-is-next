@@ -20,6 +20,12 @@ export const categoryMapper = (res:Record<string,any>) => {
     return category;
 }
 
+export const mapCategories = (res:Record<string,any>) => {
+    let categories:Category[] = [];
+    res?.map( (category:any) => { categories.push(categoryMapper(category)) });
+    return categories;
+}
+
 export type CategoryCreator = Omit<Category, 'id'> & { organization: number };
 export const categoryCreatorMapper = (category:Category, orgID:number) => {
     let categoryCreator:CategoryCreator = {

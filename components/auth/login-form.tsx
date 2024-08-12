@@ -26,11 +26,15 @@ const schema = z.object({
   password: z.string().min(4),
 });
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { directusClient } from "@/utils/request-handler";
+import { errorMapper } from "@/modules/errors/domains/error";
+import { useUserContext } from "@/provider/user.provider";
 
 const LogInForm = () => {
   const [isPending, startTransition] = React.useTransition();
   const [passwordType, setPasswordType] = React.useState("password");
   const isDesktop2xl = useMediaQuery("(max-width: 1530px)");
+  const {setAccessToken} = useUserContext();
 
   const togglePasswordType = () => {
     if (passwordType === "text") {
@@ -58,17 +62,15 @@ const LogInForm = () => {
 
   const onSubmit = (data: { email: string; password: string; }) => {
     startTransition(async () => {
-      let response = await signIn("credentials", {
-        email: data.email,
-        password: data.password,
-        redirect: false,
-      });
-      if (response?.ok) {
+      try {
+        let response = await directusClient.login(data.email, data.password);
+        setAccessToken(response.access_token? response.access_token : '');
         toast.success("Login Successful");
         window.location.assign("/dashboard");
         reset();
-      } else if (response?.error) {
-        toast.error(response?.error);
+      } catch(error:any) {
+        let err = errorMapper(error.errors[0]);
+        toast.error(err.message);
       }
     });
   };

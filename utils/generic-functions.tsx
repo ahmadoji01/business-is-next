@@ -8,3 +8,7 @@ export const currency = (val:number) => {
     const currFormat = new Intl.NumberFormat('en-US', { style: 'currency', currency: appConfig.CURRENCY_FORMAT });
     return currFormat.format(val);
 }
+
+export const isEmptyObject = (obj:object) => {
+    return Object.keys(obj).length === 0;
+}

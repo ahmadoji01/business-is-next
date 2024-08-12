@@ -12,7 +12,7 @@ export const defaultError = {
 
 export function errorMapper(res:Record<string,any>) {
     let error:Error = {
-        message: res.message,
+        message: res.message? res.message:"",
         code: res.extensions.code,
         field: res.extensions.field? res.extensions.field : "",
     }
