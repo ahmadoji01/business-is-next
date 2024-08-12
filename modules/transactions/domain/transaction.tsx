@@ -29,3 +29,16 @@ export function transactionMapper(res:Record<string,any>) {
     }
     return transaction;
 }
+
+export type TransactionCreator = Transaction & { organization:string };
+export function createTransactionMapper(trans:Transaction, date:Date, orgID:string) {
+    let transaction = {
+        id: trans.id,
+        transaction_date: date,
+        description: trans.description,
+        total: trans.total,
+        document: trans.document? trans.document:null,
+        organization: orgID,
+    }
+    return transaction;
+}

@@ -1,5 +1,5 @@
 import { defaultTransaction, Transaction, transactionMapper } from "@/modules/transactions/domain/transaction";
-import { SalesItem, SalesItemCreator, salesItemsMapper, salesItemPatcherMapper } from "./sales-item";
+import { SalesItem, SalesItemCreator, salesItemsMapper, salesItemPatcherMapper, SalesItemPatcher, salesItemCreatorMapper } from "./sales-item";
 import { SALES_STATUS } from "./sales.constants";
 import { Customer, customerMapper, defaultCustomer } from "@/modules/customers/domain/customer";
 
@@ -47,13 +47,15 @@ type Organization = {
     organization: string,
 }
 
-export type SalesCreator = Omit<Sales, 'id'|'customer'|'date_created'|'date_updated'|'transaction'> & Organization & { customer:string|null, transaction:string|null };
+export type SalesCreator = Omit<Sales, 'id'|'sales_items'|'customer'|'date_created'|'date_updated'|'transaction'> & Organization & { sales_items: SalesItemPatcher[], customer:string|null, transaction:string|null };
 export function salesCreatorMapper(sales:Sales, orgID:string, transaction?:string|null) {
-
+    
+    let items:SalesItemPatcher[] = [];
+    sales.sales_items?.map( (item) => items.push(salesItemPatcherMapper(item, orgID)));
     let salesCreator: SalesCreator = { 
         description: sales.description ? sales.description : '',
         customer: sales.customer ? sales.customer.id : null,
-        sales_items: sales.sales_items,
+        sales_items: items,
         total: sales.total,
         status: sales.status,
         transaction: transaction? transaction:null,
@@ -62,10 +64,10 @@ export function salesCreatorMapper(sales:Sales, orgID:string, transaction?:strin
     return salesCreator;
 }
 
-export type SalesPatcher = Omit<Sales, 'id'|'sales_items'|'customer'|'date_created'|'date_updated'|'transaction'> & Organization & { sales_items: SalesItemCreator[], customer:string|null };
+export type SalesPatcher = Omit<Sales, 'id'|'sales_items'|'customer'|'date_created'|'date_updated'|'transaction'> & Organization & { sales_items: SalesItemPatcher[], customer:string|null };
 export function orderPatcherMapper(sales:Sales, orgID:string, transaction?:string|null) {
 
-    let items:SalesItemCreator[] = [];
+    let items:SalesItemPatcher[] = [];
     sales.sales_items?.map( (item) => items.push(salesItemPatcherMapper(item, orgID)));
 
     let salesPatcher: SalesPatcher = { 

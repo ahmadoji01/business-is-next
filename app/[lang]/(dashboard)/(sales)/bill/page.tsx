@@ -43,11 +43,12 @@ import { ENTRIES, EntryAction } from "@/utils/accounting-dictionary";
 import { Account, mapAccounts } from "@/modules/accounts/domain/account";
 import { getAccountsWithFilter } from "@/modules/accounts/domain/accounts.actions";
 import { accountsByCodes } from "@/modules/accounts/domain/account.specifications";
-import { Transaction, transactionMapper } from "@/modules/transactions/domain/transaction";
+import { createTransactionMapper, Transaction, TransactionCreator, transactionMapper } from "@/modules/transactions/domain/transaction";
 import { defaultLedgerEntry, LedgerCreator, ledgerCreatorMapper, LedgerEntry } from "@/modules/ledger-entries/domain/ledger-entry";
 import { createManyTransactions } from "@/modules/transactions/domain/transactions.actions";
 import { createManySales } from "@/modules/sales/domain/sales.actions";
 import { createManyLedgerEntries } from "@/modules/ledger-entries/domain/ledger-entries.actions";
+import { SalesItemCreator, salesItemCreatorMapper } from "@/modules/sales/domain/sales-item";
 
 const BillPage = () => {
 
@@ -74,13 +75,15 @@ const BillPage = () => {
   }
 
   const insertBills = async (transactToCreate:Transaction[], salesToCreate:SalesCreator[], ledgersToCreate:LedgerCreator[]) => {
+    console.log(transactToCreate, salesToCreate, ledgersToCreate);
     try {
       let res = await createManyTransactions(accessToken, transactToCreate);
       res = await createManySales(accessToken, salesToCreate);
       res = await createManyLedgerEntries(accessToken, ledgersToCreate);
       toast.success("Bill(s) have been created!");
       window.location.assign("/sales");
-    } catch {
+    } catch(e) {
+      console.log(e);
       toast.error(translate("something_wrong", trans));
     }
   }
@@ -127,18 +130,18 @@ const BillPage = () => {
     let sales = activeSales;
     sales.sales_items = salesItems;
     let salesToInsert:SalesCreator[] = [];
-    let transactToCreate:Transaction[] = [];
+    let transactToCreate:TransactionCreator[] = [];
     let ledgerEntries:LedgerEntry[] = [];
     let ledgersToInsert:LedgerCreator[] = [];
 
     accounts?.map( account => {
       let ledger:LedgerEntry = defaultLedgerEntry;
       let typeIndex = entries.findIndex( action => action.code === account.code);
-      ledger.type = entries[typeIndex].type;
+      ledger.type = entries[typeIndex]?.type?.toLowerCase();
       ledger.account = account;
       ledger.total = sales.total;
       ledgerEntries.push(ledger);
-    })
+    });
 
     customers?.map( cust => {
       let transactID = crypto.randomUUID();
@@ -150,7 +153,7 @@ const BillPage = () => {
         document: null,
         total: sales.total,
       });
-      transactToCreate.push(transact);
+      transactToCreate.push(createTransactionMapper(transact, new Date(), organization.id));
 
       let sls = sales;
       sls.customer = cust;
@@ -171,6 +174,8 @@ const BillPage = () => {
   }, [activeSales])
 
   useEffect(() => {
+    handleValueChange("unpaid");
+
     if (selectedCustomers.length === 0 && isEmptyObject(filter)) {
       router.push('/sales');
     }

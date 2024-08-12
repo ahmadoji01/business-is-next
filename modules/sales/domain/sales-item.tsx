@@ -43,8 +43,8 @@ export const salesItemsMapper = (sales_items:Record<string, any>) => {
   return results;
 }
 
-export type SalesItemCreator = Omit<SalesItem, 'id'|'item'|'sales'> & { item:string, sales:string, organization: number };
-export const salesItemCreatorMapper = (salesItem:SalesItem, orgID:number) => {
+export type SalesItemCreator = Omit<SalesItem, 'id'|'item'|'sales'> & { item:string, sales:string, organization: string };
+export const salesItemCreatorMapper = (salesItem:SalesItem, orgID:string) => {
   
   let unit_cost = salesItem.item.price;
   let quantity = salesItem.quantity;
@@ -62,19 +62,20 @@ export const salesItemCreatorMapper = (salesItem:SalesItem, orgID:number) => {
   return salesItemCreator;
 }
 
-export const salesItemPatcherMapper = (orderItem:SalesItem, orgID:number) => {
+export type SalesItemPatcher = Omit<SalesItem, 'id'|'item'|'sales'> & { item:string, organization: string };
+export const salesItemPatcherMapper = (orderItem:SalesItem, orgID:string) => {
   
-  let price = orderItem.item.price;
+  let unit_cost = orderItem.item.price;
   let quantity = orderItem.quantity;
-  let total = price * quantity;
+  let total = unit_cost * quantity;
 
-  let orderItemCreator:SalesItemCreator = {
-    price: price,
+  let salesItemPatcher:SalesItemPatcher = {
+    unit_cost: unit_cost,
     quantity: quantity,
     total: total,
     item: orderItem.item.id,
     type: orderItem.type,
     organization: orgID,
   }
-  return orderItemCreator;
+  return salesItemPatcher;
 }
