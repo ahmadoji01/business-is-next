@@ -6,7 +6,7 @@ interface Logo {
 }
 
 export interface Organization {
-    id: number,
+    id: string,
     name: string,
     email: string,
     address: string,
@@ -22,7 +22,7 @@ export interface Organization {
 }
 
 export const defaultOrganization:Organization = {
-    id: 0,
+    id: "",
     name: "",
     email: "",
     address: "",

@@ -1,4 +1,4 @@
-export const ORDER_STATUS = {
+export const SALES_STATUS = {
     active: 'active',
     inactive: 'inactive',
     cancelled: 'cancelled',

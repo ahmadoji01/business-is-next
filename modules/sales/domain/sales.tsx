@@ -1,5 +1,6 @@
+import { defaultTransaction, Transaction, transactionMapper } from "@/modules/transactions/domain/transaction";
 import { SalesItem, SalesItemCreator, salesItemsMapper, salesItemPatcherMapper } from "./sales-item";
-import { ORDER_STATUS } from "./sales.constants";
+import { SALES_STATUS } from "./sales.constants";
 import { Customer, customerMapper, defaultCustomer } from "@/modules/customers/domain/customer";
 
 export interface Sales {
@@ -7,6 +8,7 @@ export interface Sales {
     description: string,
     customer: Customer,
     sales_items: SalesItem[],
+    transaction: Transaction,
     total: number,
     status: string,
     date_created: Date,
@@ -19,7 +21,8 @@ export const defaultSales: Sales = {
     customer: defaultCustomer,
     sales_items: [],
     total: 0,
-    status: ORDER_STATUS.inactive,
+    status: SALES_STATUS.inactive,
+    transaction: defaultTransaction,
     date_created: new Date,
     date_updated: new Date,
 }
@@ -33,6 +36,7 @@ export function salesMapper(res:Record<string,any>) {
         sales_items: res.sales_items? salesItemsMapper(res.sales_items):[],
         total: res.total? res.total:0,
         status: res.status? res.status:'',
+        transaction: res.transaction? transactionMapper(res.transaction):defaultTransaction,
         date_created: res.date_created? res.date_created:new Date,
         date_updated: res.date_updated? res.date_update:new Date,
     }
@@ -40,25 +44,26 @@ export function salesMapper(res:Record<string,any>) {
 }
 
 type Organization = {
-    organization: number,
+    organization: string,
 }
 
-export type SalesCreator = Omit<Sales, 'id'|'customer'|'date_created'|'date_updated'> & Organization & { customer:string|null };
-export function salesCreatorMapper(sales:Sales, orgID:number) {
+export type SalesCreator = Omit<Sales, 'id'|'customer'|'date_created'|'date_updated'|'transaction'> & Organization & { customer:string|null, transaction:string|null };
+export function salesCreatorMapper(sales:Sales, orgID:string, transaction?:string|null) {
 
-    let orderCreator: SalesCreator = { 
+    let salesCreator: SalesCreator = { 
         description: sales.description ? sales.description : '',
         customer: sales.customer ? sales.customer.id : null,
         sales_items: sales.sales_items,
         total: sales.total,
         status: sales.status,
+        transaction: transaction? transaction:null,
         organization: orgID,
     }
-    return orderCreator;
+    return salesCreator;
 }
 
-export type SalesPatcher = Omit<Sales, 'id'|'sales_items'|'customer'|'date_created'|'date_updated'> & Organization & { sales_items: SalesItemCreator[], customer:string|null };
-export function orderPatcherMapper(sales:Sales, orgID:number) {
+export type SalesPatcher = Omit<Sales, 'id'|'sales_items'|'customer'|'date_created'|'date_updated'|'transaction'> & Organization & { sales_items: SalesItemCreator[], customer:string|null };
+export function orderPatcherMapper(sales:Sales, orgID:string, transaction?:string|null) {
 
     let items:SalesItemCreator[] = [];
     sales.sales_items?.map( (item) => items.push(salesItemPatcherMapper(item, orgID)));

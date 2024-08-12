@@ -1,13 +1,16 @@
 'use client';
 
 import { Customer, customerMapper, defaultCustomer } from '@/modules/customers/domain/customer';
-import { Sales } from '@/modules/sales/domain/sales';
+import { defaultSales, Sales, SalesCreator, salesCreatorMapper } from '@/modules/sales/domain/sales';
 import { Dispatch, SetStateAction, createContext, useContext, useEffect, useState } from 'react';
 import { useUserContext } from './user.provider';
 import { getAllCustomers } from '@/modules/customers/domain/customers.actions';
 import toast from 'react-hot-toast';
 import Item from '@/modules/items/domain/item';
 import { SalesItem } from '@/modules/sales/domain/sales-item';
+import { createSales } from '@/modules/sales/domain/sales.actions';
+import { translate } from '@/lib/utils';
+import { useLanguageContext } from './language.provider';
 
 interface SalesContextType {
     customers: Customer[],
@@ -15,13 +18,17 @@ interface SalesContextType {
     selectedItems: Item[],
     filter: object,
     sales: Sales[],
+    activeSales: Sales,
     salesItems: SalesItem[],
     setSales: Dispatch<SetStateAction<Sales[]>>,
+    setActiveSales: Dispatch<SetStateAction<Sales>>,
     setSalesItems: Dispatch<SetStateAction<SalesItem[]>>,
     setFilter: Dispatch<SetStateAction<object>>,
     setSelectedCustomers: Dispatch<SetStateAction<Customer[]>>,
     setSelectedItems: Dispatch<SetStateAction<Item[]>>,
-    setCustomers: Dispatch<SetStateAction<Customer[]>>,  
+    setCustomers: Dispatch<SetStateAction<Customer[]>>, 
+    recalculateTotal: () => void, 
+    submitSales: () => void,
 }
 
 export const SalesContext = createContext<SalesContextType | null>({
@@ -30,13 +37,17 @@ export const SalesContext = createContext<SalesContextType | null>({
     selectedItems: [],
     filter: {},
     sales: [],
+    activeSales: defaultSales,
     salesItems: [],
     setSales: () => {},
+    setActiveSales: () => {},
     setSalesItems: () => {},
     setFilter: () => {},
     setSelectedCustomers: () => {},
     setSelectedItems: () => {},
     setCustomers: () => {},
+    recalculateTotal: () => {},
+    submitSales: async () => {}, 
 });
  
 export const SalesProvider = ({
@@ -51,9 +62,38 @@ export const SalesProvider = ({
     const [salesItems, setSalesItems] = useState<SalesItem[]>([]);
     const [filter, setFilter] = useState<object>({});
     const [sales, setSales] = useState<Sales[]>([]);
+    const [activeSales, setActiveSales] = useState<Sales>(defaultSales);
+    const {accessToken, organization} = useUserContext();
+    const {trans} = useLanguageContext();
+
+    const recalculateTotal = () => {
+        let total = 0;
+        salesItems?.map( item => { total += item.total });
+        
+        let newSales = {...activeSales};
+        newSales.total = total;
+        setActiveSales(newSales);
+    }
+
+    const submitSales = async () => {
+        let salesList:SalesCreator[] = [];
+        selectedCustomers.map( (cust) => {
+            let sales = {...activeSales};
+            sales.sales_items = salesItems;
+            salesList.push(salesCreatorMapper(sales, organization.id));
+        })
+
+        try {
+            let res = await createSales(accessToken, salesList);
+            toast.success("Customer has been billed!");
+            window.location.assign("/sales");
+        } catch {
+            toast.error(translate("something_wrong", trans));
+        }
+    }
 
     return (
-        <SalesContext.Provider value={{ salesItems, setSalesItems, selectedItems, setSelectedItems, customers, setCustomers, selectedCustomers, setSelectedCustomers, filter, setFilter, sales, setSales }}>
+        <SalesContext.Provider value={{ submitSales, recalculateTotal, activeSales, setActiveSales, salesItems, setSalesItems, selectedItems, setSelectedItems, customers, setCustomers, selectedCustomers, setSelectedCustomers, filter, setFilter, sales, setSales }}>
             {children}
         </SalesContext.Provider>
     );

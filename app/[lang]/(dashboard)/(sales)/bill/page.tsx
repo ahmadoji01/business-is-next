@@ -22,7 +22,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import Link from "next/link";
 import { Breadcrumbs, BreadcrumbItem } from "@/components/ui/breadcrumbs";
 import { useUserContext } from "@/provider/user.provider";
@@ -30,7 +29,7 @@ import { useSalesContext } from "@/provider/sales.provider";
 import { useEffect, useState } from "react";
 import { isEmptyObject } from "@/utils/generic-functions";
 import { Customer, mapCustomers } from "@/modules/customers/domain/customer";
-import { getAllCustomersWithFilter, getCustomersWithFilter } from "@/modules/customers/domain/customers.actions";
+import { getAllCustomersWithFilter } from "@/modules/customers/domain/customers.actions";
 import toast from "react-hot-toast";
 import { translate } from "@/lib/utils";
 import { useLanguageContext } from "@/provider/language.provider";
@@ -38,16 +37,28 @@ import { Badge } from "@/components/ui/badge";
 import AddItem from "./components/add-item";
 import { useRouter } from "next/navigation";
 import ItemTable from "./components/item-table";
+import { defaultSales, SalesCreator, salesCreatorMapper } from "@/modules/sales/domain/sales";
+import { SALES_STATUS } from "@/modules/sales/domain/sales.constants";
+import { ENTRIES, EntryAction } from "@/utils/accounting-dictionary";
+import { Account, mapAccounts } from "@/modules/accounts/domain/account";
+import { getAccountsWithFilter } from "@/modules/accounts/domain/accounts.actions";
+import { accountsByCodes } from "@/modules/accounts/domain/account.specifications";
+import { Transaction, transactionMapper } from "@/modules/transactions/domain/transaction";
+import { defaultLedgerEntry, LedgerCreator, ledgerCreatorMapper, LedgerEntry } from "@/modules/ledger-entries/domain/ledger-entry";
+import { createManyTransactions } from "@/modules/transactions/domain/transactions.actions";
+import { createManySales } from "@/modules/sales/domain/sales.actions";
+import { createManyLedgerEntries } from "@/modules/ledger-entries/domain/ledger-entries.actions";
 
 const BillPage = () => {
 
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [open, setOpen] = useState(false);
-  const [selected, setSelected] = useState<string>("cr_1");
+  const [sales, setSales] = useState(defaultSales);
+  const [selected, setSelected] = useState<string>("unpaid");
   const custField = ['id', 'name', 'address', 'phone', 'email'];
 
   const { accessToken, organization } = useUserContext();
-  const { selectedCustomers, filter } = useSalesContext();
+  const { selectedCustomers, filter, salesItems, activeSales, setActiveSales } = useSalesContext();
   const { trans } = useLanguageContext();
   const router = useRouter();
 
@@ -61,10 +72,103 @@ const BillPage = () => {
       toast.error(translate("something_wrong", trans));
     }
   }
+
+  const insertBills = async (transactToCreate:Transaction[], salesToCreate:SalesCreator[], ledgersToCreate:LedgerCreator[]) => {
+    try {
+      let res = await createManyTransactions(accessToken, transactToCreate);
+      res = await createManySales(accessToken, salesToCreate);
+      res = await createManyLedgerEntries(accessToken, ledgersToCreate);
+      toast.success("Bill(s) have been created!");
+      window.location.assign("/sales");
+    } catch {
+      toast.error(translate("something_wrong", trans));
+    }
+  }
   
   const handleValueChange = (value: string) => {
-    setSelected(value)
+    setSelected(value);
+    let newSales = {...activeSales};
+    newSales.status = value;
+    setActiveSales(newSales);
   }
+  
+  const handleSubmit = async () => {
+    if (salesItems.length <= 0)
+      toast.error(translate("Item is empty. Add an item first before sending invoice", trans));
+    
+    let desc = "";
+    let entries:EntryAction[] = [];
+    if (selected === SALES_STATUS.paid) {
+      entries = ENTRIES.sales_payment_in_advance.actions;
+      desc = ENTRIES.sales_payment_in_advance.description;
+    }
+    else {
+      entries = ENTRIES.sales_payment.actions;
+      desc = ENTRIES.sales_payment.description;
+    }
+
+    let accounts:Account[] = [];
+    let entryCodes:string[] = [];
+    let entryTypes:string[] = [];
+    entries?.map( entry => {
+      entryCodes.push(entry.code);
+      entryTypes.push(entry.type);
+    });
+    let filter = accountsByCodes(entryCodes);
+
+    try {
+      let res = await getAccountsWithFilter(accessToken, filter);
+      accounts = mapAccounts(res);
+    } catch {
+      toast.error(translate("something_wrong", trans));
+      return;
+    }
+
+    let sales = activeSales;
+    sales.sales_items = salesItems;
+    let salesToInsert:SalesCreator[] = [];
+    let transactToCreate:Transaction[] = [];
+    let ledgerEntries:LedgerEntry[] = [];
+    let ledgersToInsert:LedgerCreator[] = [];
+
+    accounts?.map( account => {
+      let ledger:LedgerEntry = defaultLedgerEntry;
+      let typeIndex = entries.findIndex( action => action.code === account.code);
+      ledger.type = entries[typeIndex].type;
+      ledger.account = account;
+      ledger.total = sales.total;
+      ledgerEntries.push(ledger);
+    })
+
+    customers?.map( cust => {
+      let transactID = crypto.randomUUID();
+      let transactDesc = desc;
+      let transact = transactionMapper({
+        id: transactID,
+        transaction_date: new Date(),
+        description: transactDesc,
+        document: null,
+        total: sales.total,
+      });
+      transactToCreate.push(transact);
+
+      let sls = sales;
+      sls.customer = cust;
+      let saleToCreate = salesCreatorMapper(sls, organization.id, transactID);  
+      salesToInsert.push(saleToCreate);
+
+      ledgerEntries.map( ent => {
+        let createLedger = ledgerCreatorMapper(ent, transactID, organization.id);
+        ledgersToInsert.push(createLedger);
+      })
+    });
+
+    insertBills(transactToCreate, salesToInsert, ledgersToInsert);
+  }
+
+  useEffect(() => {
+    setSales(activeSales);
+  }, [activeSales])
 
   useEffect(() => {
     if (selectedCustomers.length === 0 && isEmptyObject(filter)) {
@@ -199,7 +303,8 @@ const BillPage = () => {
                       </div>
                       <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3">
                         <div className="text-sm font-medium text-default-600">Total:</div>
-                        <Input defaultValue="$1243.00" className="text-xs font-medium  text-default-900 rounded w-full sm:w-[148px]" />
+                        <Label>Rp</Label>
+                        <Input type="text" value={sales.total} className="text-xs font-medium  text-default-900 rounded w-full sm:w-[148px]" disabled />
                       </div>
                     </div>
                   </div>
@@ -226,12 +331,12 @@ const BillPage = () => {
                 <CardContent>
                   <div className="space-y-3">
                     <RadioGroup
-                      defaultValue="block_1"
+                      defaultValue="unpaid"
                       onValueChange={handleValueChange}
                       >
                       <Label
                         className="flex gap-2.5 items-center w-full rounded-md p-2 hover:bg-default-50 group"
-                        htmlFor="block_1"
+                        htmlFor="unpaid"
                         >
                         <div className="h-10 w-10 rounded-full bg-default-100 flex justify-center items-center group-hover:bg-default-200">
                           <Icon icon="codicon:account" className="text-2xl" />
@@ -243,14 +348,14 @@ const BillPage = () => {
                           </ul>
                         </div>
                         <RadioGroupItem
-                          value="block_1"
-                          id="block_1"
+                          value="unpaid"
+                          id="unpaid"
                           color="primary"
                         ></RadioGroupItem>
                       </Label>
                       <Label
                         className="flex gap-2.5 items-center w-full rounded-md p-2 hover:bg-default-50 group"
-                        htmlFor="block_2"
+                        htmlFor="paid"
                         >
                         <div className="h-10 w-10 rounded-full bg-default-100 flex justify-center items-center group-hover:bg-default-200">
                           <Icon icon="ant-design:message-outlined" className="text-2xl" />
@@ -262,34 +367,26 @@ const BillPage = () => {
                           </ul>
                         </div>
                         <RadioGroupItem
-                          value="block_2"
-                          id="block_2"
+                          value="paid"
+                          id="paid"
                           color="primary"
                         ></RadioGroupItem>
                       </Label>
                     </RadioGroup>
-                  </div>
-                  <div className="mt-4 space-y-3">
-                    <div className="text-xl font-bold">Payment Method</div>
-                    <Checkbox defaultChecked id="bank" className="border-default-300"> Bank Account</Checkbox>
-                    <Checkbox id="paypal" className="border-default-300"> Paypal</Checkbox>
-                    <Checkbox id="credit" className="border-default-300"> Credit/Debit Card</Checkbox>
-                    <Checkbox id="transfer" className="border-default-300"> UPI Transfer</Checkbox>
-                    <Checkbox id="cod" className="border-default-300"> Cash On Delivery (COD)</Checkbox>
                   </div>
                 </CardContent>
               </Card>
             </div>
           </div>
           <div className="sticky bottom-2 mt-4 flex w-full gap-2">
-            <div className="flex-1">
+            <div className="flex-1 w-1/2">
               <Button asChild className="p-8 text-2xl w-full bg-default-200 font-semibold text-default-600 group hover:text-primary-foreground whitespace-nowrap">
-                <Link href="/invoice-details"><Icon icon="heroicons:eye" className="w-5 h-5 text-default-500 ltr:mr-2 rtl:ml-2 group-hover:text-primary-foreground" /> Preview</Link>
+                <Link href="">Preview</Link>
               </Button>
             </div>
-            <div className="flex-1">
-              <Button asChild className="p-8 text-2xl w-full group hover:bg-default-200 hover:text-default-900 font-semibold whitespace-nowrap">
-                <Link href=""><Icon icon="heroicons:paper-airplane" className="w-5 h-5 ltr:mr-2 rtl:ml-2 group-hover:text-default-900" /> Send Invoice</Link>
+            <div className="flex-1 w-1/2">
+              <Button asChild onClick={handleSubmit} className="p-8 text-2xl w-full group hover:bg-default-200 hover:text-default-900 font-semibold whitespace-nowrap">
+                <Link href="">Send Invoice</Link>
               </Button>
             </div>
           </div>

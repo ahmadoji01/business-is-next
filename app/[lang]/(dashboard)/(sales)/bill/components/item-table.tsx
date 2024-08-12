@@ -25,10 +25,11 @@ const ItemTable = () => {
 
     const [items, setItems] = useState<SalesItem[]>([]);
 
-    const {salesItems, setSalesItems} = useSalesContext();
+    const {salesItems, setSalesItems, recalculateTotal} = useSalesContext();
 
     useEffect(() => {
         setItems(salesItems);
+        recalculateTotal();
     }, [salesItems, ...salesItems.map(item => item.quantity)])
 
     const handleQtyChange = (i:number, quantity:number) => {
