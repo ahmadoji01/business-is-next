@@ -16,6 +16,7 @@ interface SalesContextType {
     customers: Customer[],
     selectedCustomers: Customer[],
     selectedItems: Item[],
+    selectedSales: Sales[],
     filter: object,
     sales: Sales[],
     activeSales: Sales,
@@ -26,6 +27,7 @@ interface SalesContextType {
     setFilter: Dispatch<SetStateAction<object>>,
     setSelectedCustomers: Dispatch<SetStateAction<Customer[]>>,
     setSelectedItems: Dispatch<SetStateAction<Item[]>>,
+    setSelectedSales: Dispatch<SetStateAction<Sales[]>>,
     setCustomers: Dispatch<SetStateAction<Customer[]>>, 
     recalculateTotal: () => void, 
     submitSales: () => void,
@@ -35,6 +37,7 @@ export const SalesContext = createContext<SalesContextType | null>({
     customers: [],
     selectedCustomers: [],
     selectedItems: [],
+    selectedSales: [],
     filter: {},
     sales: [],
     activeSales: defaultSales,
@@ -45,6 +48,7 @@ export const SalesContext = createContext<SalesContextType | null>({
     setFilter: () => {},
     setSelectedCustomers: () => {},
     setSelectedItems: () => {},
+    setSelectedSales: () => {},
     setCustomers: () => {},
     recalculateTotal: () => {},
     submitSales: async () => {}, 
@@ -58,6 +62,7 @@ export const SalesProvider = ({
 
     const [customers, setCustomers] = useState<Customer[]>([]);
     const [selectedCustomers, setSelectedCustomers] = useState<Customer[]>([]);
+    const [selectedSales, setSelectedSales] = useState<Sales[]>([]);
     const [selectedItems, setSelectedItems] = useState<Item[]>([]);
     const [salesItems, setSalesItems] = useState<SalesItem[]>([]);
     const [filter, setFilter] = useState<object>({});
@@ -93,7 +98,7 @@ export const SalesProvider = ({
     }
 
     return (
-        <SalesContext.Provider value={{ submitSales, recalculateTotal, activeSales, setActiveSales, salesItems, setSalesItems, selectedItems, setSelectedItems, customers, setCustomers, selectedCustomers, setSelectedCustomers, filter, setFilter, sales, setSales }}>
+        <SalesContext.Provider value={{ selectedSales, setSelectedSales, submitSales, recalculateTotal, activeSales, setActiveSales, salesItems, setSalesItems, selectedItems, setSelectedItems, customers, setCustomers, selectedCustomers, setSelectedCustomers, filter, setFilter, sales, setSales }}>
             {children}
         </SalesContext.Provider>
     );

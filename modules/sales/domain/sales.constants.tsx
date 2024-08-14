@@ -19,3 +19,18 @@ export const ORDER_ITEM_TYPE = {
     medicine: "medicine",
     treatment: "treatment",
 }
+
+export const salesStatuses = [
+    {
+        value: "unpaid",
+        label: "Unpaid",
+    },
+    {
+        value: "partially_paid",
+        label: "Partially Paid",
+    },
+    {
+        value: "installment",
+        label: "Installment",
+    }
+]

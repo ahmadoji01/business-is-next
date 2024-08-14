@@ -46,6 +46,15 @@ export function salesMapper(res:Record<string,any>) {
     return sales;
 }
 
+export function mapSales(res:Record<string,any>) {
+    let sales:Sales[] = [];
+    res?.map( (sale:any) => {
+        let sls = salesMapper(sale);
+        sales.push(sls);
+    })
+    return sales;
+}
+
 type Organization = {
     organization: string,
 }

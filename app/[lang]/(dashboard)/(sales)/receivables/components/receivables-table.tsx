@@ -17,23 +17,22 @@ import { Customer, mapCustomers } from "@/modules/customers/domain/customer";
 import { imageHandler, pagesCount, totalCount } from "@/utils/request-handler";
 import { translate } from "@/lib/utils";
 import { useLanguageContext } from "@/provider/language.provider";
-import BillDialog from "./bill-dialog";
+import BillDialog from "./report-payment-dialog";
 import { Pagination } from "@mui/material";
 import { useUserContext } from "@/provider/user.provider";
-import { getTotalSearchCustomersWithFilter, searchCustomersWithFilter } from "@/modules/customers/domain/customers.actions";
 import toast from "react-hot-toast";
 import { LIMIT_PER_PAGE } from "@/constants/request";
-import { Input } from "@/components/ui/input";
 import { DataFilter } from "./filter";
-import { customerStatuses } from "@/modules/customers/domain/customer.constants";
 import { X } from "lucide-react";
-import { isEmptyObject } from "@/utils/generic-functions";
+import { dateFormatOpts, isEmptyObject } from "@/utils/generic-functions";
 import { useRouter } from "next/navigation";
 import { useSalesContext } from "@/provider/sales.provider";
 import { getSalesWithFilter, getTotalSalesWithFilter } from "@/modules/sales/domain/sales.actions";
 import { statusFilter } from "@/modules/sales/domain/sales.specifications";
-import { SALES_STATUS } from "@/modules/sales/domain/sales.constants";
-import { Sales } from "@/modules/sales/domain/sales";
+import { SALES_STATUS, salesStatuses } from "@/modules/sales/domain/sales.constants";
+import { mapSales, Sales } from "@/modules/sales/domain/sales";
+import { Icon } from "@iconify/react";
+import ReportPaymentDialog from "./report-payment-dialog";
 
 let activeTimeout:any = null;
 
@@ -44,18 +43,19 @@ const ReceivablesTable = () => {
   const [sales, setSales] = useState<Sales[]>([]);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
   const {trans} = useLanguageContext();
   const {accessToken} = useUserContext();
-  const {filter, setFilter, selectedCustomers, setSelectedCustomers} = useSalesContext();
+  const {filter, setFilter, selectedSales, setSelectedSales} = useSalesContext();
   const router = useRouter();
+  const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'numeric', year: 'numeric' };
   
   useEffect(() => {
       if (accessToken === "")
         return;
 
       let filter = { _or: [statusFilter(SALES_STATUS.unpaid), statusFilter(SALES_STATUS.partially_paid), statusFilter(SALES_STATUS.installment)] };
+      setSelectedStatus([SALES_STATUS.unpaid, SALES_STATUS.partially_paid, SALES_STATUS.installment]);
       setFilter(filter);
       fetchSales(filter, 1);
       fetchTotal(filter);
@@ -64,8 +64,8 @@ const ReceivablesTable = () => {
   const fetchSales = async (filter:object, page:number) => {
     try {
       let res = await getSalesWithFilter(accessToken, filter, page);
-      let custs = mapCustomers(res);
-      setCustomers(custs);
+      let sales = mapSales(res);
+      setSales(sales);
     } catch(e) {
       toast.error(translate("something_wrong", trans));
     }
@@ -124,33 +124,31 @@ const ReceivablesTable = () => {
     return;
   }
 
-  const openBillDialog = () => {
+  const openPaymentDialog = () => {
     setModalOpen(true);
-    let custs:Customer[] = [];
+    let sales:Sales[] = [];
     selectedRows.map( (row) => {
-      let cust = customers.find( cust => cust.id === row );
-      if (typeof(cust) !== 'undefined')
-        custs.push(cust);
+      let sls = sales.find( sale => sale.id === row );
+      if (typeof(sls) !== 'undefined')
+        sales.push(sls);
     })
-    setSelectedCustomers(custs);
+    setSelectedSales(sales);
   }
 
   return (
     <>
-      <BillDialog 
+      <ReportPaymentDialog 
         open={modalOpen} 
         onClose={() => setModalOpen(false)} 
         onConfirm={billCustomers} 
-        defaultToast={false} 
-        customers={selectedCustomers}
-        statuses={selectedStatus}
+        sales={selectedSales}
         />
       <div className="flex flex-1 flex-wrap items-center gap-2 capitalize">
         
         <DataFilter
           selected={selectedStatus}
           title="Status"
-          options={customerStatuses}
+          options={salesStatuses}
           handleStatusChange={handleStatusChange}
           />
         {!isEmptyObject(filter) && (
@@ -175,10 +173,10 @@ const ReceivablesTable = () => {
             </TableHead>
 
             <TableHead className=" font-semibold">
-              {selectedRows.length > 0 || (!isEmptyObject(filter) && total !== 0) ? (
+              {selectedRows.length > 0 ? (
                 <div className=" flex gap-2">
                   <Button
-                    onClick={openBillDialog}
+                    onClick={openPaymentDialog}
                     size="xs"
                     variant="outline"
                     className="text-xs"
@@ -203,6 +201,7 @@ const ReceivablesTable = () => {
             <TableHead>Total Billed</TableHead>
             <TableHead>Amount Paid</TableHead>
             <TableHead>Status</TableHead>
+            <TableHead>Action</TableHead>
           </TableRow>
         </TableHeader>
 
@@ -231,7 +230,7 @@ const ReceivablesTable = () => {
                 </div>
               </TableCell>
 
-              <TableCell>{sales.date_created.toString()}</TableCell>
+              <TableCell>{Intl.DateTimeFormat('en-US', dateFormatOpts).format(new Date(sales.date_created))}</TableCell>
               <TableCell>{sales.total}</TableCell>
               <TableCell>{sales.paid}</TableCell>
               <TableCell>
@@ -246,6 +245,16 @@ const ReceivablesTable = () => {
                 >
                   {translate(sales.status, trans)}
                 </Badge>
+              </TableCell>
+              <TableCell className="flex gap-3  justify-end">
+                <Button
+                  size="icon"
+                  variant="outline"
+                  className=" h-7 w-7"
+                  color="secondary"
+                >
+                  <Icon icon="heroicons:pencil" className="h-4 w-4" />
+                </Button>
               </TableCell>
             </TableRow>
           ))}

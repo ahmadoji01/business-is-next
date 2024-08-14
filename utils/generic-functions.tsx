@@ -12,3 +12,6 @@ export const currency = (val:number) => {
 export const isEmptyObject = (obj:object) => {
     return Object.keys(obj).length === 0;
 }
+
+
+export const dateFormatOpts: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'numeric', year: 'numeric' };
