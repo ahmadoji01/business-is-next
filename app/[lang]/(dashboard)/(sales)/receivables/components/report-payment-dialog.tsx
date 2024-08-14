@@ -21,60 +21,46 @@ const ReportPaymentDialog = ({ open, onClose, onConfirm, sales }
   { open:boolean, onClose:() => void, onConfirm:() => void, sales:Sales[] }
 ) => {
   const [picker, setPicker] = useState<Date>(new Date());
+  const [isFullPayment, setIsFullPayment] = useState<boolean>(false);
   return (
     <Dialog open={open}>
       <DialogTrigger asChild />
       <DialogContent size="2xl">
         <DialogHeader className="p-0">
           <DialogTitle className="text-base font-medium text-default-700 ">
-            Create a New Account
+            Sales Payment
           </DialogTitle>
         </DialogHeader>
         <div>
           <div className="h-[290px]">
             <ScrollArea className="h-full">
-              <div className="sm:grid  sm:grid-cols-2 sm:gap-5 space-y-4 sm:space-y-0">
-                <div className="flex flex-col gap-2">
-                  <Label>First Name</Label>
-                  <Input type="text" placeholder="Enter first name" />
+              <div className="grid-cols-1 gap-5 space-y-4">
+                <div className="col-span-2 flex  items-center gap-2">
+                  <Checkbox id="terms" checked={isFullPayment} onCheckedChange={() => setIsFullPayment(!isFullPayment)} />
+                  <Label
+                    htmlFor="terms"
+                    className="text-xs text-default-700 cursor-pointer"
+                  >
+                    Full payment
+                  </Label>
                 </div>
+                { !isFullPayment && 
+                  <div className="flex flex-col gap-2">
+                    <Label>Amount Paid</Label>
+                    <Input min={0} max={sales[0]?.total - sales[0]?.paid} type="number" placeholder="Enter last name" />
+                  </div>
+                }
                 <div className="flex flex-col gap-2">
-                  <Label>Last Name</Label>
-                  <Input type="text" placeholder="Enter last name" />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <Label>Email Address</Label>
-                  <Input type="email" placeholder="Enter email address" />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <Label>Phone Number</Label>
-                  <Input type="number" placeholder="Your phone number" />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <Label>Set Password</Label>
-                  <Input type="number" placeholder="Your phone number" />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <Label>Date of birth</Label>
+                  <Label>Payment Date</Label>
                   <Flatpickr
                     className="w-full bg-background border border-default-200 focus:border-primary focus:outline-none h-10 rounded-md px-2 placeholder:text-default-600"
-                    placeholder="Date of birth"
+                    placeholder="Payment Date"
                     value={picker}
                     onChange={(dates: Date[]) => {
                       setPicker(dates[0] || null);
                     }}
                     id="default-picker"
                   />
-                </div>
-                <div className="col-span-2 flex  items-center gap-2">
-                  <Checkbox id="terms" />
-                  <Label
-                    htmlFor="terms"
-                    className="text-xs text-default-700 cursor-pointer"
-                  >
-                    You agree to our Terms, Privacy Policy. You may receive SMS
-                    notifications from us and can opt out at any time.
-                  </Label>
                 </div>
               </div>
             </ScrollArea>
@@ -87,15 +73,6 @@ const ReportPaymentDialog = ({ open, onClose, onConfirm, sales }
               </Button>
             </DialogClose>
             <Button type="button">Create Account </Button>
-          </div>
-          <div className="text-center mt-4">
-            <p className="text-sm font-medium text-default-700 ">
-              Already Have An Account?
-              <Link href="/dashboard" className="text-success">
-                {" "}
-                Sign In{" "}
-              </Link>
-            </p>
           </div>
         </div>
       </DialogContent>
