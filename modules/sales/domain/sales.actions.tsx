@@ -10,14 +10,14 @@ export const createASale = (token:string, sale:SalesCreator) =>
 export const getAllOrdersWithFilter = (token:string, filter:object, fields?:string[]) => 
 	directusClient.request( withToken(token, readItems('orders', { fields: fields? fields:['*.*.*'], sort: ['sort', 'date_updated'], filter })) );
 
-export const getOrdersWithFilter = (token:string, filter:object, page:number, fields?:string[]) => 
+export const getSalesWithFilter = (token:string, filter:object, page:number, fields?:string[]) => 
 	directusClient.request( 
-		withToken(token, readItems('orders', { fields: fields? fields:['*.*.*'], sort: ['sort', '-date_updated'], limit: LIMIT_PER_PAGE, page,
+		withToken(token, readItems('sales', { fields: fields? fields:['*.*'], sort: ['sort', '-date_updated'], limit: LIMIT_PER_PAGE, page,
 			filter: filter
 		})) 
 	)
-export const getTotalOrdersWithFilter = (token:string, filter:object) => 
-	directusClient.request( withToken(token, aggregate('orders', { aggregate: { count: '*' }, query: { filter } })) );
+export const getTotalSalesWithFilter = (token:string, filter:object) => 
+	directusClient.request( withToken(token, aggregate('sales', { aggregate: { count: '*' }, query: { filter } })) );
 
 
 export const getAnOrder = (token:string, id:string) => 

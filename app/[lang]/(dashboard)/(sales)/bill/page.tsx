@@ -100,13 +100,17 @@ const BillPage = () => {
     
     let desc = "";
     let entries:EntryAction[] = [];
+    let sales = activeSales;
+    sales.sales_items = salesItems;
     if (selected === SALES_STATUS.paid) {
       entries = ENTRIES.sales_payment_in_advance.actions;
       desc = ENTRIES.sales_payment_in_advance.description;
+      sales.paid = activeSales.total;
     }
     else {
       entries = ENTRIES.sales_payment.actions;
       desc = ENTRIES.sales_payment.description;
+      sales.paid = 0;
     }
 
     let accounts:Account[] = [];
@@ -125,9 +129,6 @@ const BillPage = () => {
       toast.error(translate("something_wrong", trans));
       return;
     }
-
-    let sales = activeSales;
-    sales.sales_items = salesItems;
     let salesToInsert:SalesCreator[] = [];
     let transactToCreate:TransactionCreator[] = [];
     let ledgerEntries:LedgerEntry[] = [];
@@ -164,7 +165,6 @@ const BillPage = () => {
         ledgersToInsert.push(createLedger);
       })
     });
-
     insertBills(transactToCreate, salesToInsert, ledgersToInsert);
   }
 

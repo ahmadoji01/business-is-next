@@ -7,7 +7,7 @@ import { Sales } from "../../domain/sales";
 import Currency from "@/components/Currency";
 import moment from 'moment/min/moment-with-locales';
 import { Pagination } from "@mui/material";
-import { orderItemDisplayName } from "../../domain/order.specifications";
+import { orderItemDisplayName } from "../../domain/sales.specifications";
 import { useTranslations } from "next-intl";
 
 interface OrderListTableProps {
