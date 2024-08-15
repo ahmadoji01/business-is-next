@@ -33,6 +33,7 @@ import { SALES_STATUS, salesStatuses } from "@/modules/sales/domain/sales.consta
 import { mapSales, Sales } from "@/modules/sales/domain/sales";
 import { Icon } from "@iconify/react";
 import ReportPaymentDialog from "./report-payment-dialog";
+import PaymentDialog from "./payment-dialog";
 
 let activeTimeout:any = null;
 
@@ -126,22 +127,25 @@ const ReceivablesTable = () => {
 
   const openPaymentDialog = () => {
     setModalOpen(true);
-    let sales:Sales[] = [];
+    let sls:Sales[] = [];
     selectedRows.map( (row) => {
-      let sls = sales.find( sale => sale.id === row );
-      if (typeof(sls) !== 'undefined')
-        sales.push(sls);
+      let sale = sales.find( sale => sale.id === row );
+      if (typeof(sale) !== 'undefined')
+        sls.push(sale);
     })
-    setSelectedSales(sales);
+    setSelectedSales(sls);
+  }
+
+  const onReportPayment = async () => {
+    console.log("Reported!");
   }
 
   return (
     <>
-      <ReportPaymentDialog 
+      <PaymentDialog 
         open={modalOpen} 
         onClose={() => setModalOpen(false)} 
-        onConfirm={billCustomers} 
-        sales={selectedSales}
+        onConfirm={onReportPayment}
         />
       <div className="flex flex-1 flex-wrap items-center gap-2 capitalize">
         

@@ -80,7 +80,7 @@ customers, statuses}: {
             onClick={() => startTransition(handleConfirm)}
           >
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {isPending ? "Deleting.." : "Continue"}
+            {isPending ? "Loading.." : "Continue"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
