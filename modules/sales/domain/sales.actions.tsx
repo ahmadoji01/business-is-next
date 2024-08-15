@@ -1,4 +1,4 @@
-import { aggregate, createItem, createItems, deleteItem, readItem, readItems, updateItem, withToken } from "@directus/sdk";
+import { aggregate, createItem, createItems, deleteItem, readItem, readItems, updateItem, updateItems, withToken } from "@directus/sdk";
 import { directusClient } from "@/utils/request-handler";
 import { SalesCreator } from "./sales";
 import { LIMIT_PER_PAGE } from "@/constants/request";
@@ -40,3 +40,6 @@ export const createSales = (token:string, sales:SalesCreator[]) =>
 
 export const createManySales = (token:string, sales:SalesCreator[]) => 
     directusClient.request( withToken(token, createItems('sales', sales)) );
+
+export const updateManySales = (token:string, salesIDs:string[], field:object) =>
+	directusClient.request( withToken(token, updateItems('sales', salesIDs, field)) );

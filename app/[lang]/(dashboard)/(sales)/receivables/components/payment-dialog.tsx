@@ -23,17 +23,30 @@ import toast from "react-hot-toast";
 import MaterialModal from "@/components/material-modal";
 const PaymentDialog = ({ open, onClose, onConfirm }
   :
-  { open:boolean, onClose:() => void, onConfirm:() => Promise<void> }
+  { open:boolean, onClose:() => void, onConfirm:(fullyPaid:boolean, amount:number) => Promise<void> }
 ) => {
   const [isPending, startTransition] = useTransition();
   const [isFullPayment, setIsFullPayment] = useState<boolean>(false);
+  const [amountToPay, setAmountToPay] = useState<number>(0);
   const {trans} = useLanguageContext();
   const {selectedSales} = useSalesContext();
 
+  const amountChange = (value:number) => {
+    let amount = 0;
+    
+    if (value > (selectedSales[0]?.total - selectedSales[0]?.paid))
+        amount = selectedSales[0]?.total - selectedSales[0]?.paid;
+    else if (value < 0)
+        amount = 0;
+    else
+        amount = value;
+    setAmountToPay(amount);
+    return;
+  }
+
   const handleConfirm = async () => {
-    await onConfirm();
+    await onConfirm(isFullPayment, amountToPay);
     onClose();
-    toast.success(translate("Report successfully submitted!", trans));
   }
 
   return (
@@ -43,8 +56,8 @@ const PaymentDialog = ({ open, onClose, onConfirm }
         aria-labelledby="child-modal-title"
         aria-describedby="child-modal-description"
         >
-        <h2 id="child-modal-title text-xl font-bold">Sales Payment</h2>
-        <ScrollArea className="mt-4">
+        <h2 id="child-modal-title" className="mb-4 text-xl font-bold">Sales Payment</h2>
+        <ScrollArea>
             <div className="grid-cols-1 gap-5 space-y-4">
                 <div className="flex flex-col gap-2">
                     <Label>Amount Unpaid</Label>
@@ -62,7 +75,12 @@ const PaymentDialog = ({ open, onClose, onConfirm }
                 { !isFullPayment && 
                     <div className="flex flex-col gap-2">
                     <Label>Amount to Pay</Label>
-                    <Input required min={0} max={selectedSales[0]?.total - selectedSales[0]?.paid} type="number" placeholder="Amount to pay" />
+                    <Input 
+                        required 
+                        min={0} 
+                        max={selectedSales[0]?.total - selectedSales[0]?.paid} 
+                        value={amountToPay} 
+                        onChange={ e => amountChange(parseInt(e.target.value))} type="number" placeholder="Amount to pay" />
                     </div>
                 }
                 <div className="flex flex-col gap-2">

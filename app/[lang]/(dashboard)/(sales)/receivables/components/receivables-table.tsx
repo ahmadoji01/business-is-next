@@ -27,7 +27,7 @@ import { X } from "lucide-react";
 import { dateFormatOpts, isEmptyObject } from "@/utils/generic-functions";
 import { useRouter } from "next/navigation";
 import { useSalesContext } from "@/provider/sales.provider";
-import { getSalesWithFilter, getTotalSalesWithFilter } from "@/modules/sales/domain/sales.actions";
+import { getSalesWithFilter, getTotalSalesWithFilter, updateManySales } from "@/modules/sales/domain/sales.actions";
 import { statusFilter } from "@/modules/sales/domain/sales.specifications";
 import { SALES_STATUS, salesStatuses } from "@/modules/sales/domain/sales.constants";
 import { mapSales, Sales } from "@/modules/sales/domain/sales";
@@ -136,8 +136,20 @@ const ReceivablesTable = () => {
     setSelectedSales(sls);
   }
 
-  const onReportPayment = async () => {
-    console.log("Reported!");
+  const onReportPayment = async (fullyPaid:boolean, amount:number) => {
+    let field = {};
+    if (fullyPaid)
+      field = { status: SALES_STATUS.paid };
+    else
+      field = { status: SALES_STATUS.partially_paid, paid: amount };
+
+    try {
+      let res = await updateManySales(accessToken, selectedRows, field);
+      toast.success(translate("Report successfully submitted!", trans));
+      window.location.assign("/receivables");
+    } catch {
+      toast.error(translate("something_wrong", trans));
+    }
   }
 
   return (
