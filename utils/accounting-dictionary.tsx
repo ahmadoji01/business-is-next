@@ -228,6 +228,21 @@ export const ENTRIES = {
       }
     ]
   },
+  "receivable_payment": {
+    "description": "Payment for receivable.",
+    "actions": [
+      {
+        "code": "10300",
+        "type": "Credit",
+        "cashflow": "none"
+      },
+      {
+        "code": "10100",
+        "type": "Debit",
+        "cashflow": "in"
+      }
+    ]
+  },
   "student_tuition_payment_in_advance": {
     "description": "Payment received from students for tuition fees.",
     "actions": [

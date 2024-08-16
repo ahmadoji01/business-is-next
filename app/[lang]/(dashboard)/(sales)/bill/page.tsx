@@ -82,7 +82,6 @@ const BillPage = () => {
       toast.success("Bill(s) have been created!");
       window.location.assign("/sales");
     } catch(e) {
-      console.log(e);
       toast.error(translate("something_wrong", trans));
     }
   }

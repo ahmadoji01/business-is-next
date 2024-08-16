@@ -34,6 +34,14 @@ import { mapSales, Sales } from "@/modules/sales/domain/sales";
 import { Icon } from "@iconify/react";
 import ReportPaymentDialog from "./report-payment-dialog";
 import PaymentDialog from "./payment-dialog";
+import { ENTRIES, EntryAction } from "@/utils/accounting-dictionary";
+import { accountsByCodes } from "@/modules/accounts/domain/account.specifications";
+import { Account, mapAccounts } from "@/modules/accounts/domain/account";
+import { getAccountsWithFilter } from "@/modules/accounts/domain/accounts.actions";
+import { defaultLedgerEntry, LedgerCreator, ledgerCreatorMapper, LedgerEntry } from "@/modules/ledger-entries/domain/ledger-entry";
+import { createTransactionMapper, TransactionCreator, transactionMapper } from "@/modules/transactions/domain/transaction";
+import { createManyLedgerEntries } from "@/modules/ledger-entries/domain/ledger-entries.actions";
+import { createManyTransactions } from "@/modules/transactions/domain/transactions.actions";
 
 let activeTimeout:any = null;
 
@@ -46,7 +54,7 @@ const ReceivablesTable = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
   const {trans} = useLanguageContext();
-  const {accessToken} = useUserContext();
+  const {accessToken, organization} = useUserContext();
   const {filter, setFilter, selectedSales, setSelectedSales} = useSalesContext();
   const router = useRouter();
   const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'numeric', year: 'numeric' };
@@ -136,15 +144,78 @@ const ReceivablesTable = () => {
     setSelectedSales(sls);
   }
 
+  const onRowClick = (id:string) => {
+    setSelectedRows([id]);
+    let sale = sales.find( sale => sale.id === id );
+    if (typeof(sale) === 'undefined')
+      return;
+
+    setSelectedSales([sale]);
+    setModalOpen(true);      
+  }
+
   const onReportPayment = async (fullyPaid:boolean, amount:number) => {
     let field = {};
-    if (fullyPaid)
+    let desc = ENTRIES.receivable_payment.description;
+    let entries:EntryAction[] = ENTRIES.receivable_payment.actions;
+    if (fullyPaid) {
       field = { status: SALES_STATUS.paid };
+      amount = selectedSales[0].total;
+    }
     else
       field = { status: SALES_STATUS.partially_paid, paid: amount };
+    
+    let accounts:Account[] = [];
+    let entryCodes:string[] = [];
+    let entryTypes:string[] = [];
+    entries?.map( entry => {
+      entryCodes.push(entry.code);
+      entryTypes.push(entry.type);
+    });
+    let filter = accountsByCodes(entryCodes);
+    try {
+      let res = await getAccountsWithFilter(accessToken, filter);
+      accounts = mapAccounts(res);
+    } catch {
+      toast.error(translate("something_wrong", trans));
+      return;
+    }
+
+    let ledgerEntries:LedgerEntry[] = [];
+    let ledgersToInsert:LedgerCreator[] = [];
+    let transactToCreate:TransactionCreator[] = [];
+
+    accounts?.map( account => {
+      let ledger:LedgerEntry = {...defaultLedgerEntry};
+      let typeIndex = entries.findIndex( action => action.code === account.code);
+      ledger.type = entries[typeIndex]?.type?.toLowerCase();
+      ledger.account = account;
+      ledger.total = amount;
+      ledgerEntries.push(ledger);
+    });
+
+    selectedRows?.map( row => {
+      let transactID = crypto.randomUUID();
+      let transactDesc = desc;
+      let transact = transactionMapper({
+        id: transactID,
+        transaction_date: new Date(),
+        description: transactDesc,
+        document: null,
+        total: amount,
+      });
+      transactToCreate.push(createTransactionMapper(transact, new Date(), organization.id));
+
+      ledgerEntries.map( ent => {
+        let createLedger = ledgerCreatorMapper(ent, transactID, organization.id);
+        ledgersToInsert.push(createLedger);
+      })
+    });
 
     try {
       let res = await updateManySales(accessToken, selectedRows, field);
+      res = await createManyTransactions(accessToken, transactToCreate);
+      res = await createManyLedgerEntries(accessToken, ledgersToInsert);
       toast.success(translate("Report successfully submitted!", trans));
       window.location.assign("/receivables");
     } catch {
@@ -157,7 +228,7 @@ const ReceivablesTable = () => {
       <PaymentDialog 
         open={modalOpen} 
         onClose={() => setModalOpen(false)} 
-        onConfirm={onReportPayment}
+        onReportPayment={onReportPayment}
         />
       <div className="flex flex-1 flex-wrap items-center gap-2 capitalize">
         
@@ -268,7 +339,8 @@ const ReceivablesTable = () => {
                   variant="outline"
                   className=" h-7 w-7"
                   color="secondary"
-                >
+                  onClick={() => onRowClick(sales.id)}
+                  >
                   <Icon icon="heroicons:pencil" className="h-4 w-4" />
                 </Button>
               </TableCell>

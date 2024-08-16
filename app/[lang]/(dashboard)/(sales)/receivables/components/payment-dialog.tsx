@@ -21,9 +21,9 @@ import { useState, useTransition } from "react";
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import toast from "react-hot-toast";
 import MaterialModal from "@/components/material-modal";
-const PaymentDialog = ({ open, onClose, onConfirm }
+const PaymentDialog = ({ open, onClose, onReportPayment }
   :
-  { open:boolean, onClose:() => void, onConfirm:(fullyPaid:boolean, amount:number) => Promise<void> }
+  { open:boolean, onClose:() => void, onReportPayment:(fullyPaid:boolean, amount:number) => Promise<void> }
 ) => {
   const [isPending, startTransition] = useTransition();
   const [isFullPayment, setIsFullPayment] = useState<boolean>(false);
@@ -45,7 +45,7 @@ const PaymentDialog = ({ open, onClose, onConfirm }
   }
 
   const handleConfirm = async () => {
-    await onConfirm(isFullPayment, amountToPay);
+    await onReportPayment(isFullPayment, amountToPay);
     onClose();
   }
 
