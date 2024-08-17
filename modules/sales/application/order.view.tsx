@@ -1,7 +1,7 @@
 'use client';
 
 import { Sales } from "../domain/sales";
-import { orderItemDisplayName } from "../domain/order.specifications";
+import { orderItemDisplayName } from "../domain/sales.specifications";
 import Currency from "@/components/Currency";
 import { useTranslations } from "next-intl";
 

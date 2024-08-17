@@ -7,6 +7,8 @@ import { Toaster as ReactToaster } from "@/components/ui/toaster";
 import { Toaster } from "react-hot-toast";
 import { SonnToaster } from "@/components/ui/sonner";
 import { UserProvider } from "./user.provider";
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import NextTopLoader from "nextjs-toploader";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -23,19 +25,21 @@ const Providers = ({ children }: { children: React.ReactNode }) => {
         } as React.CSSProperties
         }
       >
-        <ThemeProvider
-          attribute="class"
-          enableSystem={false}
-          defaultTheme="light"
-        >
-          <div className={cn("h-full  ")}>
-            <NextTopLoader />
-            {children}
-            <ReactToaster />
-          </div>
-          <Toaster />
-          <SonnToaster />
-        </ThemeProvider>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <ThemeProvider
+            attribute="class"
+            enableSystem={false}
+            defaultTheme="light"
+          >
+            <div className={cn("h-full  ")}>
+              <NextTopLoader />
+              {children}
+              <ReactToaster />
+            </div>
+            <Toaster />
+            <SonnToaster />
+          </ThemeProvider>
+        </LocalizationProvider>
       </body>
     </UserProvider>
   );

@@ -6,6 +6,7 @@ export const SALES_STATUS = {
     waiting_to_pay: 'waiting_to_pay',
     installment: 'installment',
     unpaid: 'unpaid',
+    partially_paid: 'partially_paid'
 }
 
 export const DOCTOR_PAID = {
@@ -18,3 +19,18 @@ export const ORDER_ITEM_TYPE = {
     medicine: "medicine",
     treatment: "treatment",
 }
+
+export const salesStatuses = [
+    {
+        value: "unpaid",
+        label: "Unpaid",
+    },
+    {
+        value: "partially_paid",
+        label: "Partially Paid",
+    },
+    {
+        value: "installment",
+        label: "Installment",
+    }
+]

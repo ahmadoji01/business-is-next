@@ -85,11 +85,11 @@ const ItemTable = () => {
                                         onChange={ e => handleQtyChange(key, e.target.valueAsNumber)}
                                         />
                                     <Select>
-                                        <SelectTrigger className="rounded ltr:rounded-l-none rtl:rounded-r-none h-9  pr-1 [&>svg]:h-4 [&>svg]:w-4 [&>svg]:mt-1 ">
-                                            <SelectValue placeholder="pcs" />
+                                        <SelectTrigger className="rounded ltr:rounded-l-none rtl:rounded-r-none h-9 pr-1 [&>svg]:h-4 [&>svg]:w-4 [&>svg]:mt-1 ">
+                                            <SelectValue defaultValue={item.item.unit} />
                                         </SelectTrigger>
                                         <SelectContent >
-                                            <SelectItem value="pcs">pcs</SelectItem>
+                                            <SelectItem value={item.item.unit}>{item.item.unit}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>

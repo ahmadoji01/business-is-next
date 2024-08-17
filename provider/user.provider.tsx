@@ -136,7 +136,7 @@ export const UserProvider = ({
                 usr = userMapper(res);
                 setUser(usr);
             }).catch( () => {
-                if (pathname !== '/') {
+                if (!pathname?.includes('auth/login')) {
                     window.location.assign("/auth/login");
                 }
                 return;

@@ -11,6 +11,7 @@ export interface Sales {
     transaction: Transaction,
     total: number,
     status: string,
+    paid: number,
     date_created: Date,
     date_updated: Date,
 }
@@ -21,6 +22,7 @@ export const defaultSales: Sales = {
     customer: defaultCustomer,
     sales_items: [],
     total: 0,
+    paid: 0,
     status: SALES_STATUS.inactive,
     transaction: defaultTransaction,
     date_created: new Date,
@@ -37,9 +39,19 @@ export function salesMapper(res:Record<string,any>) {
         total: res.total? res.total:0,
         status: res.status? res.status:'',
         transaction: res.transaction? transactionMapper(res.transaction):defaultTransaction,
+        paid: res.paid? res.paid:0,
         date_created: res.date_created? res.date_created:new Date,
         date_updated: res.date_updated? res.date_update:new Date,
     }
+    return sales;
+}
+
+export function mapSales(res:Record<string,any>) {
+    let sales:Sales[] = [];
+    res?.map( (sale:any) => {
+        let sls = salesMapper(sale);
+        sales.push(sls);
+    })
     return sales;
 }
 
@@ -57,6 +69,7 @@ export function salesCreatorMapper(sales:Sales, orgID:string, transaction?:strin
         customer: sales.customer ? sales.customer.id : null,
         sales_items: items,
         total: sales.total,
+        paid: sales.paid? sales.paid:0,
         status: sales.status,
         transaction: transaction? transaction:null,
         organization: orgID,
@@ -75,6 +88,7 @@ export function orderPatcherMapper(sales:Sales, orgID:string, transaction?:strin
         customer: sales.customer ? sales.customer.id : null,
         sales_items: items,
         total: sales.total,
+        paid: sales.paid? sales.paid:0,
         status: sales.status,
         organization: orgID,
     }
