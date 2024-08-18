@@ -19,22 +19,25 @@ import { translate } from "@/lib/utils";
 import { useLanguageContext } from "@/provider/language.provider";
 import { Pagination } from "@mui/material";
 import { useUserContext } from "@/provider/user.provider";
-import { getTotalSearchCustomersWithFilter, searchCustomersWithFilter, updateManyCustomers } from "@/modules/customers/domain/customers.actions";
+import { createACustomer, getTotalSearchCustomersWithFilter, searchCustomersWithFilter, updateManyCustomers } from "@/modules/customers/domain/customers.actions";
 import toast from "react-hot-toast";
 import { LIMIT_PER_PAGE } from "@/constants/request";
 import { Input } from "@/components/ui/input";
 import { DataFilter } from "./filter";
 import { customerStatuses } from "@/modules/customers/domain/customer.constants";
-import { X } from "lucide-react";
+import { PlusCircle, X } from "lucide-react";
 import { isEmptyObject } from "@/utils/generic-functions";
 import { redirect, useRouter } from "next/navigation";
 import EditDialog from "./edit-dialog";
+import CreateDialog from "./create-dialog";
 
 let activeTimeout:any = null;
 
 const CustomersTable = () => {
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
@@ -43,7 +46,7 @@ const CustomersTable = () => {
   const [selectedCustomers, setSelectedCustomers] = useState<Customer[]>([]);
   const [filter, setFilter] = useState<object>({});
   const {trans} = useLanguageContext();
-  const {accessToken} = useUserContext();
+  const {accessToken, organization} = useUserContext();
   
   useEffect(() => {
       if (accessToken === "")
@@ -131,8 +134,14 @@ const CustomersTable = () => {
     return;
   }
 
+  const openCreateDialog = () => {
+    setEditModalOpen(false);
+    setCreateModalOpen(true);
+  }
+
   const openEditDialog = () => {
-    setModalOpen(true);
+    setEditModalOpen(true);
+    setCreateModalOpen(false);
     let custs:Customer[] = [];
     selectedRows.map( (row) => {
       let cust = customers.find( cust => cust.id === row );
@@ -173,11 +182,27 @@ const CustomersTable = () => {
     }
   }
 
+  const postACustomer = async (customer:Customer) => {
+    try {
+      let res = await createACustomer(accessToken, customer, organization.id);
+      toast.success(translate("Customer(s) successfully created!", trans));
+      window.location.assign("/customers");
+    } catch {
+      toast.error(translate("something_wrong", trans));
+      return;
+    }
+  }
+
   return (
     <>
+      <CreateDialog 
+        open={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        postACustomer={postACustomer}
+        />
       <EditDialog 
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
+        open={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
         selectedCustomers={selectedCustomers}
         patchCustomers={patchCustomers}
         />
@@ -187,7 +212,14 @@ const CustomersTable = () => {
           placeholder={translate("search for customers...", trans)}
           className="h-8 min-w-[200px] max-w-sm"
           />
-        
+        <Button
+            variant="outline"
+            className="h-8 px-2 lg:px-3"
+            onClick={() => {setCreateModalOpen(true); setEditModalOpen(false)}}
+            >
+            <PlusCircle className="ltr:mr-2 rtl:ml-2 h-4 w-4" />
+            Add a Customer
+          </Button>
         <DataFilter
           selected={selectedStatus}
           title="Status"

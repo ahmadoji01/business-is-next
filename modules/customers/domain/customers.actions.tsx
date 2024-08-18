@@ -1,6 +1,7 @@
 import { LIMIT_PER_PAGE } from "@/constants/request";
 import { directusClient } from "@/utils/request-handler";
-import { aggregate, readItems, updateItems, withToken } from "@directus/sdk";
+import { aggregate, createItem, readItems, updateItems, withToken } from "@directus/sdk";
+import { Customer } from "./customer";
 
 export const getAllCustomers = (token:string, page:number, fields?:string[]) =>
     directusClient.request( withToken(token, readItems('customers', { fields: fields? fields:['*.*'], limit: LIMIT_PER_PAGE, page } )) );
@@ -25,3 +26,9 @@ export const getTotalSearchCustomersWithFilter = (token:string, query:string, fi
 
 export const updateManyCustomers = (token:string, customerIDs:string[], field:object) =>
 	directusClient.request( withToken(token, updateItems('customers', customerIDs, field)) );
+
+export const createACustomer = async (token:string, customer:Customer, organization:string) => {
+	const { id, ...cust } = customer;
+	let custToInsert = Object.assign(cust, { organization });
+	directusClient.request( withToken(token, createItem('customers', custToInsert)) );
+}
