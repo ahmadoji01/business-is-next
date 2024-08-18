@@ -47,3 +47,16 @@ export function mapCustomers(res:Record<string,any>) {
     res?.map( (customer:any) => { custs.push(customerMapper(customer)) });
     return custs;
 }
+
+export type CustomerPatcher = Omit<Customer, 'id'|'photo'>;
+
+export function customerPatcherMapper(customer:Customer) {
+    let result:CustomerPatcher = {
+        name: customer.name? customer.name:'', 
+        status: customer.status? customer.status:'',
+        address: customer.address? customer.address:'',
+        email: customer.email? customer.email:'', 
+        phone: customer.phone? customer.phone:'',
+    }
+    return result;
+}

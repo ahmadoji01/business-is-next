@@ -13,7 +13,7 @@ const CustomersPage = () => {
   return (
     <>
       <div className="space-y-6">
-        <Card title={translate("customers to bill", trans)}>
+        <Card title={translate("customers list", trans)}>
           <CustomersTable />
         </Card>
       </div>
