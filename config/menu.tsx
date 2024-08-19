@@ -51,6 +51,7 @@ import {
     CashMoney,
     CashRegister,
     Buildings,
+    CashOut,
   } from "@/components/svg";
 import { ROLES } from "@/modules/users/domain/users.constants";
   
@@ -1267,6 +1268,11 @@ export const menusConfig = {
         href: "/liabilities/add",
       },
       {
+        title: "report expenses",
+        icon: CashOut,
+        href: "/expenses",
+      },
+      {
         title: "adjust cashflow",
         icon: MoneyBag,
         href: "/liabilities/add",
@@ -1432,6 +1438,11 @@ export const menusConfig = {
       {
         title: "report liabilities",
         icon: CardReceive,
+        href: "/liabilities/add",
+      },
+      {
+        title: "report expenses",
+        icon: CashOut,
         href: "/liabilities/add",
       },
       {
