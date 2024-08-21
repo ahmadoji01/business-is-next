@@ -13,9 +13,8 @@ import { translate } from '@/lib/utils';
 import { useLanguageContext } from './language.provider';
 
 interface AssetsContextType {
-    customers: Customer[],
     selectedCustomers: Customer[],
-    selectedItems: Item[],
+    items: Item[],
     selectedSales: Sales[],
     filter: object,
     sales: Sales[],
@@ -26,17 +25,15 @@ interface AssetsContextType {
     setSalesItems: Dispatch<SetStateAction<SalesItem[]>>,
     setFilter: Dispatch<SetStateAction<object>>,
     setSelectedCustomers: Dispatch<SetStateAction<Customer[]>>,
-    setSelectedItems: Dispatch<SetStateAction<Item[]>>,
+    setItems: Dispatch<SetStateAction<Item[]>>,
     setSelectedSales: Dispatch<SetStateAction<Sales[]>>,
-    setCustomers: Dispatch<SetStateAction<Customer[]>>, 
     recalculateTotal: () => void, 
-    submitSales: () => void,
+    submitItems: () => void,
 }
 
 export const AssetsContext = createContext<AssetsContextType | null>({
-    customers: [],
     selectedCustomers: [],
-    selectedItems: [],
+    items: [],
     selectedSales: [],
     filter: {},
     sales: [],
@@ -47,11 +44,10 @@ export const AssetsContext = createContext<AssetsContextType | null>({
     setSalesItems: () => {},
     setFilter: () => {},
     setSelectedCustomers: () => {},
-    setSelectedItems: () => {},
+    setItems: () => {},
     setSelectedSales: () => {},
-    setCustomers: () => {},
     recalculateTotal: () => {},
-    submitSales: async () => {}, 
+    submitItems: async () => {}, 
 });
  
 export const AssetsProvider = ({
@@ -60,10 +56,9 @@ export const AssetsProvider = ({
     children: React.ReactNode;
 }) => {
 
-    const [customers, setCustomers] = useState<Customer[]>([]);
+    const [items, setItems] = useState<Item[]>([]);
     const [selectedCustomers, setSelectedCustomers] = useState<Customer[]>([]);
     const [selectedSales, setSelectedSales] = useState<Sales[]>([]);
-    const [selectedItems, setSelectedItems] = useState<Item[]>([]);
     const [salesItems, setSalesItems] = useState<SalesItem[]>([]);
     const [filter, setFilter] = useState<object>({});
     const [sales, setSales] = useState<Sales[]>([]);
@@ -80,7 +75,7 @@ export const AssetsProvider = ({
         setActiveSales(newSales);
     }
 
-    const submitSales = async () => {
+    const submitItems = async () => {
         let salesList:SalesCreator[] = [];
         selectedCustomers.map( (cust) => {
             let sales = {...activeSales};
@@ -98,7 +93,23 @@ export const AssetsProvider = ({
     }
 
     return (
-        <AssetsContext.Provider value={{ selectedSales, setSelectedSales, submitSales, recalculateTotal, activeSales, setActiveSales, salesItems, setSalesItems, selectedItems, setSelectedItems, customers, setCustomers, selectedCustomers, setSelectedCustomers, filter, setFilter, sales, setSales }}>
+        <AssetsContext.Provider value={{ 
+            selectedSales, 
+            setSelectedSales,
+            submitItems, 
+            recalculateTotal, 
+            activeSales, 
+            setActiveSales, 
+            salesItems, 
+            setSalesItems, 
+            items, 
+            setItems, 
+            selectedCustomers, 
+            setSelectedCustomers, 
+            filter, 
+            setFilter, 
+            sales, 
+            setSales }}>
             {children}
         </AssetsContext.Provider>
     );

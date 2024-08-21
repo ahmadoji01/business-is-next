@@ -1,58 +1,54 @@
-import React, { useEffect, useState } from "react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { SearchIcon, X } from "lucide-react";
+"use client";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Loader2 } from "lucide-react";
+import React, { useEffect, useState, useTransition } from "react";
+import MaterialModal from "@/components/material-modal";
+import Select from "react-select";
+import { customerStatuses } from "@/modules/customers/domain/customer.constants";
+import { Customer, defaultCustomer } from "@/modules/customers/domain/customer";
 import { Input } from "@/components/ui/input";
+import Item, { defaultItem, mapItems } from "@/modules/items/domain/item";
+import { Autocomplete, capitalize, CircularProgress, TextField } from "@mui/material";
 import { searchItemsWithFilter } from "@/modules/items/domain/items.actions";
 import { useUserContext } from "@/provider/user.provider";
 import toast from "react-hot-toast";
-import { useLanguageContext } from "@/provider/language.provider";
 import { translate } from "@/lib/utils";
-import Item, { mapItems } from "@/modules/items/domain/item";
-import { Category, defaultCategory, mapCategories } from "@/modules/categories/domain/category";
-import { getAllCategories } from "@/modules/categories/domain/categories.actions";
-import { CircularProgress } from "@/components/ui/progress";
-import ItemCard from "./item-card";
-import { categoryNameEquals } from "@/modules/items/domain/item.specifications";
-import { useSalesContext } from "@/provider/sales.provider";
-import { SalesItem, SalesItemCreator } from "@/modules/sales/domain/sales-item";
-import { defaultSales } from "@/modules/sales/domain/sales";
+import { useLanguageContext } from "@/provider/language.provider";
+import { itemTypes } from "@/modules/items/domain/item.constants";
+import { useAssetsContext } from "@/provider/assets.provider";
+
+const styles = {
+    option: (provided: any, state: any) => ({
+      ...provided,
+      fontSize: "14px",
+    }),
+};
 
 let activeTimeout:any = null;
 
-const AddItem = ({ open, setOpen }: { open: boolean; setOpen: any }) => {
-    
-    const [loading, setLoading] = useState(true);
-    const [items, setItems] = useState<Item[]>([]);
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [selectedCategory, setSelectedCategory] = useState("");
-    const [searchQuery, setSearchQuery] = useState("");
-    const [filter, setFilter] = useState({});
-    const fields = ['id', 'name', 'category.id', 'category.name', 'price', 'stock', 'type', 'unit', 'photo.id', 'photo.filename_download']
-
-    const {accessToken, organization} = useUserContext();
-    const {trans} = useLanguageContext();
-    const {salesItems, setSalesItems} = useSalesContext();
-
-    const fetchCategories = async () => {
-        setLoading(true);
-        try {
-            let res = await getAllCategories(accessToken, 1);
-            let cats = mapCategories(res);
-            setCategories(cats);
-            setLoading(false);
-        } catch {
-            toast.error(translate("something_wrong", trans));
-            setLoading(false);
-        }
-    }
+const AddItem = ({ open, onClose }
+  :
+  { open:boolean, onClose:() => void }
+) => {
+  const [isPending, startTransition] = useTransition();
+  const [customer, setCustomer] = useState<Customer>(defaultCustomer);
+  const [item, setItem] = useState<Item>(defaultItem);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [inputDisabled, setInputDisabled] = useState(false);
+  const [itemOptions, setItemOptions] = useState<Item[]>([]);
+  const {accessToken} = useUserContext();
+  const {trans} = useLanguageContext();
+  const {items, setItems} = useAssetsContext();
 
     const fetchItems = async (query:string, filter:object) => {
-        setLoading(true);
         try {
-            let res = await searchItemsWithFilter(accessToken, query, filter, 1, fields);
-            let its = mapItems(res);
-            setItems(its);
+            let res = await searchItemsWithFilter(accessToken, query, filter, 1);
+            let items = mapItems(res);
+            let itemOpts:Item[] = [];
+            items.map( item => itemOpts.push(item));
+            setItemOptions(itemOpts);
             setLoading(false);
         } catch {
             toast.error(translate("something_wrong", trans));
@@ -60,122 +56,159 @@ const AddItem = ({ open, setOpen }: { open: boolean; setOpen: any }) => {
         }
     }
 
-    useEffect(() => {
-        fetchCategories();
-        fetchItems("", {});
-    }, [])
-
     const handleChange = (query:string) => {
+        setItem({ ...item, id: "", name: query });
         if (activeTimeout) {
-          clearTimeout(activeTimeout);
+            clearTimeout(activeTimeout);
         }
         
         activeTimeout = setTimeout(() => {
-          handleSearch(query);
+            handleSearch(query);
         }, 1000);
     }
-    
-    const handleSearch = (query:string) => {    
+
+    useEffect( () => {
+        if (accessToken === "")
+            return;
+
+        fetchItems("", {});
+    }, [accessToken])
+
+    useEffect( () => {
+        if (item.id !== "")
+            setInputDisabled(true);
+
+        if (item.id === "")
+            setInputDisabled(false);
+    }, [item.id])
+
+    const handleSearch = (query:string) => {
+        setItem({ ...item, id: "" });    
         if (query.length > 1 && query.length <= 3)
-          return;
-    
+            return;
+
         setSearchQuery(query);
         setLoading(true);
-        fetchItems(query, filter);
+        fetchItems(query, {});
     }
 
-    const handleAddItem = (item:Item, quantity:number) => {
-        if (typeof(salesItems.find( itm => itm.item.id === item.id )) !== 'undefined')
-            return;
+  const handleConfirm = async (itm:Item) => {
+    setItems([...items, itm]);
+    onClose();
+  }
 
-        let newSalesItems = [...salesItems];
-        let salesItem:SalesItem = { 
-            id: '',
-            quantity, 
-            total: quantity * item.price,
-            item: item,
-            type: item.type,
-            sales: defaultSales,
-            unit_cost: item.price,
-        }
-        newSalesItems.push(salesItem);
-        setSalesItems(newSalesItems);
-        toast.success(translate("item_added", trans))
-    }
+  const handleOptClick = (value:string) => {
+    let itm = itemOptions.find( item => item.name === value);
+    
+    if (typeof(itm) === 'undefined')
+        return;
+    
+    setItem({ ...item, id: itm.id, name: itm.name, sku: itm.sku, unit: itm.unit, price: itm.price, type: itm.type });
+  }
 
-    const categoryClick = (name:string) => {
-        if (selectedCategory === name)
-            return;
-
-        let newFilter = {};
-        if (name !== "")
-            newFilter = categoryNameEquals(name);
-
-        setSelectedCategory(name);
-        setFilter(newFilter);
-        fetchItems(searchQuery, newFilter);
-    }
-  
-    return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent size="2xl" className="p-0 " hiddenCloseIcon>
-                <div className="flex items-center border-b border-default-200">
-                    <SearchIcon size={14} className="ml-4" />
-                    <Input
-                        placeholder=""
-                        className="h-14 border-none"
-                        onChange={e => handleChange(e.target.value)}
+  return (
+    <MaterialModal
+        open={open}
+        onClose={onClose}
+        aria-labelledby="child-modal-title"
+        aria-describedby="child-modal-description"
+        >
+        <h2 id="child-modal-title" className="mb-4 text-xl font-bold">Sales Payment</h2>
+            <div className="grid-cols-1 gap-5 space-y-4 overflow-y-scroll">
+                <div className="flex flex-col gap-2">
+                    <Label>Name</Label>
+                    <Autocomplete
+                        id="free-solo-demo"
+                        freeSolo
+                        options={itemOptions.map( (option) => option.name)}
+                        onChange={(event: any, newValue: string | null) => {
+                            let val = newValue? newValue : "";
+                            handleOptClick(val);
+                        }}
+                        renderInput={(params) => 
+                            <TextField {...params} 
+                                onChange={ e => handleChange(e.target.value)}
+                                InputProps={{
+                                    ...params.InputProps,
+                                    endAdornment: (
+                                        <React.Fragment>
+                                            {loading ? <CircularProgress color="inherit" size={20} /> : null}
+                                            {params.InputProps.endAdornment}
+                                        </React.Fragment>
+                                    ),
+                                }}
+                                />}
                         />
-                    <div className="flex-none flex items-center justify-center gap-1 pr-4">
-                    <span className="text-sm text-default-500 font-normal select-none">
-                        [esc]
-                    </span>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        className="hover:bg-transparent text-xs hover:text-default-800 px-1"
-                        onClick={() => setOpen(false)}
-                    >
-                        {""}
-                        <X className="w-5 h-5 text-default-500" />
-                    </Button>
+                </div>
+                <div className="flex flex-col gap-2">
+                    <Label>SKU</Label>
+                    <Input  
+                        disabled={inputDisabled}
+                        value={item.sku} 
+                        onChange={ e => setItem({ ...item, sku: e.target.value })} 
+                        type="number" 
+                        placeholder="SKU (e.g. MED0001)" />
+                </div>
+                <div className="flex flex-col gap-2">
+                    <Label>Quantity</Label>
+                    <Input  
+                        value={item.stock} 
+                        onChange={ e => setItem({ ...item, stock: parseInt(e.target.value) })} 
+                        type="number"
+                        min={0} 
+                        placeholder="Quantity" />
+                </div>
+                <div className="flex flex-col gap-2">
+                    <Label>Unit</Label>
+                    <Input 
+                        disabled={inputDisabled}
+                        value={item.unit} 
+                        onChange={ e => setItem({ ...item, unit: e.target.value })} 
+                        type="text" 
+                        placeholder="Unit (e.g. kg, gram, tablet, piece)" />
+                </div>
+                <div className="flex flex-col gap-2">
+                    <Label>Price</Label>
+                    <Input 
+                        disabled={inputDisabled}
+                        required 
+                        value={item.price} 
+                        onChange={ e => setItem({ ...item, price: parseFloat(e.target.value) })} 
+                        type="number"
+                        min={0.0} 
+                        placeholder="Price" />
+                </div>
+                <div className="flex flex-col gap-2">
+                    <Label>Type</Label>
+                    <div>
+                        <Select
+                            isDisabled={inputDisabled}
+                            className="react-select"
+                            classNamePrefix="select"
+                            value={ { value: item.type, label: capitalize(item.type) } }
+                            onChange={ e => setItem({ ...item, type: e?.value? e.value:'' }) }
+                            defaultValue={itemTypes[0]}
+                            options={itemTypes}
+                            styles={styles}
+                            />
                     </div>
                 </div>
-                <div className="grid grid-cols-1 gap-2">
-                    <div className="flex gap-2 overflow-x-auto p-4">
-                        <Button color="dark" onClick={() => categoryClick("")} variant={selectedCategory !== ""? "outline" : null}>
-                            All Items
-                        </Button>
-                        { categories?.map( (category, key) => {
-                            return (
-                                <Button key={key} color="dark" onClick={() => categoryClick(category.name)} variant={selectedCategory !== category.name? "outline" : null}>
-                                    {category.name}
-                                </Button>
-                            )
-                        }) }
-                    </div>
-                </div>
-                { loading && 
-                    <div className="flex w-full justify-center items-center">
-                        <CircularProgress value={50} color="primary" loading />
-                    </div>
-                }
-                <div className="grid max-h-[400px] xl:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-5 p-4 overflow-y-auto">
-                    { items?.map( (item, key) => {
-                        let isSelected = false;
-                        if (typeof(salesItems.find( itm => itm.item.id === item.id )) !== 'undefined')
-                            isSelected = true;
-                        return (
-                            <ItemCard
-                                isSelected={isSelected} 
-                                item={item} 
-                                handleAddItem={handleAddItem} />
-                        )
-                    }) }
-                </div>
-            </DialogContent>
-        </Dialog>
-    );
+            </div>
+        <div className="flex justify-center mt-4 gap-3">
+            <Button type="button" onClick={() => onClose()} variant="outline">
+                Cancel
+            </Button>
+            <Button 
+                type="button" 
+                className={isPending ? "pointer-events-none" : ""}
+                onClick={() => startTransition(() => handleConfirm(item))}
+                >
+                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                {isPending ? "Loading.." : "Continue"}
+            </Button>
+        </div>
+    </MaterialModal>
+  );
 };
 
 export default AddItem;

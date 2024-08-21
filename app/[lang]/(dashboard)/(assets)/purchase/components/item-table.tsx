@@ -20,25 +20,22 @@ import Item from "@/modules/items/domain/item";
 import { useSalesContext } from "@/provider/sales.provider";
 import { SalesItem } from "@/modules/sales/domain/sales-item";
 import { Label } from "@/components/ui/label";
+import { useAssetsContext } from "@/provider/assets.provider";
 
 const ItemTable = () => {
-
-    const [items, setItems] = useState<SalesItem[]>([]);
-
-    const {salesItems, setSalesItems, recalculateTotal} = useSalesContext();
+    const [itms, setItms] = useState<Item[]>([]);
+    const {items, setItems, recalculateTotal} = useAssetsContext();
 
     useEffect(() => {
-        setItems(salesItems);
+        if (typeof(items) === 'undefined')
+            return;
+
+        setItms(items);
         recalculateTotal();
-    }, [salesItems, ...salesItems.map(item => item.quantity)])
+    }, [items])
 
     const handleQtyChange = (i:number, quantity:number) => {
-        let newSalesItems = [...salesItems];
-        let newItem = {...salesItems[i]};
-        newItem.quantity = quantity;
-        newItem.total = quantity * newItem.unit_cost;
-        newSalesItems[i] = newItem;
-        setSalesItems(newSalesItems);
+        
     }
 
     return (
@@ -63,7 +60,7 @@ const ItemTable = () => {
                             </TableCell>
                             <TableCell className="min-w-[220px] w-full max-w-[432px]">
                                 <Input
-                                    value={item.item.name}
+                                    value={item.name}
                                     type="text"
                                     placeholder="Gaming Mouse & Keyboard Combo"
                                     className="text-default-800 rounded "
@@ -72,7 +69,7 @@ const ItemTable = () => {
                             <TableCell>
                                 <div className="flex gap-2 items-center">
                                     <Label>Rp</Label>
-                                    <Input type="text" value={item.unit_cost} className="text-end font-medium  text-default-900 rounded min-w-[140px]" disabled />
+                                    <Input type="text" value={item.price} className="text-end font-medium  text-default-900 rounded min-w-[140px]" disabled />
                                 </div>
                             </TableCell>
                             <TableCell>
@@ -81,15 +78,15 @@ const ItemTable = () => {
                                         className="w-[70px] appearance-none accent-transparent rounded ltr:rounded-r-none ltr:border-r-0 rtl:rounded-l-none rtl:border-l-0"
                                         min={1}
                                         type="number"
-                                        defaultValue={item.quantity}
+                                        defaultValue={item.stock}
                                         onChange={ e => handleQtyChange(key, e.target.valueAsNumber)}
                                         />
                                     <Select>
                                         <SelectTrigger className="rounded ltr:rounded-l-none rtl:rounded-r-none h-9 pr-1 [&>svg]:h-4 [&>svg]:w-4 [&>svg]:mt-1 ">
-                                            <SelectValue defaultValue={item.item.unit} />
+                                            <SelectValue defaultValue={item.unit} />
                                         </SelectTrigger>
                                         <SelectContent >
-                                            <SelectItem value={item.item.unit}>{item.item.unit}</SelectItem>
+                                            <SelectItem value={item.unit}>{item.unit}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -97,7 +94,7 @@ const ItemTable = () => {
                             <TableCell>
                                 <div className="flex gap-2 items-center">
                                     <Label>Rp</Label>
-                                    <Input type="text" value={item.total} className="text-end font-medium  text-default-900 rounded min-w-[140px]" disabled />
+                                    <Input type="text" defaultValue={0} className="text-end font-medium  text-default-900 rounded min-w-[140px]" disabled />
                                 </div>
                             </TableCell>
                         </TableRow>

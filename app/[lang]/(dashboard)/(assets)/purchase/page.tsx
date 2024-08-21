@@ -61,7 +61,6 @@ const PurchasePage = () => {
   const { accessToken, organization } = useUserContext();
   const { selectedCustomers, filter, salesItems, activeSales, setActiveSales } = useSalesContext();
   const { trans } = useLanguageContext();
-  const router = useRouter();
 
   const fetchCustomers = async () => {
     try {
@@ -187,7 +186,7 @@ const PurchasePage = () => {
 
   return (
     <>
-      <AddItem open={open} setOpen={setOpen} />
+      <AddItem open={open} onClose={() => setOpen(false)} />
       <div>
         <Breadcrumbs>
           <BreadcrumbItem>Pages</BreadcrumbItem>
@@ -212,13 +211,7 @@ const PurchasePage = () => {
               <CardContent>
                 <div className="mt-8 flex justify-between flex-wrap gap-4">
                   <div className="w-full space-y-2">
-                    <div className="text-base font-semibold text-default-800 pb-1">Billing From:</div>
-                    <Input type="text" placeholder="Company Name" value={organization?.name} />
-                    <Input type="email" placeholder="Company Email" value={organization?.email} />
-                    <Textarea placeholder="Company Address" value={organization?.address} />
-                  </div>
-                  <div className="w-full space-y-2">
-                    <div className="text-base font-semibold text-default-800 pb-1">Billing To:</div>
+                    <div className="text-base font-semibold text-default-800 pb-1">Purchase From:</div>
                     <Input type="text" placeholder="Company Name" value={organization?.name} />
                     <Input type="email" placeholder="Company Email" value={organization?.email} />
                     <Textarea placeholder="Company Address" value={organization?.address} />
@@ -230,7 +223,7 @@ const PurchasePage = () => {
                   </div>
                   <div className="flex flex-col sm:flex-row gap-4 py-5 px-6">
                     <div className="flex-1">
-                      <Button onClick={() => setOpen(true)} className="text-xs whitespace-nowrap"> <Plus className="w-5 h-5 ltr:mr-2 rtl:ml-2" /> Add Invoice Item </Button>
+                      <Button onClick={() => setOpen(true)} className="text-xs whitespace-nowrap"> <Plus className="w-5 h-5 ltr:mr-2 rtl:ml-2" /> Add Item </Button>
                     </div>
                     <div className="flex-none flex flex-col sm:items-end gap-y-2">
                       <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3">
@@ -298,7 +291,7 @@ const PurchasePage = () => {
                         <div className="flex-1">
                           <h2 className="text-sm font-bold text-default-900 mb-1">Unpaid</h2>
                           <ul className="space-y-[2px]">
-                            <li className="text-xs text-default-500">Customer has not paid the bill yet.</li>
+                            <li className="text-xs text-default-500">The purchase has not been paid yet.</li>
                           </ul>
                         </div>
                         <RadioGroupItem
@@ -317,7 +310,7 @@ const PurchasePage = () => {
                         <div className="flex-1">
                           <h2 className="text-sm font-bold text-default-900 mb-1">Paid</h2>
                           <ul className="space-y-[2px]">
-                            <li className="text-xs text-default-500">Customer has paid prior to invoice creation.</li>
+                            <li className="text-xs text-default-500">Items have been paid prior to invoice creation.</li>
                           </ul>
                         </div>
                         <RadioGroupItem
