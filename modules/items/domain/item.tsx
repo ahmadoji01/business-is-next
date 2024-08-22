@@ -1,10 +1,6 @@
 import { Category, categoryMapper } from "@/modules/categories/domain/category";
 import { defaultCategory } from "@/modules/categories/domain/category";
-
-export interface Photo {
-    id: string,
-    filename_download: string,
-}
+import { Photo } from "@/modules/photos/domain/photo";
 
 export default interface Item {
     id: string,

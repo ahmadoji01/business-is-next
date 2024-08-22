@@ -1,7 +1,4 @@
-export interface Photo {
-    id: string,
-    filename_download: string,
-}
+import { Photo } from "@/modules/photos/domain/photo";
 
 export interface Customer {
     id: string,
