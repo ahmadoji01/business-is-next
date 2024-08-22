@@ -146,7 +146,7 @@ const AddItem = ({ open, onClose }
                         disabled={inputDisabled}
                         value={item.sku} 
                         onChange={ e => setItem({ ...item, sku: e.target.value })} 
-                        type="number" 
+                        type="text" 
                         placeholder="SKU (e.g. MED0001)" />
                 </div>
                 <div className="flex flex-col gap-2">

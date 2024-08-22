@@ -1,57 +1,68 @@
 import { defaultTransaction, Transaction, transactionMapper } from "@/modules/transactions/domain/transaction";
 import { SalesItem, SalesItemCreator, salesItemsMapper, salesItemPatcherMapper, SalesItemPatcher, salesItemCreatorMapper } from "./sales-item";
-import { SALES_STATUS } from "./sales.constants";
 import { Customer, customerMapper, defaultCustomer, Photo } from "@/modules/customers/domain/customer";
+import { defaultWarehouse, Warehouse, warehouseMapper } from "@/modules/warehouse/domain/warehouse";
+import { defaultPurchase, Purchase, purchaseMapper } from "@/modules/purchase/domain/purchase";
 
 export interface Asset {
     id: string,
     description: string,
-    value: number,
-    sales_items: SalesItem[],
-    transaction: Transaction,
-    status: string,
-    photo: Photo|null,
+    code: string,
+    type: string,
+    quantity: number,
+    unit: string,
+    unit_cost: number,
+    lifetime: Date,
+    warehouse: Warehouse|null,
+    purchase: Purchase,
+    total: number,
     date_created: Date,
     date_updated: Date,
 }
 
-export const defaultSales: Sales = {
+export const defaultAsset: Asset = {
     id: "",
     description: "",
-    customer: defaultCustomer,
-    sales_items: [],
+    code: "",
+    type: "",
+    quantity: 0,
+    unit: "",
+    unit_cost: 0,
+    lifetime: new Date,
+    warehouse: null,
+    purchase: defaultPurchase,
     total: 0,
-    paid: 0,
-    status: SALES_STATUS.inactive,
-    transaction: defaultTransaction,
     date_created: new Date,
     date_updated: new Date,
 }
 
-export function salesMapper(res:Record<string,any>) {
-    let sales = defaultSales;
-    sales = { 
+export function assetMapper(res:Record<string,any>) {
+    let asset = defaultAsset;
+    asset = { 
         id: res.id? res.id:"",
         description: res.description? res.description:"", 
-        customer: res.customer? customerMapper(res.customer):defaultCustomer,
-        sales_items: res.sales_items? salesItemsMapper(res.sales_items):[],
+        code: res.code,
+        type: res.type,
+        quantity: res.quantity,
+        unit: res.unit,
+        unit_cost: parseFloat(res.unit_cost),
+        lifetime: res.lifetime? res.lifetime:new Date,
+        warehouse: res.warehouse? warehouseMapper(res.warehouse):defaultWarehouse,
+        purchase: res.purchase? purchaseMapper(res.purchase):defaultPurchase,
         total: res.total? res.total:0,
-        status: res.status? res.status:'',
-        transaction: res.transaction? transactionMapper(res.transaction):defaultTransaction,
-        paid: res.paid? res.paid:0,
         date_created: res.date_created? res.date_created:new Date,
         date_updated: res.date_updated? res.date_update:new Date,
     }
-    return sales;
+    return asset;
 }
 
-export function mapSales(res:Record<string,any>) {
-    let sales:Sales[] = [];
-    res?.map( (sale:any) => {
-        let sls = salesMapper(sale);
-        sales.push(sls);
+export function mapAssets(res:Record<string,any>) {
+    let assets:Asset[] = [];
+    res?.map( (asset:any) => {
+        let asst = assetMapper(asset);
+        assets.push(asst);
     })
-    return sales;
+    return assets;
 }
 
 type Organization = {
