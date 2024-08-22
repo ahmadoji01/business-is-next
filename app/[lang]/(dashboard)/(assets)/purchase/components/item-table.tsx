@@ -21,21 +21,24 @@ import { useSalesContext } from "@/provider/sales.provider";
 import { SalesItem } from "@/modules/sales/domain/sales-item";
 import { Label } from "@/components/ui/label";
 import { useAssetsContext } from "@/provider/assets.provider";
+import { Asset } from "@/modules/assets/domain/asset";
 
 const ItemTable = () => {
-    const [itms, setItms] = useState<Item[]>([]);
-    const {items, setItems, recalculateTotal, assets, setAssets} = useAssetsContext();
+    const [assts, setAssts] = useState<Asset[]>([]);
+    const {recalculateTotal, assets, setAssets} = useAssetsContext();
 
     useEffect(() => {
-        if (typeof(items) === 'undefined')
-            return;
-
-        setItms(items);
+        setAssts(assets);
         recalculateTotal();
-    }, [items])
+    }, [assets, ...assets.map(asset => asset.quantity)])
 
     const handleQtyChange = (i:number, quantity:number) => {
-        
+        let newAssets = [...assets];
+        let newAsset = {...assets[i]};
+        newAsset.quantity = quantity;
+        newAsset.total = quantity * newAsset.unit_cost;
+        newAssets[i] = newAsset;
+        setAssets(newAssets);
     }
 
     return (
@@ -50,7 +53,7 @@ const ItemTable = () => {
                 </TableRow>
             </TableHeader>
             <TableBody className="[&_tr:last-child]:border-1">
-                { assets?.map( (asset,key) => {
+                { assts.map( (asset,key) => {
                     return (
                         <TableRow key={key}>
                             <TableCell>
@@ -94,7 +97,7 @@ const ItemTable = () => {
                             <TableCell>
                                 <div className="flex gap-2 items-center">
                                     <Label>Rp</Label>
-                                    <Input type="text" defaultValue={asset.total} className="text-end font-medium  text-default-900 rounded min-w-[140px]" disabled />
+                                    <Input type="text" value={asset.total} className="text-end font-medium  text-default-900 rounded min-w-[140px]" disabled />
                                 </div>
                             </TableCell>
                         </TableRow>
