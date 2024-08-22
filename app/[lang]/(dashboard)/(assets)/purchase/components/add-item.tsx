@@ -16,7 +16,8 @@ import toast from "react-hot-toast";
 import { translate } from "@/lib/utils";
 import { useLanguageContext } from "@/provider/language.provider";
 import { itemTypes } from "@/modules/items/domain/item.constants";
-import { useAssetsContext } from "@/provider/assets.provider";
+import { AssetsContext, useAssetsContext } from "@/provider/assets.provider";
+import { Asset, defaultAsset } from "@/modules/assets/domain/asset";
 
 const styles = {
     option: (provided: any, state: any) => ({
@@ -35,12 +36,13 @@ const AddItem = ({ open, onClose }
   const [customer, setCustomer] = useState<Customer>(defaultCustomer);
   const [item, setItem] = useState<Item>(defaultItem);
   const [loading, setLoading] = useState<boolean>(false);
+  const [asset, setAsset] = useState<Asset>(defaultAsset);
   const [searchQuery, setSearchQuery] = useState("");
   const [inputDisabled, setInputDisabled] = useState(false);
   const [itemOptions, setItemOptions] = useState<Item[]>([]);
   const {accessToken} = useUserContext();
   const {trans} = useLanguageContext();
-  const {items, setItems} = useAssetsContext();
+  const {items, setItems, assets, setAssets} = useAssetsContext();
 
     const fetchItems = async (query:string, filter:object) => {
         try {
@@ -93,7 +95,9 @@ const AddItem = ({ open, onClose }
     }
 
   const handleConfirm = async (itm:Item) => {
-    setItems([...items, itm]);
+    asset.item = itm;
+    asset.total = itm.price * asset.quantity;
+    setAssets([...assets, asset]);
     onClose();
   }
 
@@ -104,6 +108,7 @@ const AddItem = ({ open, onClose }
         return;
     
     setItem({ ...item, id: itm.id, name: itm.name, sku: itm.sku, unit: itm.unit, price: itm.price, type: itm.type });
+    setAsset({ ...asset, unit: itm.unit, unit_cost: itm.price, type: itm.type });
   }
 
   return (
@@ -152,8 +157,8 @@ const AddItem = ({ open, onClose }
                 <div className="flex flex-col gap-2">
                     <Label>Quantity</Label>
                     <Input  
-                        value={item.stock} 
-                        onChange={ e => setItem({ ...item, stock: parseInt(e.target.value) })} 
+                        value={asset.quantity} 
+                        onChange={ e => setAsset({ ...asset, quantity: parseInt(e.target.value) })} 
                         type="number"
                         min={0} 
                         placeholder="Quantity" />
@@ -162,18 +167,18 @@ const AddItem = ({ open, onClose }
                     <Label>Unit</Label>
                     <Input 
                         disabled={inputDisabled}
-                        value={item.unit} 
-                        onChange={ e => setItem({ ...item, unit: e.target.value })} 
+                        value={asset.unit} 
+                        onChange={ e => setAsset({ ...asset, unit: e.target.value })} 
                         type="text" 
                         placeholder="Unit (e.g. kg, gram, tablet, piece)" />
                 </div>
                 <div className="flex flex-col gap-2">
-                    <Label>Price</Label>
+                    <Label>Unit Cost</Label>
                     <Input 
                         disabled={inputDisabled}
                         required 
-                        value={item.price} 
-                        onChange={ e => setItem({ ...item, price: parseFloat(e.target.value) })} 
+                        value={asset.unit_cost} 
+                        onChange={ e => setAsset({ ...asset, unit_cost: parseFloat(e.target.value) })} 
                         type="number"
                         min={0.0} 
                         placeholder="Price" />
@@ -186,7 +191,7 @@ const AddItem = ({ open, onClose }
                             className="react-select"
                             classNamePrefix="select"
                             value={ { value: item.type, label: capitalize(item.type) } }
-                            onChange={ e => setItem({ ...item, type: e?.value? e.value:'' }) }
+                            onChange={ e => { setAsset({ ...asset, type: e?.value? e.value:'' }); setItem({ ...item, type: e?.value? e.value:'' }) } }
                             defaultValue={itemTypes[0]}
                             options={itemTypes}
                             styles={styles}

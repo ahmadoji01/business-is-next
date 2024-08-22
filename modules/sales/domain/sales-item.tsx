@@ -6,7 +6,7 @@ export interface SalesItem {
   item: Item,
   quantity: number,
   type: string,
-  sales: Sales,
+  sales: Sales|null,
   unit_cost: number,
   total: number,
 }
@@ -16,7 +16,7 @@ export const defaultSalesItem:SalesItem = {
   item: defaultItem,
   quantity: 0,
   type: "",
-  sales: {},
+  sales: null,
   unit_cost: 0,
   total: 0,
 }

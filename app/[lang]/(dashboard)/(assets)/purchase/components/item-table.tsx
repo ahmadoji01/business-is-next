@@ -24,7 +24,7 @@ import { useAssetsContext } from "@/provider/assets.provider";
 
 const ItemTable = () => {
     const [itms, setItms] = useState<Item[]>([]);
-    const {items, setItems, recalculateTotal} = useAssetsContext();
+    const {items, setItems, recalculateTotal, assets, setAssets} = useAssetsContext();
 
     useEffect(() => {
         if (typeof(items) === 'undefined')
@@ -50,7 +50,7 @@ const ItemTable = () => {
                 </TableRow>
             </TableHeader>
             <TableBody className="[&_tr:last-child]:border-1">
-                { items?.map( (item,key) => {
+                { assets?.map( (asset,key) => {
                     return (
                         <TableRow key={key}>
                             <TableCell>
@@ -60,7 +60,7 @@ const ItemTable = () => {
                             </TableCell>
                             <TableCell className="min-w-[220px] w-full max-w-[432px]">
                                 <Input
-                                    value={item.name}
+                                    value={asset.item?.name}
                                     type="text"
                                     placeholder="Gaming Mouse & Keyboard Combo"
                                     className="text-default-800 rounded "
@@ -69,7 +69,7 @@ const ItemTable = () => {
                             <TableCell>
                                 <div className="flex gap-2 items-center">
                                     <Label>Rp</Label>
-                                    <Input type="text" value={item.price} className="text-end font-medium  text-default-900 rounded min-w-[140px]" disabled />
+                                    <Input type="text" value={asset.unit_cost} className="text-end font-medium  text-default-900 rounded min-w-[140px]" disabled />
                                 </div>
                             </TableCell>
                             <TableCell>
@@ -78,15 +78,15 @@ const ItemTable = () => {
                                         className="w-[70px] appearance-none accent-transparent rounded ltr:rounded-r-none ltr:border-r-0 rtl:rounded-l-none rtl:border-l-0"
                                         min={1}
                                         type="number"
-                                        defaultValue={item.stock}
+                                        defaultValue={asset.quantity}
                                         onChange={ e => handleQtyChange(key, e.target.valueAsNumber)}
                                         />
                                     <Select>
                                         <SelectTrigger className="rounded ltr:rounded-l-none rtl:rounded-r-none h-9 pr-1 [&>svg]:h-4 [&>svg]:w-4 [&>svg]:mt-1 ">
-                                            <SelectValue defaultValue={item.unit} />
+                                            <SelectValue defaultValue={asset.unit} />
                                         </SelectTrigger>
                                         <SelectContent >
-                                            <SelectItem value={item.unit}>{item.unit}</SelectItem>
+                                            <SelectItem value={asset.unit}>{asset.unit}</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -94,7 +94,7 @@ const ItemTable = () => {
                             <TableCell>
                                 <div className="flex gap-2 items-center">
                                     <Label>Rp</Label>
-                                    <Input type="text" defaultValue={0} className="text-end font-medium  text-default-900 rounded min-w-[140px]" disabled />
+                                    <Input type="text" defaultValue={asset.total} className="text-end font-medium  text-default-900 rounded min-w-[140px]" disabled />
                                 </div>
                             </TableCell>
                         </TableRow>

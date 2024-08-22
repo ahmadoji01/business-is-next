@@ -1,28 +1,27 @@
 'use client';
 
-import { Customer, customerMapper, defaultCustomer } from '@/modules/customers/domain/customer';
+import { Customer } from '@/modules/customers/domain/customer';
 import { defaultSales, Sales, SalesCreator, salesCreatorMapper } from '@/modules/sales/domain/sales';
 import { Dispatch, SetStateAction, createContext, useContext, useEffect, useState } from 'react';
 import { useUserContext } from './user.provider';
-import { getAllCustomers } from '@/modules/customers/domain/customers.actions';
 import toast from 'react-hot-toast';
 import Item from '@/modules/items/domain/item';
 import { SalesItem } from '@/modules/sales/domain/sales-item';
 import { createSales } from '@/modules/sales/domain/sales.actions';
 import { translate } from '@/lib/utils';
 import { useLanguageContext } from './language.provider';
+import { Asset } from '@/modules/assets/domain/asset';
+import { defaultPurchase, Purchase } from '@/modules/purchase/domain/purchase';
 
 interface AssetsContextType {
     selectedCustomers: Customer[],
     items: Item[],
     selectedSales: Sales[],
     filter: object,
-    sales: Sales[],
-    activeSales: Sales,
-    salesItems: SalesItem[],
-    setSales: Dispatch<SetStateAction<Sales[]>>,
-    setActiveSales: Dispatch<SetStateAction<Sales>>,
-    setSalesItems: Dispatch<SetStateAction<SalesItem[]>>,
+    assets: Asset[],
+    purchase: Purchase,
+    setAssets: Dispatch<SetStateAction<Asset[]>>,
+    setPurchase: Dispatch<SetStateAction<Purchase>>,
     setFilter: Dispatch<SetStateAction<object>>,
     setSelectedCustomers: Dispatch<SetStateAction<Customer[]>>,
     setItems: Dispatch<SetStateAction<Item[]>>,
@@ -36,12 +35,10 @@ export const AssetsContext = createContext<AssetsContextType | null>({
     items: [],
     selectedSales: [],
     filter: {},
-    sales: [],
-    activeSales: defaultSales,
-    salesItems: [],
-    setSales: () => {},
-    setActiveSales: () => {},
-    setSalesItems: () => {},
+    assets: [],
+    purchase: defaultPurchase,
+    setAssets: () => {},
+    setPurchase: () => {},
     setFilter: () => {},
     setSelectedCustomers: () => {},
     setItems: () => {},
@@ -57,34 +54,26 @@ export const AssetsProvider = ({
 }) => {
 
     const [items, setItems] = useState<Item[]>([]);
+    const [assets, setAssets] = useState<Asset[]>([]);
+    const [purchase, setPurchase] = useState<Purchase>(defaultPurchase);
     const [selectedCustomers, setSelectedCustomers] = useState<Customer[]>([]);
     const [selectedSales, setSelectedSales] = useState<Sales[]>([]);
-    const [salesItems, setSalesItems] = useState<SalesItem[]>([]);
     const [filter, setFilter] = useState<object>({});
-    const [sales, setSales] = useState<Sales[]>([]);
-    const [activeSales, setActiveSales] = useState<Sales>(defaultSales);
     const {accessToken, organization} = useUserContext();
     const {trans} = useLanguageContext();
 
     const recalculateTotal = () => {
         let total = 0;
-        salesItems?.map( item => { total += item.total });
+        assets?.map( asset => { total += asset.total });
         
-        let newSales = {...activeSales};
-        newSales.total = total;
-        setActiveSales(newSales);
+        let newPurchase = {...purchase};
+        newPurchase.total = total;
+        setPurchase(newPurchase);
     }
 
     const submitItems = async () => {
-        let salesList:SalesCreator[] = [];
-        selectedCustomers.map( (cust) => {
-            let sales = {...activeSales};
-            sales.sales_items = salesItems;
-            salesList.push(salesCreatorMapper(sales, organization.id));
-        })
-
         try {
-            let res = await createSales(accessToken, salesList);
+            let res = await createSales(accessToken, purchase);
             toast.success("Customer has been billed!");
             window.location.assign("/sales");
         } catch {
@@ -98,18 +87,16 @@ export const AssetsProvider = ({
             setSelectedSales,
             submitItems, 
             recalculateTotal, 
-            activeSales, 
-            setActiveSales, 
-            salesItems, 
-            setSalesItems, 
             items, 
             setItems, 
             selectedCustomers, 
             setSelectedCustomers, 
             filter, 
-            setFilter, 
-            sales, 
-            setSales }}>
+            setFilter,
+            assets, 
+            setAssets,
+            purchase,
+            setPurchase }}>
             {children}
         </AssetsContext.Provider>
     );
