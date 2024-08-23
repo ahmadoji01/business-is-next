@@ -41,6 +41,12 @@ const ItemTable = () => {
         setAssets(newAssets);
     }
 
+    const handleRemoveAsset = (i:number) => {
+        let newAssets = [...assets];
+        newAssets.splice(i,1);
+        setAssets(newAssets);
+    }
+
     return (
         <Table>
             <TableHeader>
@@ -58,7 +64,7 @@ const ItemTable = () => {
                         <TableRow key={key}>
                             <TableCell>
                                 <div className="flex items-center gap-2 ">
-                                    <Trash2 className="w-4 h-4 text-warning" />
+                                    <Trash2 className="w-4 h-4 text-warning" onClick={ () => handleRemoveAsset(key) } />
                                 </div>
                             </TableCell>
                             <TableCell className="min-w-[220px] w-full max-w-[432px]">
