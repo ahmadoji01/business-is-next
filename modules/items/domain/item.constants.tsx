@@ -27,4 +27,40 @@ export const itemTypes = [
         value: "inventory",
         label: "Inventory",
     },
+    {
+        value: "machine",
+        label: "Machine",
+    },
+    {
+        value: "land",
+        label: "Land",
+    },
+    {
+        value: "building",
+        label: "Building",
+    },
+    {
+        value: "security",
+        label: "Security",
+    },
+    {
+        value: "equipment",
+        label: "Equipment",
+    },
+    {
+        value: "vehicle",
+        label: "Vehicle",
+    },
+    {
+        value: "patent",
+        label: "Patent",
+    },
+    {
+        value: "trademark",
+        label: "Trademark",
+    },
+    {
+        value: "goodwill",
+        label: "Goodwill",
+    },
 ]

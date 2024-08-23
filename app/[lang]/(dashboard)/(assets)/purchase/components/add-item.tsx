@@ -18,6 +18,7 @@ import { useLanguageContext } from "@/provider/language.provider";
 import { itemTypes } from "@/modules/items/domain/item.constants";
 import { AssetsContext, useAssetsContext } from "@/provider/assets.provider";
 import { Asset, defaultAsset } from "@/modules/assets/domain/asset";
+import { CleaveInput } from "@/components/ui/cleave";
 
 const styles = {
     option: (provided: any, state: any) => ({
@@ -60,6 +61,9 @@ const AddItem = ({ open, onClose }
 
     const handleChange = (query:string) => {
         setItem({ ...item, id: "", name: query });
+        if (query === "")
+            setInputDisabled(false);
+
         if (activeTimeout) {
             clearTimeout(activeTimeout);
         }
@@ -84,8 +88,7 @@ const AddItem = ({ open, onClose }
             setInputDisabled(false);
     }, [item.id])
 
-    const handleSearch = (query:string) => {
-        setItem({ ...item, id: "" });    
+    const handleSearch = (query:string) => {   
         if (query.length > 1 && query.length <= 3)
             return;
 
@@ -98,6 +101,9 @@ const AddItem = ({ open, onClose }
     asset.item = itm;
     asset.total = itm.price * asset.quantity;
     setAssets([...assets, asset]);
+    setItem(defaultItem);
+    setAsset(defaultAsset);
+    setInputDisabled(false);
     onClose();
   }
 
@@ -119,6 +125,7 @@ const AddItem = ({ open, onClose }
         aria-describedby="child-modal-description"
         >
         <h2 id="child-modal-title" className="mb-4 text-xl font-bold">Sales Payment</h2>
+        <form onSubmit={ e => { e.preventDefault(); startTransition(() => handleConfirm(item))} }>
             <div className="grid-cols-1 gap-5 space-y-4 overflow-y-scroll">
                 <div className="flex flex-col gap-2">
                     <Label>Name</Label>
@@ -126,12 +133,14 @@ const AddItem = ({ open, onClose }
                         id="free-solo-demo"
                         freeSolo
                         options={itemOptions.map( (option) => option.name)}
+                        onInputChange={(event: any, newValue: string | null) => { if (newValue === "") setInputDisabled(false) }}
                         onChange={(event: any, newValue: string | null) => {
                             let val = newValue? newValue : "";
                             handleOptClick(val);
                         }}
                         renderInput={(params) => 
                             <TextField {...params} 
+                                required
                                 onChange={ e => handleChange(e.target.value)}
                                 InputProps={{
                                     ...params.InputProps,
@@ -148,6 +157,7 @@ const AddItem = ({ open, onClose }
                 <div className="flex flex-col gap-2">
                     <Label>SKU</Label>
                     <Input  
+                        required
                         disabled={inputDisabled}
                         value={item.sku} 
                         onChange={ e => setItem({ ...item, sku: e.target.value })} 
@@ -157,6 +167,7 @@ const AddItem = ({ open, onClose }
                 <div className="flex flex-col gap-2">
                     <Label>Quantity</Label>
                     <Input  
+                        required
                         value={asset.quantity} 
                         onChange={ e => setAsset({ ...asset, quantity: parseInt(e.target.value) })} 
                         type="number"
@@ -166,6 +177,7 @@ const AddItem = ({ open, onClose }
                 <div className="flex flex-col gap-2">
                     <Label>Unit</Label>
                     <Input 
+                        required
                         disabled={inputDisabled}
                         value={asset.unit} 
                         onChange={ e => setAsset({ ...asset, unit: e.target.value })} 
@@ -174,44 +186,44 @@ const AddItem = ({ open, onClose }
                 </div>
                 <div className="flex flex-col gap-2">
                     <Label>Unit Cost</Label>
-                    <Input 
-                        disabled={inputDisabled}
-                        required 
-                        value={asset.unit_cost} 
-                        onChange={ e => setAsset({ ...asset, unit_cost: parseFloat(e.target.value) })} 
-                        type="number"
-                        min={0.0} 
-                        placeholder="Price" />
-                </div>
-                <div className="flex flex-col gap-2">
-                    <Label>Type</Label>
-                    <div>
-                        <Select
-                            isDisabled={inputDisabled}
-                            className="react-select"
-                            classNamePrefix="select"
-                            value={ { value: item.type, label: capitalize(item.type) } }
-                            onChange={ e => { setAsset({ ...asset, type: e?.value? e.value:'' }); setItem({ ...item, type: e?.value? e.value:'' }) } }
-                            defaultValue={itemTypes[0]}
-                            options={itemTypes}
-                            styles={styles}
-                            />
-                    </div>
+                    <CleaveInput
+                        id="nu"
+                        required
+                        options={{ numeral: true }}
+                        placeholder="10,000"
+                        onChange={ e => { setAsset({ ...asset, unit_cost: parseFloat(e.target.value.replace(/,/g, '')) }); }} 
+                        />
                 </div>
             </div>
-        <div className="flex justify-center mt-4 gap-3">
-            <Button type="button" onClick={() => onClose()} variant="outline">
-                Cancel
-            </Button>
-            <Button 
-                type="button" 
-                className={isPending ? "pointer-events-none" : ""}
-                onClick={() => startTransition(() => handleConfirm(item))}
-                >
-                {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isPending ? "Loading.." : "Continue"}
-            </Button>
-        </div>
+            <div className="flex flex-col gap-2 mt-4">
+                <Label>Type</Label>
+                <div>
+                    <Select
+                        required
+                        isDisabled={inputDisabled}
+                        className="react-select"
+                        classNamePrefix="select"
+                        value={ { value: item.type, label: capitalize(item.type) } }
+                        onChange={ e => { setAsset({ ...asset, type: e?.value? e.value:'' }); setItem({ ...item, type: e?.value? e.value:'' }) } }
+                        defaultValue={itemTypes[0]}
+                        options={itemTypes}
+                        styles={styles}
+                        />
+                </div>
+            </div>
+            <div className="flex justify-center mt-4 gap-3">
+                <Button type="button" onClick={() => onClose()} variant="outline">
+                    Cancel
+                </Button>
+                <Button 
+                    type="submit"
+                    className={isPending ? "pointer-events-none" : ""}
+                    >
+                    {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {isPending ? "Loading.." : "Continue"}
+                </Button>
+            </div>
+        </form>
     </MaterialModal>
   );
 };

@@ -49,6 +49,7 @@ import { createManyTransactions } from "@/modules/transactions/domain/transactio
 import { createManySales } from "@/modules/sales/domain/sales.actions";
 import { createManyLedgerEntries } from "@/modules/ledger-entries/domain/ledger-entries.actions";
 import { SalesItemCreator, salesItemCreatorMapper } from "@/modules/sales/domain/sales-item";
+import { useAssetsContext } from "@/provider/assets.provider";
 
 const PurchasePage = () => {
 
@@ -60,6 +61,7 @@ const PurchasePage = () => {
 
   const { accessToken, organization } = useUserContext();
   const { selectedCustomers, filter, salesItems, activeSales, setActiveSales } = useSalesContext();
+  const { purchase, setPurchase } = useAssetsContext();
   const { trans } = useLanguageContext();
 
   const fetchCustomers = async () => {
@@ -251,7 +253,7 @@ const PurchasePage = () => {
                       <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-3">
                         <div className="text-sm font-medium text-default-600">Total:</div>
                         <Label>Rp</Label>
-                        <Input type="text" value={sales.total} className="text-xs font-medium  text-default-900 rounded w-full sm:w-[148px]" disabled />
+                        <Input type="text" value={purchase.total} className="text-xs font-medium  text-default-900 rounded w-full sm:w-[148px]" disabled />
                       </div>
                     </div>
                   </div>
