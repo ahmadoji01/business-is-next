@@ -50,6 +50,8 @@ import { createManySales } from "@/modules/sales/domain/sales.actions";
 import { createManyLedgerEntries } from "@/modules/ledger-entries/domain/ledger-entries.actions";
 import { SalesItemCreator, salesItemCreatorMapper } from "@/modules/sales/domain/sales-item";
 import { useAssetsContext } from "@/provider/assets.provider";
+import { DatePicker } from "@mui/x-date-pickers";
+import { defaultSupplier } from "@/modules/supplier/domain/supplier";
 
 const PurchasePage = () => {
 
@@ -57,12 +59,16 @@ const PurchasePage = () => {
   const [open, setOpen] = useState(false);
   const [sales, setSales] = useState(defaultSales);
   const [selected, setSelected] = useState<string>("unpaid");
+  const [transactionDate, setTransactionDate] = useState(new Date());
+  const [supplier, setSupplier] = useState(defaultSupplier);
   const custField = ['id', 'name', 'address', 'phone', 'email'];
 
   const { accessToken, organization } = useUserContext();
   const { selectedCustomers, filter, salesItems, activeSales, setActiveSales } = useSalesContext();
   const { purchase, setPurchase } = useAssetsContext();
   const { trans } = useLanguageContext();
+
+  useEffect(() => {}, [purchase]);
 
   const fetchCustomers = async () => {
     try {
@@ -95,8 +101,10 @@ const PurchasePage = () => {
   }
   
   const handleSubmit = async () => {
-    if (salesItems.length <= 0)
-      toast.error(translate("Item is empty. Add an item first before sending invoice", trans));
+    console.log(purchase);
+
+    /*if (assets.length <= 0)
+      toast.error(translate("Item is empty. Add an item first before submitting purchase", trans));
     
     let desc = "";
     let entries:EntryAction[] = [];
@@ -129,7 +137,7 @@ const PurchasePage = () => {
       toast.error(translate("something_wrong", trans));
       return;
     }
-    let salesToInsert:SalesCreator[] = [];
+    let purchaseToInsert:PurchaseCreator[] = [];
     let transactToCreate:TransactionCreator[] = [];
     let ledgerEntries:LedgerEntry[] = [];
     let ledgersToInsert:LedgerCreator[] = [];
@@ -148,12 +156,12 @@ const PurchasePage = () => {
       let transactDesc = desc;
       let transact = transactionMapper({
         id: transactID,
-        transaction_date: new Date(),
+        transaction_date: transactionDate,
         description: transactDesc,
         document: null,
-        total: sales.total,
+        total: purchase.total,
       });
-      transactToCreate.push(createTransactionMapper(transact, new Date(), organization.id));
+      transactToCreate.push(createTransactionMapper(transact, transactionDate, organization.id));
 
       let sls = {...sales};
       sls.customer = cust;
@@ -165,7 +173,7 @@ const PurchasePage = () => {
         ledgersToInsert.push(createLedger);
       })
     });
-    insertBills(transactToCreate, salesToInsert, ledgersToInsert);
+    insertBills(transactToCreate, salesToInsert, ledgersToInsert);*/
   }
 
   useEffect(() => {
@@ -217,6 +225,10 @@ const PurchasePage = () => {
                     <Input type="text" placeholder="Company Name" value={organization?.name} />
                     <Input type="email" placeholder="Company Email" value={organization?.email} />
                     <Textarea placeholder="Company Address" value={organization?.address} />
+                  </div>
+                  <div className="w-full space-y-2">
+                    <div className="text-base font-semibold text-default-800 pb-1">Transaction Date:</div>
+                    <DatePicker className="w-full" onChange={ e => setTransactionDate(e? e.toDate():new Date())} />
                   </div>
                 </div>
                 <div className="border border-default-300 rounded-md mt-9">
@@ -335,7 +347,7 @@ const PurchasePage = () => {
             </div>
             <div className="flex-1 w-1/2">
               <Button asChild onClick={handleSubmit} className="p-8 text-2xl w-full group hover:bg-default-200 hover:text-default-900 font-semibold whitespace-nowrap">
-                <Link href="">Send Invoice</Link>
+                <Link href="">Submit Purchase</Link>
               </Button>
             </div>
           </div>

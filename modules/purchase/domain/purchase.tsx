@@ -1,4 +1,5 @@
 import { Asset, AssetCreator, assetCreatorMapper, mapAssets } from "@/modules/assets/domain/asset";
+import { defaultSupplier, Supplier, supplierMapper } from "@/modules/supplier/domain/supplier";
 import { defaultTransaction, Transaction, transactionMapper } from "@/modules/transactions/domain/transaction";
 
 export interface Purchase {
@@ -9,6 +10,7 @@ export interface Purchase {
     paid: number,
     transaction: Transaction,
     assets: Asset[],
+    supplier: Supplier,
 }
 
 export const defaultPurchase:Purchase = {
@@ -19,10 +21,11 @@ export const defaultPurchase:Purchase = {
     paid: 0,
     transaction: defaultTransaction,
     assets: [],
+    supplier: defaultSupplier,
 }
 
 export function purchaseMapper(res:Record<string,any>) {
-    let purchase = {
+    let purchase:Purchase = {
         id: res.id,
         status: res.status,
         total: parseFloat(res.total),
@@ -30,6 +33,7 @@ export function purchaseMapper(res:Record<string,any>) {
         paid: parseFloat(res.paid),
         transaction: res.transaction? transactionMapper(res.transaction):defaultTransaction,
         assets: res.assets? mapAssets(res.assets):[],
+        supplier: res.supplier? supplierMapper(res.supplier):defaultSupplier, 
     }
     return purchase;
 }

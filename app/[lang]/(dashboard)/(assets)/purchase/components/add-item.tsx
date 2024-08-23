@@ -19,6 +19,7 @@ import { itemTypes } from "@/modules/items/domain/item.constants";
 import { AssetsContext, useAssetsContext } from "@/provider/assets.provider";
 import { Asset, defaultAsset } from "@/modules/assets/domain/asset";
 import { CleaveInput } from "@/components/ui/cleave";
+import { DatePicker } from "@mui/x-date-pickers";
 
 const styles = {
     option: (provided: any, state: any) => ({
@@ -99,7 +100,7 @@ const AddItem = ({ open, onClose }
 
   const handleConfirm = async (itm:Item) => {
     asset.item = itm;
-    asset.total = itm.price * asset.quantity;
+    asset.total = asset.unit_cost * asset.quantity;
     setAssets([...assets, asset]);
     setItem(defaultItem);
     setAsset(defaultAsset);
@@ -126,7 +127,7 @@ const AddItem = ({ open, onClose }
         >
         <h2 id="child-modal-title" className="mb-4 text-xl font-bold">Sales Payment</h2>
         <form onSubmit={ e => { e.preventDefault(); startTransition(() => handleConfirm(item))} }>
-            <div className="grid-cols-1 gap-5 space-y-4 overflow-y-scroll">
+            <div className="grid-cols-1 gap-5 space-y-4 overflow-y-auto">
                 <div className="flex flex-col gap-2">
                     <Label>Name</Label>
                     <Autocomplete
@@ -171,7 +172,7 @@ const AddItem = ({ open, onClose }
                         value={asset.quantity} 
                         onChange={ e => setAsset({ ...asset, quantity: parseInt(e.target.value) })} 
                         type="number"
-                        min={0} 
+                        min={1} 
                         placeholder="Quantity" />
                 </div>
                 <div className="flex flex-col gap-2">
@@ -190,25 +191,41 @@ const AddItem = ({ open, onClose }
                         id="nu"
                         required
                         options={{ numeral: true }}
+                        value={asset.unit_cost}
                         placeholder="10,000"
                         onChange={ e => { setAsset({ ...asset, unit_cost: parseFloat(e.target.value.replace(/,/g, '')) }); }} 
                         />
                 </div>
-            </div>
-            <div className="flex flex-col gap-2 mt-4">
-                <Label>Type</Label>
-                <div>
-                    <Select
-                        required
-                        isDisabled={inputDisabled}
-                        className="react-select"
-                        classNamePrefix="select"
-                        value={ { value: item.type, label: capitalize(item.type) } }
-                        onChange={ e => { setAsset({ ...asset, type: e?.value? e.value:'' }); setItem({ ...item, type: e?.value? e.value:'' }) } }
-                        defaultValue={itemTypes[0]}
-                        options={itemTypes}
-                        styles={styles}
-                        />
+                <div className="flex flex-col gap-2 mt-4 overflow-y-visible">
+                    <Label>Type</Label>
+                    <div>
+                        <Select
+                            required
+                            isDisabled={inputDisabled}
+                            className="react-select"
+                            classNamePrefix="select"
+                            value={ { value: item.type, label: capitalize(item.type) } }
+                            onChange={ e => { setAsset({ ...asset, type: e?.value? e.value:'' }); setItem({ ...item, type: e?.value? e.value:'' }) } }
+                            defaultValue={itemTypes[0]}
+                            options={itemTypes}
+                            styles={styles}
+                            />
+                    </div>
+                </div>
+                <div className="flex flex-col gap-2 mt-4">
+                    <Label>Lifetime/Expiry</Label>
+                    <div>
+                        <DatePicker 
+                            className="w-full border border-default-200 focus:border-primary focus:outline-none h-10 rounded-md px-2 placeholder:text-default-600"
+                            onChange={ e => { setAsset({ ...asset, lifetime: e? e.toDate() : new Date() }); }}
+                            views={['year', 'month', 'day']}
+                            slotProps={{
+                                popper: {
+                                sx: {zIndex: 10000}
+                                },
+                            }}
+                            />
+                    </div>
                 </div>
             </div>
             <div className="flex justify-center mt-4 gap-3">

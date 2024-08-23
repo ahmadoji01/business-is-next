@@ -16,12 +16,10 @@ import {
 } from "@/components/ui/select";
 import { Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import Item from "@/modules/items/domain/item";
-import { useSalesContext } from "@/provider/sales.provider";
-import { SalesItem } from "@/modules/sales/domain/sales-item";
 import { Label } from "@/components/ui/label";
 import { useAssetsContext } from "@/provider/assets.provider";
 import { Asset } from "@/modules/assets/domain/asset";
+import moment from "moment";
 
 const ItemTable = () => {
     const [assts, setAssts] = useState<Asset[]>([]);
@@ -52,7 +50,8 @@ const ItemTable = () => {
             <TableHeader>
                 <TableRow>
                     <TableHead className="text-default-600 uppercase"></TableHead>
-                    <TableHead className="text-default-600 uppercase">Item</TableHead>
+                    <TableHead className="text-default-600 uppercase">Item Name</TableHead>
+                    <TableHead className="text-default-600 uppercase">Lifetime/Expiry</TableHead>
                     <TableHead className="text-default-600 uppercase">Unit Cost</TableHead>
                     <TableHead className="text-default-600 uppercase">Quantity</TableHead>
                     <TableHead className="text-default-600 uppercase">Total</TableHead>
@@ -71,7 +70,17 @@ const ItemTable = () => {
                                 <Input
                                     value={asset.item?.name}
                                     type="text"
+                                    disabled
                                     placeholder="Gaming Mouse & Keyboard Combo"
+                                    className="text-default-800 rounded "
+                                />
+                            </TableCell>
+                            <TableCell className="min-w-[220px] w-full max-w-[432px]">
+                                <Input
+                                    value={moment(asset.lifetime).format("DD-MM-YYYY")}
+                                    type="text"
+                                    disabled
+                                    placeholder="DD/MM/YY"
                                     className="text-default-800 rounded "
                                 />
                             </TableCell>
