@@ -38,8 +38,8 @@ export function purchaseMapper(res:Record<string,any>) {
     return purchase;
 }
 
-export type PurchaseCreator = Omit<Purchase, 'id'|'assets'|'transaction'> & { assets:AssetCreator[], organization:string, transaction:string|null };
-export function purchaseCreatorMapper(purchase:Purchase, orgID:string, transaction?:string|null) {
+export type PurchaseCreator = Omit<Purchase, 'id'|'assets'|'transaction'|'supplier'> & { assets:AssetCreator[], organization:string, transaction:string|null, supplier:string|null };
+export function purchaseCreatorMapper(purchase:Purchase, orgID:string, transaction?:string|null, supplier?:string|null) {
     
     let assets:AssetCreator[] = [];
     purchase.assets?.map( (asset) => assets.push(assetCreatorMapper(asset, orgID)));
@@ -50,6 +50,7 @@ export function purchaseCreatorMapper(purchase:Purchase, orgID:string, transacti
         paid: purchase.paid,
         transaction: transaction? transaction:"",
         assets: assets,
+        supplier: supplier? supplier:"",
         organization: orgID,
     };
     return result;

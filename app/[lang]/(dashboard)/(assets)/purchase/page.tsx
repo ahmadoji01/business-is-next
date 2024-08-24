@@ -27,67 +27,49 @@ import { Breadcrumbs, BreadcrumbItem } from "@/components/ui/breadcrumbs";
 import { useUserContext } from "@/provider/user.provider";
 import { useSalesContext } from "@/provider/sales.provider";
 import { useEffect, useState } from "react";
-import { isEmptyObject } from "@/utils/generic-functions";
-import { Customer, mapCustomers } from "@/modules/customers/domain/customer";
-import { getAllCustomersWithFilter } from "@/modules/customers/domain/customers.actions";
 import toast from "react-hot-toast";
 import { translate } from "@/lib/utils";
 import { useLanguageContext } from "@/provider/language.provider";
-import { Badge } from "@/components/ui/badge";
 import AddItem from "./components/add-item";
-import { useRouter } from "next/navigation";
 import ItemTable from "./components/item-table";
 import { defaultSales, SalesCreator, salesCreatorMapper } from "@/modules/sales/domain/sales";
-import { SALES_STATUS } from "@/modules/sales/domain/sales.constants";
 import { ENTRIES, EntryAction } from "@/utils/accounting-dictionary";
 import { Account, mapAccounts } from "@/modules/accounts/domain/account";
 import { getAccountsWithFilter } from "@/modules/accounts/domain/accounts.actions";
 import { accountsByCodes } from "@/modules/accounts/domain/account.specifications";
 import { createTransactionMapper, Transaction, TransactionCreator, transactionMapper } from "@/modules/transactions/domain/transaction";
 import { defaultLedgerEntry, LedgerCreator, ledgerCreatorMapper, LedgerEntry } from "@/modules/ledger-entries/domain/ledger-entry";
-import { createManyTransactions } from "@/modules/transactions/domain/transactions.actions";
+import { createATransaction, createManyTransactions } from "@/modules/transactions/domain/transactions.actions";
 import { createManySales } from "@/modules/sales/domain/sales.actions";
 import { createManyLedgerEntries } from "@/modules/ledger-entries/domain/ledger-entries.actions";
-import { SalesItemCreator, salesItemCreatorMapper } from "@/modules/sales/domain/sales-item";
 import { useAssetsContext } from "@/provider/assets.provider";
 import { DatePicker } from "@mui/x-date-pickers";
 import { defaultSupplier } from "@/modules/supplier/domain/supplier";
+import { PURCHASE_STATUS } from "@/modules/purchase/domain/purchases.constants";
+import { PurchaseCreator, purchaseCreatorMapper } from "@/modules/purchase/domain/purchase";
+import { createAPurchase } from "@/modules/purchase/domain/purchases.actions";
 
 const PurchasePage = () => {
 
-  const [customers, setCustomers] = useState<Customer[]>([]);
   const [open, setOpen] = useState(false);
   const [sales, setSales] = useState(defaultSales);
-  const [selected, setSelected] = useState<string>("unpaid");
+  const [selected, setSelected] = useState<string>("paid_delivered");
   const [transactionDate, setTransactionDate] = useState(new Date());
   const [supplier, setSupplier] = useState(defaultSupplier);
-  const custField = ['id', 'name', 'address', 'phone', 'email'];
 
   const { accessToken, organization } = useUserContext();
-  const { selectedCustomers, filter, salesItems, activeSales, setActiveSales } = useSalesContext();
-  const { purchase, setPurchase } = useAssetsContext();
+  const { assets, purchase, setPurchase } = useAssetsContext();
   const { trans } = useLanguageContext();
 
   useEffect(() => {}, [purchase]);
 
-  const fetchCustomers = async () => {
+  const insertPurchase = async (transactToCreate:TransactionCreator, purchaseToCreate:PurchaseCreator, ledgersToCreate:LedgerCreator[]) => {
     try {
-      let res = await getAllCustomersWithFilter(accessToken, filter, custField);
-      let custs = mapCustomers(res);
-      setCustomers(custs);
-      return;
-    } catch {
-      toast.error(translate("something_wrong", trans));
-    }
-  }
-
-  const insertBills = async (transactToCreate:Transaction[], salesToCreate:SalesCreator[], ledgersToCreate:LedgerCreator[]) => {
-    try {
-      let res = await createManyTransactions(accessToken, transactToCreate);
-      res = await createManySales(accessToken, salesToCreate);
+      let res = await createATransaction(accessToken, transactToCreate);
+      res = await createAPurchase(accessToken, purchaseToCreate);
       res = await createManyLedgerEntries(accessToken, ledgersToCreate);
-      toast.success("Bill(s) have been created!");
-      window.location.assign("/sales");
+      toast.success("A purchase has been created!");
+      window.location.assign("/purchase");
     } catch(e) {
       toast.error(translate("something_wrong", trans));
     }
@@ -95,30 +77,31 @@ const PurchasePage = () => {
   
   const handleValueChange = (value: string) => {
     setSelected(value);
-    let newSales = {...activeSales};
-    newSales.status = value;
-    setActiveSales(newSales);
+    let newPurchase = {...purchase};
+    newPurchase.status = value;
+    setPurchase(newPurchase);
   }
   
   const handleSubmit = async () => {
-    console.log(purchase);
-
-    /*if (assets.length <= 0)
+    if (assets.length <= 0)
       toast.error(translate("Item is empty. Add an item first before submitting purchase", trans));
     
     let desc = "";
     let entries:EntryAction[] = [];
-    let sales = activeSales;
-    sales.sales_items = salesItems;
-    if (selected === SALES_STATUS.paid) {
-      entries = ENTRIES.sales_payment_in_advance.actions;
-      desc = ENTRIES.sales_payment_in_advance.description;
-      sales.paid = activeSales.total;
+    purchase.assets = assets;
+    if (purchase.status === PURCHASE_STATUS.paid_delivered) {
+      entries = ENTRIES.purchase_paid_and_delivered.actions;
+      desc = ENTRIES.purchase_paid_and_delivered.description;
+      purchase.paid = purchase.total;
     }
-    else {
-      entries = ENTRIES.sales_payment.actions;
-      desc = ENTRIES.sales_payment.description;
-      sales.paid = 0;
+    else if (purchase.status === PURCHASE_STATUS.paid_undelivered) {
+      entries = ENTRIES.purchase_paid_and_undelivered.actions;
+      desc = ENTRIES.purchase_paid_and_undelivered.description;
+      purchase.paid = purchase.total;
+    } else {
+      entries = ENTRIES.purchase_unpaid.actions;
+      desc = ENTRIES.purchase_unpaid.description;
+      purchase.paid = 0;
     }
 
     let accounts:Account[] = [];
@@ -137,8 +120,8 @@ const PurchasePage = () => {
       toast.error(translate("something_wrong", trans));
       return;
     }
-    let purchaseToInsert:PurchaseCreator[] = [];
-    let transactToCreate:TransactionCreator[] = [];
+    let purchaseToCreate:PurchaseCreator;
+    let transactToCreate:TransactionCreator;
     let ledgerEntries:LedgerEntry[] = [];
     let ledgersToInsert:LedgerCreator[] = [];
 
@@ -151,48 +134,26 @@ const PurchasePage = () => {
       ledgerEntries.push(ledger);
     });
     
-    customers?.map( cust => {
-      let transactID = crypto.randomUUID();
-      let transactDesc = desc;
-      let transact = transactionMapper({
-        id: transactID,
-        transaction_date: transactionDate,
-        description: transactDesc,
-        document: null,
-        total: purchase.total,
-      });
-      transactToCreate.push(createTransactionMapper(transact, transactionDate, organization.id));
-
-      let sls = {...sales};
-      sls.customer = cust;
-      let saleToCreate = salesCreatorMapper(sls, organization.id, transactID);  
-      salesToInsert.push(saleToCreate);
-
-      ledgerEntries.map( ent => {
-        let createLedger = ledgerCreatorMapper(ent, transactID, organization.id);
-        ledgersToInsert.push(createLedger);
-      })
+    let transactID = crypto.randomUUID();
+    let transactDesc = desc;
+    let transact = transactionMapper({
+      id: transactID,
+      transaction_date: transactionDate,
+      description: transactDesc,
+      document: null,
+      total: purchase.total,
     });
-    insertBills(transactToCreate, salesToInsert, ledgersToInsert);*/
+    transactToCreate = createTransactionMapper(transact, transactionDate, organization.id);
+
+    let purch = {...purchase};
+    purchaseToCreate = purchaseCreatorMapper(purchase, organization.id, transactID, supplier.id);  
+
+    ledgerEntries.map( ent => {
+      let createLedger = ledgerCreatorMapper(ent, transactID, organization.id);
+      ledgersToInsert.push(createLedger);
+    })
+    insertPurchase(transactToCreate, purchaseToCreate, ledgersToInsert);
   }
-
-  useEffect(() => {
-    setSales(activeSales);
-  }, [activeSales])
-
-  useEffect(() => {
-    handleValueChange("unpaid");
-
-    if (selectedCustomers.length > 0) {
-      setCustomers(selectedCustomers);
-      return;
-    }
-
-    if (isEmptyObject(filter))
-      return;
-
-    fetchCustomers();
-  }, []);
 
   return (
     <>
@@ -292,9 +253,47 @@ const PurchasePage = () => {
                 <CardContent>
                   <div className="space-y-3">
                     <RadioGroup
-                      defaultValue="unpaid"
+                      defaultValue="paid_delivered"
                       onValueChange={handleValueChange}
                       >
+                      <Label
+                        className="flex gap-2.5 items-center w-full rounded-md p-2 hover:bg-default-50 group"
+                        htmlFor="paid_delivered"
+                        >
+                        <div className="h-10 w-10 rounded-full bg-default-100 flex justify-center items-center group-hover:bg-default-200">
+                          <Icon icon="codicon:account" className="text-2xl" />
+                        </div>
+                        <div className="flex-1">
+                          <h2 className="text-sm font-bold text-default-900 mb-1">Paid and Item(s) Delivered</h2>
+                          <ul className="space-y-[2px]">
+                            <li className="text-xs text-default-500">Item(s) have been paid and delivered.</li>
+                          </ul>
+                        </div>
+                        <RadioGroupItem
+                          value="paid_delivered"
+                          id="paid_delivered"
+                          color="primary"
+                        ></RadioGroupItem>
+                      </Label>
+                      <Label
+                        className="flex gap-2.5 items-center w-full rounded-md p-2 hover:bg-default-50 group"
+                        htmlFor="paid_undelivered"
+                        >
+                        <div className="h-10 w-10 rounded-full bg-default-100 flex justify-center items-center group-hover:bg-default-200">
+                          <Icon icon="ant-design:message-outlined" className="text-2xl" />
+                        </div>
+                        <div className="flex-1">
+                          <h2 className="text-sm font-bold text-default-900 mb-1">Paid and Item(s) Undelivered</h2>
+                          <ul className="space-y-[2px]">
+                            <li className="text-xs text-default-500">Item(s) have been paid but undelivered.</li>
+                          </ul>
+                        </div>
+                        <RadioGroupItem
+                          value="paid_undelivered"
+                          id="paid_undelivered"
+                          color="primary"
+                        ></RadioGroupItem>
+                      </Label>
                       <Label
                         className="flex gap-2.5 items-center w-full rounded-md p-2 hover:bg-default-50 group"
                         htmlFor="unpaid"
@@ -311,25 +310,6 @@ const PurchasePage = () => {
                         <RadioGroupItem
                           value="unpaid"
                           id="unpaid"
-                          color="primary"
-                        ></RadioGroupItem>
-                      </Label>
-                      <Label
-                        className="flex gap-2.5 items-center w-full rounded-md p-2 hover:bg-default-50 group"
-                        htmlFor="paid"
-                        >
-                        <div className="h-10 w-10 rounded-full bg-default-100 flex justify-center items-center group-hover:bg-default-200">
-                          <Icon icon="ant-design:message-outlined" className="text-2xl" />
-                        </div>
-                        <div className="flex-1">
-                          <h2 className="text-sm font-bold text-default-900 mb-1">Paid</h2>
-                          <ul className="space-y-[2px]">
-                            <li className="text-xs text-default-500">Items have been paid prior to invoice creation.</li>
-                          </ul>
-                        </div>
-                        <RadioGroupItem
-                          value="paid"
-                          id="paid"
                           color="primary"
                         ></RadioGroupItem>
                       </Label>
