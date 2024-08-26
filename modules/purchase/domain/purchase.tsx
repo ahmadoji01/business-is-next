@@ -1,5 +1,6 @@
 import { Asset, AssetCreator, assetCreatorMapper, mapAssets } from "@/modules/assets/domain/asset";
-import { defaultSupplier, Supplier, supplierMapper } from "@/modules/supplier/domain/supplier";
+import { ItemCreator, itemCreatorMapper } from "@/modules/items/domain/item";
+import { defaultSupplier, Supplier, SupplierCreator, supplierMapper } from "@/modules/supplier/domain/supplier";
 import { defaultTransaction, Transaction, transactionMapper } from "@/modules/transactions/domain/transaction";
 
 export interface Purchase {
@@ -38,11 +39,22 @@ export function purchaseMapper(res:Record<string,any>) {
     return purchase;
 }
 
-export type PurchaseCreator = Omit<Purchase, 'id'|'assets'|'transaction'|'supplier'> & { assets:AssetCreator[], organization:string, transaction:string|null, supplier:string|null };
-export function purchaseCreatorMapper(purchase:Purchase, orgID:string, transaction?:string|null, supplier?:string|null) {
+export type PurchaseCreator = Omit<Purchase, 'id'|'assets'|'transaction'|'supplier'> & { assets:AssetCreator[], organization:string, transaction:string|null, supplier:SupplierCreator|string };
+export function purchaseCreatorMapper(purchase:Purchase, orgID:string, transaction?:string|null, supplier?:SupplierCreator|string) {
     
     let assets:AssetCreator[] = [];
-    purchase.assets?.map( (asset) => assets.push(assetCreatorMapper(asset, orgID)));
+    purchase.assets?.map( (asset) => {
+        let item:ItemCreator|string = "";
+
+        if (asset.item?.id === "") {
+            asset.item.price = asset.unit_cost;
+            item = itemCreatorMapper(asset.item, "", orgID);
+        }
+        else
+            item = asset.item.id;
+        
+        assets.push(assetCreatorMapper(asset, orgID, item));
+    });
     let result:PurchaseCreator = {
         status: purchase.status,
         total: purchase.total,

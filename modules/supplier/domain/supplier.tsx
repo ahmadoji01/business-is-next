@@ -36,3 +36,14 @@ export function mapSuppliers(res:Record<string,any>) {
 }
 
 export type SupplierCreator = Omit<Supplier, 'id'> & { organization:string }
+export function supplierCreatorMapper(supplier:Supplier, orgID:string) {
+    let result:SupplierCreator = {
+        name: supplier.name,
+        address: supplier.address,
+        phone: supplier.phone,
+        email: supplier.email,
+        status: supplier.status,
+        organization: orgID
+    }
+    return result;
+}

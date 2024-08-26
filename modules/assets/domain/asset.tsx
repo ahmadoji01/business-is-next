@@ -2,7 +2,7 @@ import { defaultTransaction, Transaction, transactionMapper } from "@/modules/tr
 import { SalesItem, SalesItemCreator, salesItemsMapper, salesItemPatcherMapper, SalesItemPatcher, salesItemCreatorMapper } from "./sales-item";
 import { defaultWarehouse, Warehouse, warehouseMapper } from "@/modules/warehouse/domain/warehouse";
 import { defaultPurchase, Purchase, purchaseMapper } from "@/modules/purchase/domain/purchase";
-import Item, { defaultItem, itemMapper } from "@/modules/items/domain/item";
+import Item, { defaultItem, ItemCreator, itemMapper } from "@/modules/items/domain/item";
 import { Photo } from "@/modules/photos/domain/photo";
 
 
@@ -78,8 +78,8 @@ type Organization = {
     organization: string,
 }
 
-export type AssetCreator = Omit<Asset, 'id'|'item'|'warehouse'|'purchase'|'date_created'|'date_updated'> & Organization & { warehouse:string, item:string };
-export function assetCreatorMapper(asset:Asset, orgID:string, itm?:string, warehouse?:string) {
+export type AssetCreator = Omit<Asset, 'id'|'item'|'warehouse'|'purchase'|'date_created'|'date_updated'> & Organization & { warehouse:string, item:ItemCreator|string };
+export function assetCreatorMapper(asset:Asset, orgID:string, itm?:ItemCreator|string, warehouse?:string) {
     
     let result:AssetCreator = {
         description: asset.description,

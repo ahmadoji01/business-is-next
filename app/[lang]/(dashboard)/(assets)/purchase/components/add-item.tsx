@@ -98,8 +98,8 @@ const AddItem = ({ open, onClose }
         fetchItems(query, {});
     }
 
-  const handleConfirm = async (itm:Item) => {
-    asset.item = itm;
+  const handleConfirm = async () => {
+    asset.item = item;
     asset.total = asset.unit_cost * asset.quantity;
     setAssets([...assets, asset]);
     setItem(defaultItem);
@@ -221,8 +221,11 @@ const AddItem = ({ open, onClose }
                             views={['year', 'month', 'day']}
                             slotProps={{
                                 popper: {
-                                sx: {zIndex: 10000}
+                                    sx: {zIndex: 10000}
                                 },
+                                textField: {
+                                    required: true
+                                }
                             }}
                             />
                     </div>
