@@ -1,192 +1,148 @@
 export const chartsOfAccounts = [
-    {
+  {
       "code": "10000",
-      "name": "Aset Lancar"
-    },
-    {
+      "name": "Cash and Cash Equivalents"
+  },
+  {
       "code": "10100",
-      "name": "Kas dan Setara Kas"
-    },
-    {
+      "name": "Accounts Receivable"
+  },
+  {
       "code": "10200",
-      "name": "Rekening Bank"
-    },
-    {
+      "name": "Inventory"
+  },
+  {
+      "code": "10210",
+      "name": "Raw Materials Inventory"
+  },
+  {
+      "code": "10220",
+      "name": "Finished Goods Inventory"
+  },
+  {
       "code": "10300",
-      "name": "Piutang Mahasiswa"
-    },
-    {
+      "name": "Prepaid Expenses"
+  },
+  {
       "code": "10400",
-      "name": "Piutang Lainnya"
-    },
-    {
+      "name": "Property, Plant, and Equipment (PP&E)"
+  },
+  {
+      "code": "10410",
+      "name": "Vehicles"
+  },
+  {
       "code": "10500",
-      "name": "Persediaan"
-    },
-    {
+      "name": "Accumulated Depreciation (contra asset)"
+  },
+  {
       "code": "10600",
-      "name": "Biaya Dibayar Di Muka"
-    },
-    {
-      "code": "11000",
-      "name": "Aset Tetap"
-    },
-    {
-      "code": "11100",
-      "name": "Tanah"
-    },
-    {
-      "code": "11200",
-      "name": "Gedung"
-    },
-    {
-      "code": "11300",
-      "name": "Peralatan"
-    },
-    {
-      "code": "11400",
-      "name": "Furnitur dan Fasilitas"
-    },
-    {
-      "code": "11500",
-      "name": "Akumulasi Penyusutan"
-    },
-    {
-      "code": "12000",
-      "name": "Aset Tak Berwujud"
-    },
-    {
-      "code": "12100",
-      "name": "Hak Cipta"
-    },
-    {
-      "code": "12200",
-      "name": "Paten"
-    },
-    {
-      "code": "12300",
-      "name": "Lisensi"
-    },
-    {
+      "name": "Intangible Assets"
+  },
+  {
+      "code": "10700",
+      "name": "Investments"
+  },
+  {
+      "code": "10800",
+      "name": "Other Assets"
+  },
+  {
       "code": "20000",
-      "name": "Kewajiban Jangka Pendek"
-    },
-    {
+      "name": "Accounts Payable"
+  },
+  {
       "code": "20100",
-      "name": "Hutang Usaha"
-    },
-    {
+      "name": "Accrued Expenses"
+  },
+  {
       "code": "20200",
-      "name": "Hutang Gaji"
-    },
-    {
+      "name": "Notes Payable"
+  },
+  {
+      "code": "20210",
+      "name": "Short-term Debt"
+  },
+  {
       "code": "20300",
-      "name": "Hutang Pajak"
-    },
-    {
+      "name": "Long-term Debt"
+  },
+  {
       "code": "20400",
-      "name": "Hutang Jangka Pendek Lainnya"
-    },
-    {
-      "code": "21000",
-      "name": "Kewajiban Jangka Panjang"
-    },
-    {
-      "code": "21100",
-      "name": "Hutang Bank Jangka Panjang"
-    },
-    {
-      "code": "21200",
-      "name": "Hutang Obligasi"
-    },
-    {
-      "code": "21300",
-      "name": "Hutang Jangka Panjang Lainnya"
-    },
-    {
+      "name": "Deferred Revenue"
+  },
+  {
+      "code": "20500",
+      "name": "Other Liabilities"
+  },
+  {
       "code": "30000",
-      "name": "Ekuitas"
-    },
-    {
+      "name": "Common Stock / Share Capital"
+  },
+  {
       "code": "30100",
-      "name": "Modal Disetor"
-    },
-    {
+      "name": "Retained Earnings"
+  },
+  {
       "code": "30200",
-      "name": "Laba Ditahan"
-    },
-    {
+      "name": "Additional Paid-In Capital"
+  },
+  {
       "code": "30300",
-      "name": "Cadangan"
-    },
-    {
+      "name": "Treasury Stock (contra equity)"
+  },
+  {
       "code": "30400",
-      "name": "Pendapatan Komprehensif Lainnya"
-    },
-    {
+      "name": "Accumulated Other Comprehensive Income"
+  },
+  {
       "code": "40000",
-      "name": "Pendapatan"
-    },
-    {
+      "name": "Sales Revenue"
+  },
+  {
       "code": "40100",
-      "name": "Pendapatan Kuliah"
-    },
-    {
+      "name": "Service Revenue"
+  },
+  {
       "code": "40200",
-      "name": "Pendapatan Sumbangan"
-    },
-    {
+      "name": "Interest Income"
+  },
+  {
       "code": "40300",
-      "name": "Pendapatan Sponsorship"
-    },
-    {
-      "code": "40400",
-      "name": "Pendapatan Penjualan"
-    },
-    {
-      "code": "40500",
-      "name": "Pendapatan Investasi"
-    },
-    {
+      "name": "Other Income"
+  },
+  {
       "code": "50000",
-      "name": "Biaya"
-    },
-    {
+      "name": "Cost of Goods Sold (COGS)"
+  },
+  {
       "code": "50100",
-      "name": "Biaya Gaji"
-    },
-    {
+      "name": "Salaries and Wages"
+  },
+  {
       "code": "50200",
-      "name": "Biaya Operasional"
-    },
-    {
+      "name": "Rent Expense"
+  },
+  {
       "code": "50300",
-      "name": "Biaya Pendidikan"
-    },
-    {
+      "name": "Utilities Expense"
+  },
+  {
       "code": "50400",
-      "name": "Biaya Pemeliharaan"
-    },
-    {
-      "code": "50500",
-      "name": "Biaya Administrasi"
-    },
-    {
-      "code": "50600",
-      "name": "Biaya Utilities"
-    },
-    {
-      "code": "50700",
-      "name": "Biaya Penyusutan"
-    },
-    {
-      "code": "50800",
-      "name": "Biaya Amortisasi"
-    },
-    {
-      "code": "50900",
-      "name": "Biaya Lainnya"
-    }
+      "name": "Depreciation Expense"
+  },
+  {
+    "code": "50500",
+    "name": "Advertising Expense"
+  },
+  {
+    "code": "50600",
+    "name": "Interest Expense"
+  },
+  {
+    "code": "50700",
+    "name": "Other Operating Expenses"
+  }
 ]
 
 export const ENTRY_TYPE = {
@@ -199,14 +155,12 @@ export const ENTRIES = {
     "description": "Sales billed to the customers with payment in advance.",
     "actions": [
       {
-        "code": "10100",
-        "name": "Cash/Bank",
+        "code": "10000",
         "type": "Debit",
         "cashflow": "in"
       },
       {
-        "code": "40100",
-        "name": "Tuition Revenue",
+        "code": "40000",
         "type": "Credit",
         "cashflow": "none"
       }
@@ -216,13 +170,12 @@ export const ENTRIES = {
     "description": "Sales billed to the customers with no payment involved.",
     "actions": [
       {
-        "code": "10300",
+        "code": "10100",
         "type": "Debit",
         "cashflow": "none"
       },
       {
         "code": "40100",
-        "name": "Tuition Revenue",
         "type": "Credit",
         "cashflow": "none"
       }
@@ -232,12 +185,12 @@ export const ENTRIES = {
     "description": "Payment for receivable.",
     "actions": [
       {
-        "code": "10300",
+        "code": "10100",
         "type": "Credit",
         "cashflow": "none"
       },
       {
-        "code": "10100",
+        "code": "10000",
         "type": "Debit",
         "cashflow": "in"
       }
@@ -247,14 +200,12 @@ export const ENTRIES = {
     "description": "Payment received from students for tuition fees.",
     "actions": [
       {
-        "code": "10100",
-        "name": "Cash/Bank",
+        "code": "10000",
         "type": "Debit",
         "cashflow": "in"
       },
       {
-        "code": "40100",
-        "name": "Tuition Revenue",
+        "code": "40000",
         "type": "Credit",
         "cashflow": "none"
       }
@@ -264,13 +215,57 @@ export const ENTRIES = {
     "description": "Tuition fees billed to the students with no payment involved.",
     "actions": [
       {
-        "code": "10300",
+        "code": "10100",
         "type": "Debit",
         "cashflow": "none"
       },
       {
-        "code": "40100",
-        "name": "Tuition Revenue",
+        "code": "40000",
+        "type": "Credit",
+        "cashflow": "none"
+      }
+    ]
+  },
+  "purchase_paid_and_delivered": {
+    "description": "Purchase with payment in advance and goods delivered",
+    "actions": [
+      {
+        "code": "10200",
+        "type": "Debit",
+        "cashflow": "none"
+      },
+      {
+        "code": "10000",
+        "type": "Credit",
+        "cashflow": "out"
+      }
+    ]
+  },
+  "purchase_paid_and_undelivered": {
+    "description": "Purchase with payment in advance but goods undelivered",
+    "actions": [
+      {
+        "code": "10100",
+        "type": "Debit",
+        "cashflow": "none"
+      },
+      {
+        "code": "40000",
+        "type": "Credit",
+        "cashflow": "none"
+      }
+    ]
+  },
+  "purchase_unpaid": {
+    "description": "Purchase without payment",
+    "actions": [
+      {
+        "code": "10200",
+        "type": "Debit",
+        "cashflow": "none"
+      },
+      {
+        "code": "20000",
         "type": "Credit",
         "cashflow": "none"
       }

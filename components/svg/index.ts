@@ -103,6 +103,7 @@ export { default as DocumentsIcon } from "./dual-tone/documents.svg";
 export { default as BalanceIcon } from "./dual-tone/balance-scale.svg";
 export { default as CashMoney } from "./dual-tone/cash-money.svg";
 export { default as CashRegister } from "./dual-tone/cash-register.svg";
+export { default as CashOut } from "./dual-tone/cash-out.svg";
 export { default as Buildings } from "./dual-tone/buildings.svg";
 export { default as Buildings2 } from "./dual-tone/buildings-2.svg";
 export { default as CoinDollar } from "./dual-tone/dollar-minimalistic.svg";

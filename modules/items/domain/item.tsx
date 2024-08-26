@@ -1,10 +1,6 @@
 import { Category, categoryMapper } from "@/modules/categories/domain/category";
 import { defaultCategory } from "@/modules/categories/domain/category";
-
-export interface Photo {
-    id: string,
-    filename_download: string,
-}
+import { Photo } from "@/modules/photos/domain/photo";
 
 export default interface Item {
     id: string,
@@ -52,8 +48,12 @@ export function mapItems(res:Record<string,any>) {
     return items;
 }
 
-export type ItemCreator = Omit<Item, 'id'|'category'> & { category:string, organization: number };
-export function itemCreatorMapper(item:Item, catID:string, orgID:number) {
+export type ItemCreator = Omit<Item, 'id'|'category'> & { category:string|null, organization: string };
+export function itemCreatorMapper(item:Item, catID:string, orgID:string) {
+
+    let cat:string|null = catID;
+    if (catID === "")
+        cat = null;
 
     let itemCreator: ItemCreator = { 
         name: item.name, 
@@ -63,7 +63,7 @@ export function itemCreatorMapper(item:Item, catID:string, orgID:number) {
         unit: item.unit? item.unit : "",
         type: item.type? item.type : "",
         photo: item.photo? item.photo : null,
-        category: catID,
+        category: cat,
         organization: orgID,
     }
     return itemCreator;
