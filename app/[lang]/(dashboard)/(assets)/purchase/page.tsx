@@ -26,7 +26,7 @@ import Link from "next/link";
 import { Breadcrumbs, BreadcrumbItem } from "@/components/ui/breadcrumbs";
 import { useUserContext } from "@/provider/user.provider";
 import { useSalesContext } from "@/provider/sales.provider";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { translate } from "@/lib/utils";
 import { useLanguageContext } from "@/provider/language.provider";
@@ -44,10 +44,14 @@ import { createManySales } from "@/modules/sales/domain/sales.actions";
 import { createManyLedgerEntries } from "@/modules/ledger-entries/domain/ledger-entries.actions";
 import { useAssetsContext } from "@/provider/assets.provider";
 import { DatePicker } from "@mui/x-date-pickers";
-import { defaultSupplier } from "@/modules/supplier/domain/supplier";
+import { defaultSupplier, mapSuppliers, Supplier } from "@/modules/supplier/domain/supplier";
 import { PURCHASE_STATUS } from "@/modules/purchase/domain/purchases.constants";
 import { PurchaseCreator, purchaseCreatorMapper } from "@/modules/purchase/domain/purchase";
 import { createAPurchase } from "@/modules/purchase/domain/purchases.actions";
+import { Autocomplete, CircularProgress, TextField } from "@mui/material";
+import { searchSuppliersWithFilter } from "@/modules/supplier/domain/suppliers.actions";
+
+let activeTimeout:any = null;
 
 const PurchasePage = () => {
 
@@ -56,12 +60,31 @@ const PurchasePage = () => {
   const [selected, setSelected] = useState<string>("paid_delivered");
   const [transactionDate, setTransactionDate] = useState(new Date());
   const [supplier, setSupplier] = useState(defaultSupplier);
+  const [supplierOpts, setSupplierOpts] = useState<Supplier[]>([]);
+  const [inputDisabled, setInputDisabled] = useState(false);
+  const [fetchingSupplier, setFetchingSupplier] = useState(false);
+  const [supplierQuery, setSupplierQuery] = useState("");
+  const [supplierFilter, setSupplierFilter] = useState({});
 
   const { accessToken, organization } = useUserContext();
   const { assets, purchase, setPurchase } = useAssetsContext();
   const { trans } = useLanguageContext();
 
   useEffect(() => {}, [purchase]);
+
+  const fetchSuppliers = async (query:string, filter:object) => {
+    try {
+      let res = await searchSuppliersWithFilter(accessToken, query, filter, 1);
+      let suppliers = mapSuppliers(res);
+      let opts:Supplier[] = [];
+      suppliers.map( supplier => opts.push(supplier));
+      setSupplierOpts(opts);
+      setFetchingSupplier(false);
+    } catch {
+        toast.error(translate("something_wrong", trans));
+        setFetchingSupplier(false);
+    }
+  }
 
   const insertPurchase = async (transactToCreate:TransactionCreator, purchaseToCreate:PurchaseCreator, ledgersToCreate:LedgerCreator[]) => {
     try {
@@ -155,6 +178,39 @@ const PurchasePage = () => {
     insertPurchase(transactToCreate, purchaseToCreate, ledgersToInsert);
   }
 
+  const handleSupplierChange = (query:string) => {
+    setSupplier(defaultSupplier);
+    if (query === "")
+        setInputDisabled(false);
+
+    if (activeTimeout) {
+        clearTimeout(activeTimeout);
+    }
+    
+    activeTimeout = setTimeout(() => {
+        handleSearch(query);
+    }, 1000);
+  }
+
+  const handleSearch = (query:string) => {   
+    if (query.length > 1 && query.length <= 3)
+        return;
+
+    setSupplierQuery(query);
+    setFetchingSupplier(true);
+    fetchSuppliers(query, {});
+  }
+  
+  const handleOptClick = (value:string) => {
+    let sup = supplierOpts.find( item => item.name === value);
+    
+    if (typeof(sup) === 'undefined')
+        return;
+
+    setInputDisabled(true);
+    setSupplier({ ...supplier, id: sup.id, name: sup.name, address: sup.address, phone: sup.phone, email: sup.email });
+  }
+
   return (
     <>
       <AddItem open={open} onClose={() => setOpen(false)} />
@@ -183,9 +239,46 @@ const PurchasePage = () => {
                 <div className="mt-8 flex justify-between flex-wrap gap-4">
                   <div className="w-full space-y-2">
                     <div className="text-base font-semibold text-default-800 pb-1">Purchase From:</div>
-                    <Input type="text" placeholder="Company Name" value={organization?.name} />
-                    <Input type="email" placeholder="Company Email" value={organization?.email} />
-                    <Textarea placeholder="Company Address" value={organization?.address} />
+                    <Autocomplete
+                        id="free-solo-demo"
+                        freeSolo
+                        options={supplierOpts.map( (supplier) => supplier.name)}
+                        onInputChange={(event: any, newValue: string | null) => { if (newValue === "") setInputDisabled(false) }}
+                        onChange={(event: any, newValue: string | null) => {
+                            let val = newValue? newValue : "";
+                            handleOptClick(val);
+                        }}
+                        renderInput={(params) => 
+                            <TextField {...params} 
+                                required
+                                onChange={ e => handleSupplierChange(e.target.value)}
+                                InputProps={{
+                                    ...params.InputProps,
+                                    endAdornment: (
+                                        <React.Fragment>
+                                            {fetchingSupplier ? <CircularProgress color="inherit" size={20} /> : null}
+                                            {params.InputProps.endAdornment}
+                                        </React.Fragment>
+                                    ),
+                                }}
+                                />}
+                        />
+                    <Input type="email" 
+                      disabled={inputDisabled}
+                      onChange={ (e) => setSupplier({ ...supplier, email: e.target.value }) } 
+                      placeholder="Company Email" 
+                      value={supplier?.email} 
+                      />
+                    <Input type="phone"
+                      disabled={inputDisabled} 
+                      onChange={ (e) => setSupplier({ ...supplier, phone: e.target.value }) } 
+                      placeholder="Company Phone" 
+                      value={supplier?.email} />
+                    <Textarea 
+                      disabled={inputDisabled}
+                      onChange={ (e) => setSupplier({ ...supplier, phone: e.target.value }) } 
+                      placeholder="Company Address" 
+                      value={supplier?.address} />
                   </div>
                   <div className="w-full space-y-2">
                     <div className="text-base font-semibold text-default-800 pb-1">Transaction Date:</div>

@@ -28,4 +28,11 @@ export function supplierMapper(res:Record<string,any>) {
     return supplier;
 }
 
+
+export function mapSuppliers(res:Record<string,any>) {
+    let suppliers:Supplier[] = [];
+    res?.map( (supplier:any) => { suppliers.push(supplierMapper(supplier)) });
+    return suppliers;
+}
+
 export type SupplierCreator = Omit<Supplier, 'id'> & { organization:string }
