@@ -99,7 +99,6 @@ const AddItem = ({ open, onClose }
     }
 
   const handleConfirm = async () => {
-    console.log(asset);
     asset.item = item;
     asset.total = asset.unit_cost * asset.quantity;
     setAssets([...assets, asset]);

@@ -137,7 +137,7 @@ const PurchasePage = () => {
     });
     assetCodes.push(entries[1].code);
     let filter = accountsByCodes(assetCodes);
-    console.log(filter);
+    
     try {
       let res = await getAccountsWithFilter(accessToken, filter);
       accounts = mapAccounts(res);
