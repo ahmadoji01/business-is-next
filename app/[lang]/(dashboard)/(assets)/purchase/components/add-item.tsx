@@ -103,6 +103,10 @@ const AddItem = ({ open, onClose }
     asset.item = item;
     asset.total = asset.unit_cost * asset.quantity;
     setAssets([...assets, asset]);
+    handleClose();
+  }
+
+  const handleClose = () => {
     setItem(defaultItem);
     setAsset(defaultAsset);
     setInputDisabled(false);
@@ -127,7 +131,7 @@ const AddItem = ({ open, onClose }
   return (
     <MaterialModal
         open={open}
-        onClose={onClose}
+        onClose={handleClose}
         aria-labelledby="child-modal-title"
         aria-describedby="child-modal-description"
         >
@@ -238,7 +242,7 @@ const AddItem = ({ open, onClose }
                 </div>
             </div>
             <div className="flex justify-center mt-4 gap-3">
-                <Button type="button" onClick={() => onClose()} variant="outline">
+                <Button type="button" onClick={() => handleClose()} variant="outline">
                     Cancel
                 </Button>
                 <Button 

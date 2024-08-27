@@ -1,3 +1,9 @@
+export const ASSET_STATUS = {
+  delivered: "delivered",
+  undelivered: "undelivered",
+  lost: "lost",
+  exist: "exist",
+}
 
 export const assetStatuses = [
     {

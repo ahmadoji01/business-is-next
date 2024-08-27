@@ -38,6 +38,7 @@ import { PurchaseCreator, purchaseCreatorMapper } from "@/modules/purchase/domai
 import { createAPurchase } from "@/modules/purchase/domain/purchases.actions";
 import { Autocomplete, CircularProgress, TextField } from "@mui/material";
 import { searchSuppliersWithFilter } from "@/modules/supplier/domain/suppliers.actions";
+import { ASSET_STATUS } from "@/modules/assets/domain/assets.constants";
 
 let activeTimeout:any = null;
 
@@ -99,6 +100,7 @@ const PurchasePage = () => {
     
     let desc = "";
     let entries:EntryAction[] = [];
+    let assetStatus = "";
     purchase.assets = assets;
     purchase.status = selected;
     
@@ -106,14 +108,17 @@ const PurchasePage = () => {
       entries = ENTRIES.purchase_paid_and_delivered.actions;
       desc = ENTRIES.purchase_paid_and_delivered.description;
       purchase.paid = purchase.total;
+      assetStatus = ASSET_STATUS.delivered;
     }
     else if (purchase.status === PURCHASE_STATUS.paid_undelivered) {
       entries = ENTRIES.purchase_paid_and_undelivered.actions;
       desc = ENTRIES.purchase_paid_and_undelivered.description;
       purchase.paid = purchase.total;
+      assetStatus = ASSET_STATUS.undelivered;
     } else {
       entries = ENTRIES.purchase_unpaid.actions;
       desc = ENTRIES.purchase_unpaid.description;
+      assetStatus = ASSET_STATUS.delivered;
       purchase.paid = 0;
     }
 
@@ -122,6 +127,7 @@ const PurchasePage = () => {
     let assetCodes:string[] = [];
     assets?.map( asset => {
       assetCodes.push(asset.code);
+      asset.status = assetStatus;
     });
     assetCodes.push(entries[1].code);
     let filter = accountsByCodes(assetCodes);

@@ -22,6 +22,7 @@ export interface Asset {
     purchase: Purchase|null,
     total: number,
     photo: Photo|null,
+    status: string,
     date_created: Date,
     date_updated: Date,
 }
@@ -41,6 +42,7 @@ export const defaultAsset: Asset = {
     purchase: null,
     total: 0,
     photo: null,
+    status: "",
     date_created: new Date,
     date_updated: new Date,
 }
@@ -62,6 +64,7 @@ export function assetMapper(res:Record<string,any>) {
         purchase: res.purchase? purchaseMapper(res.purchase):defaultPurchase,
         total: res.total? res.total:0,
         photo: res.photo? res.photo:null,
+        status: res.status? res.status:"",
         date_created: res.date_created? res.date_created:new Date,
         date_updated: res.date_updated? res.date_update:new Date,
     }
@@ -97,6 +100,7 @@ export function assetCreatorMapper(asset:Asset, orgID:string, itm?:ItemCreator|s
         warehouse: warehouse? warehouse:"",
         total: asset.total,
         photo: asset.photo,
+        status: asset.status,
         organization: orgID,
     };
     return result;
