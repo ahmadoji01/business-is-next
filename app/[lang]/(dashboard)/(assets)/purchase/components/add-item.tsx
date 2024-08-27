@@ -99,6 +99,7 @@ const AddItem = ({ open, onClose }
     }
 
   const handleConfirm = async () => {
+    asset.name = item.name;
     asset.item = item;
     asset.total = asset.unit_cost * asset.quantity;
     setAssets([...assets, asset]);
@@ -186,7 +187,7 @@ const AddItem = ({ open, onClose }
                         required
                         disabled={inputDisabled}
                         value={asset.unit} 
-                        onChange={ e => setAsset({ ...asset, unit: e.target.value })} 
+                        onChange={ e => { setAsset({ ...asset, unit: e.target.value }); setItem({ ...item, unit: e.target.value }) }} 
                         type="text" 
                         placeholder="Unit (e.g. kg, gram, tablet, piece)" />
                 </div>
@@ -198,7 +199,7 @@ const AddItem = ({ open, onClose }
                         options={{ numeral: true }}
                         value={asset.unit_cost}
                         placeholder="10,000"
-                        onChange={ e => { setAsset({ ...asset, unit_cost: parseFloat(e.target.value.replace(/,/g, '')) }); }} 
+                        onChange={ e => { let cost = parseFloat(e.target.value.replace(/,/g, '')); setAsset({ ...asset, unit_cost: cost }); setItem({ ...item, price: cost }) }} 
                         />
                 </div>
                 <div className="flex flex-col gap-2 mt-4 overflow-y-visible">

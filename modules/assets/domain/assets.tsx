@@ -9,6 +9,7 @@ import { Photo } from "@/modules/photos/domain/photo";
 
 export interface Asset {
     id: string,
+    name: string,
     description: string,
     code: string,
     type: string,
@@ -27,6 +28,7 @@ export interface Asset {
 
 export const defaultAsset: Asset = {
     id: "",
+    name: "",
     description: "",
     code: "",
     type: "",
@@ -47,6 +49,7 @@ export function assetMapper(res:Record<string,any>) {
     let asset = defaultAsset;
     asset = { 
         id: res.id? res.id:"",
+        name: res.name? res.name:"", 
         description: res.description? res.description:"", 
         code: res.code,
         type: res.type,
@@ -82,6 +85,7 @@ export type AssetCreator = Omit<Asset, 'id'|'item'|'warehouse'|'purchase'|'date_
 export function assetCreatorMapper(asset:Asset, orgID:string, itm?:ItemCreator|string, warehouse?:string) {
     
     let result:AssetCreator = {
+        name: asset.name, 
         description: asset.description,
         code: asset.code,
         type: asset.type,

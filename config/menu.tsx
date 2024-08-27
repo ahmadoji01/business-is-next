@@ -134,7 +134,7 @@ export const homeMenuItems: HomeMenuItem[] = [
           {
             image: '/icons/menu/assets.png',
             title: 'see assets list',
-            url: '/assets',
+            url: '/list-assets',
           },
           {
             image: '/icons/menu/inventory.png',
@@ -1253,7 +1253,7 @@ export const menusConfig = {
           },
           {
             title: "Assets List",
-            href: "/assets",
+            href: "/list-assets",
           },
         ]
       },
@@ -1284,7 +1284,7 @@ export const menusConfig = {
       {
         title: "assets list",
         icon: Buildings,
-        href: "/assets",
+        href: "/list-assets",
       },
       {
         title: "liabilities list",
@@ -1426,7 +1426,7 @@ export const menusConfig = {
           },
           {
             title: "Assets List",
-            href: "/assets",
+            href: "/list-assets",
           },
         ]
       },
@@ -1457,7 +1457,7 @@ export const menusConfig = {
       {
         title: "assets list",
         icon: Buildings,
-        href: "/assets",
+        href: "/list-assets",
       },
       {
         title: "liabilities list",

@@ -46,6 +46,7 @@ const AssetsTable = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
+  const assetField = ['id', 'name', 'quantity', 'total', 'unit', 'unit_cost', 'type', 'lifetime', 'item.name', 'item.id', 'item.price', 'item.type', 'item.unit']
   const {trans} = useLanguageContext();
   const {accessToken} = useUserContext();
   const {filter, setFilter, selectedCustomers, setSelectedCustomers} = useSalesContext();
@@ -61,7 +62,7 @@ const AssetsTable = () => {
 
   const fetchAssets = async (query:string, filter:object, page:number) => {
     try {
-      let res = await searchAssetsWithFilter(accessToken, query, filter, page);
+      let res = await searchAssetsWithFilter(accessToken, query, filter, page, assetField);
       let assts = mapAssets(res);
       setAssets(assts);
     } catch(e) {
@@ -253,7 +254,7 @@ const AssetsTable = () => {
                   </span>
                 </div>
               </TableCell>
-              <TableCell>{asset.quantity}</TableCell>
+              <TableCell>{asset.quantity} {asset.unit}</TableCell>
               <TableCell>{currency(asset.total)}</TableCell>
               <TableCell>{asset.type}</TableCell>
               <TableCell>{moment(asset.lifetime).format("DD-MM-YYYY")}</TableCell>
