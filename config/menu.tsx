@@ -124,7 +124,7 @@ export const homeMenuItems: HomeMenuItem[] = [
           {
             image: '/icons/menu/buy-assets.png',
             title: 'purchase asset',
-            url: '/assets/buy',
+            url: '/purchase',
           },
           {
             image: '/icons/menu/sell-assets.png',
@@ -1249,11 +1249,11 @@ export const menusConfig = {
         child: [
           {
             title: "Purchase Asset",
-            href: "/assets/purchase",
+            href: "/purchase",
           },
           {
-            title: "Sell Asset",
-            href: "/assets/sell",
+            title: "Assets List",
+            href: "/assets",
           },
         ]
       },
@@ -1422,11 +1422,11 @@ export const menusConfig = {
         child: [
           {
             title: "Purchase Asset",
-            href: "/assets/purchase",
+            href: "/purchase",
           },
           {
-            title: "Sell Asset",
-            href: "/assets/sell",
+            title: "Assets List",
+            href: "/assets",
           },
         ]
       },
