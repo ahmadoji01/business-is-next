@@ -209,7 +209,7 @@ const AddItem = ({ open, onClose }
                             isDisabled={inputDisabled}
                             className="react-select"
                             classNamePrefix="select"
-                            value={ { value: item.type, label: capitalize(item.type), code: "" } }
+                            value={ { value: item.type, label: itemTypes.find(itm => item.type === itm.value)?.label, code: "" } }
                             onChange={ e => { setAsset({ ...asset, type: e?.value? e.value:'', code: e?.code? e.code:'10800' }); setItem({ ...item, type: e?.value? e.value:'' }) } }
                             defaultValue={itemTypes[0]}
                             options={itemTypes}
