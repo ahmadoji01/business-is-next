@@ -6,7 +6,7 @@ import { useLanguageContext } from "@/provider/language.provider";
 import ScrollButton from "@/components/scroll-button";
 import AssetsTable from "./components/assets-table";
 
-const SalesPage = () => {
+const AssetsListPage = () => {
 
   const {trans} = useLanguageContext();
 
@@ -22,4 +22,4 @@ const SalesPage = () => {
   );
 };
 
-export default SalesPage;
+export default AssetsListPage;

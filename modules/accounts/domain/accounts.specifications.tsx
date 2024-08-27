@@ -1,7 +1,6 @@
 import { EntryAction } from "@/utils/accounting-dictionary";
-import { Account, mapAccounts } from "./account";
+import { Account, mapAccounts } from "./accounts";
 import { getAccountsWithFilter } from "./accounts.actions";
-import toast from "react-hot-toast";
 
 export function accountsByCodes(codes:string[]) {
     let codesFilter:object[] = [];

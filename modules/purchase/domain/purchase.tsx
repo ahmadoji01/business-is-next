@@ -1,4 +1,4 @@
-import { Asset, AssetCreator, assetCreatorMapper, mapAssets } from "@/modules/assets/domain/asset";
+import { Asset, AssetCreator, assetCreatorMapper, mapAssets } from "@/modules/assets/domain/assets";
 import { ItemCreator, itemCreatorMapper } from "@/modules/items/domain/item";
 import { defaultSupplier, Supplier, SupplierCreator, supplierMapper } from "@/modules/supplier/domain/supplier";
 import { defaultTransaction, Transaction, transactionMapper } from "@/modules/transactions/domain/transaction";

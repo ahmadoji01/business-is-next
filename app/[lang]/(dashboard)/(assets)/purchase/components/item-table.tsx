@@ -18,7 +18,7 @@ import { Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { useAssetsContext } from "@/provider/assets.provider";
-import { Asset } from "@/modules/assets/domain/asset";
+import { Asset } from "@/modules/assets/domain/assets";
 import moment from "moment";
 
 const ItemTable = () => {

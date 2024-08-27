@@ -10,7 +10,7 @@ import { SalesItem } from '@/modules/sales/domain/sales-item';
 import { createSales } from '@/modules/sales/domain/sales.actions';
 import { translate } from '@/lib/utils';
 import { useLanguageContext } from './language.provider';
-import { Asset } from '@/modules/assets/domain/asset';
+import { Asset } from '@/modules/assets/domain/assets';
 import { defaultPurchase, Purchase } from '@/modules/purchase/domain/purchase';
 
 interface AssetsContextType {
@@ -27,7 +27,6 @@ interface AssetsContextType {
     setItems: Dispatch<SetStateAction<Item[]>>,
     setSelectedSales: Dispatch<SetStateAction<Sales[]>>,
     recalculateTotal: () => void, 
-    submitItems: () => void,
 }
 
 export const AssetsContext = createContext<AssetsContextType | null>({
@@ -44,7 +43,6 @@ export const AssetsContext = createContext<AssetsContextType | null>({
     setItems: () => {},
     setSelectedSales: () => {},
     recalculateTotal: () => {},
-    submitItems: async () => {}, 
 });
  
 export const AssetsProvider = ({
@@ -59,8 +57,6 @@ export const AssetsProvider = ({
     const [selectedCustomers, setSelectedCustomers] = useState<Customer[]>([]);
     const [selectedSales, setSelectedSales] = useState<Sales[]>([]);
     const [filter, setFilter] = useState<object>({});
-    const {accessToken, organization} = useUserContext();
-    const {trans} = useLanguageContext();
 
     const recalculateTotal = () => {
         let total = 0;
@@ -71,21 +67,10 @@ export const AssetsProvider = ({
         setPurchase(newPurchase);
     }
 
-    const submitItems = async () => {
-        try {
-            let res = await createSales(accessToken, purchase);
-            toast.success("Customer has been billed!");
-            window.location.assign("/sales");
-        } catch {
-            toast.error(translate("something_wrong", trans));
-        }
-    }
-
     return (
         <AssetsContext.Provider value={{ 
             selectedSales, 
             setSelectedSales,
-            submitItems, 
             recalculateTotal, 
             items, 
             setItems, 

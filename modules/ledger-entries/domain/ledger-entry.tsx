@@ -1,4 +1,4 @@
-import { Account, accountMapper, defaultAccount } from "@/modules/accounts/domain/account";
+import { Account, accountMapper, defaultAccount } from "@/modules/accounts/domain/accounts";
 import { defaultTransaction, Transaction, transactionMapper } from "@/modules/transactions/domain/transaction";
 
 export interface LedgerEntry {

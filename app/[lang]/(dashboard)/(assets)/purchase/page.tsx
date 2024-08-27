@@ -1,20 +1,12 @@
 "use client"
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Icon } from "@iconify/react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
 import {
   Select,
   SelectContent,
@@ -22,25 +14,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import Link from "next/link";
 import { Breadcrumbs, BreadcrumbItem } from "@/components/ui/breadcrumbs";
 import { useUserContext } from "@/provider/user.provider";
-import { useSalesContext } from "@/provider/sales.provider";
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { translate } from "@/lib/utils";
 import { useLanguageContext } from "@/provider/language.provider";
 import AddItem from "./components/add-item";
 import ItemTable from "./components/item-table";
-import { defaultSales, SalesCreator, salesCreatorMapper } from "@/modules/sales/domain/sales";
 import { ENTRIES, EntryAction } from "@/utils/accounting-dictionary";
-import { Account, defaultAccount, mapAccounts } from "@/modules/accounts/domain/account";
+import { Account, defaultAccount, mapAccounts } from "@/modules/accounts/domain/accounts";
 import { getAccountsWithFilter } from "@/modules/accounts/domain/accounts.actions";
-import { accountsByCodes } from "@/modules/accounts/domain/account.specifications";
-import { createTransactionMapper, Transaction, TransactionCreator, transactionMapper } from "@/modules/transactions/domain/transaction";
+import { accountsByCodes } from "@/modules/accounts/domain/accounts.specifications";
+import { createTransactionMapper, TransactionCreator, transactionMapper } from "@/modules/transactions/domain/transaction";
 import { defaultLedgerEntry, LedgerCreator, ledgerCreatorMapper, LedgerEntry } from "@/modules/ledger-entries/domain/ledger-entry";
-import { createATransaction, createManyTransactions } from "@/modules/transactions/domain/transactions.actions";
-import { createManySales } from "@/modules/sales/domain/sales.actions";
+import { createATransaction } from "@/modules/transactions/domain/transactions.actions";
 import { createManyLedgerEntries } from "@/modules/ledger-entries/domain/ledger-entries.actions";
 import { useAssetsContext } from "@/provider/assets.provider";
 import { DatePicker } from "@mui/x-date-pickers";
@@ -56,7 +44,6 @@ let activeTimeout:any = null;
 const PurchasePage = () => {
 
   const [open, setOpen] = useState(false);
-  const [sales, setSales] = useState(defaultSales);
   const [selected, setSelected] = useState<string>("paid_delivered");
   const [transactionDate, setTransactionDate] = useState(new Date());
   const [supplier, setSupplier] = useState(defaultSupplier);
@@ -64,7 +51,6 @@ const PurchasePage = () => {
   const [inputDisabled, setInputDisabled] = useState(false);
   const [fetchingSupplier, setFetchingSupplier] = useState(false);
   const [supplierQuery, setSupplierQuery] = useState("");
-  const [supplierFilter, setSupplierFilter] = useState({});
 
   const { accessToken, organization } = useUserContext();
   const { assets, purchase, setPurchase } = useAssetsContext();

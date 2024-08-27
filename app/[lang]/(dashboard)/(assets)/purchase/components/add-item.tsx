@@ -17,7 +17,7 @@ import { translate } from "@/lib/utils";
 import { useLanguageContext } from "@/provider/language.provider";
 import { itemTypes } from "@/modules/items/domain/item.constants";
 import { AssetsContext, useAssetsContext } from "@/provider/assets.provider";
-import { Asset, defaultAsset } from "@/modules/assets/domain/asset";
+import { Asset, defaultAsset } from "@/modules/assets/domain/assets";
 import { CleaveInput } from "@/components/ui/cleave";
 import { DatePicker } from "@mui/x-date-pickers";
 

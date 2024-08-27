@@ -25,12 +25,15 @@ import toast from "react-hot-toast";
 import { LIMIT_PER_PAGE } from "@/constants/request";
 import { Input } from "@/components/ui/input";
 import { DataFilter } from "./filter";
-import { customerStatuses } from "@/modules/customers/domain/customer.constants";
 import { X } from "lucide-react";
-import { isEmptyObject } from "@/utils/generic-functions";
-import { redirect, useRouter } from "next/navigation";
+import { currency, isEmptyObject } from "@/utils/generic-functions";
+import { useRouter } from "next/navigation";
 import { useSalesContext } from "@/provider/sales.provider";
-import { assetStatuses } from "@/modules/assets/domain/asset.constants";
+import { assetStatuses } from "@/modules/assets/domain/assets.constants";
+import { getTotalSearchAssetsWithFilter, searchAssetsWithFilter } from "@/modules/assets/domain/assets.actions";
+import { Asset, mapAssets } from "@/modules/assets/domain/assets";
+import moment from "moment";
+import { Icon } from "@iconify/react";
 
 let activeTimeout:any = null;
 
@@ -38,6 +41,7 @@ const AssetsTable = () => {
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [assets, setAssets] = useState<Asset[]>([]);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
@@ -51,15 +55,15 @@ const AssetsTable = () => {
       if (accessToken === "")
         return;
 
-      fetchCustomers("", {}, 1);
+      fetchAssets("", {}, 1);
       fetchTotal("", {});
   }, [accessToken]);
 
-  const fetchCustomers = async (query:string, filter:object, page:number) => {
+  const fetchAssets = async (query:string, filter:object, page:number) => {
     try {
-      let res = await searchCustomersWithFilter(accessToken, query, filter, page);
-      let custs = mapCustomers(res);
-      setCustomers(custs);
+      let res = await searchAssetsWithFilter(accessToken, query, filter, page);
+      let assts = mapAssets(res);
+      setAssets(assts);
     } catch(e) {
       toast.error(translate("something_wrong", trans));
     }
@@ -67,7 +71,7 @@ const AssetsTable = () => {
 
   const fetchTotal = async (query:string, filter:object) => {
     try {
-      let res = await getTotalSearchCustomersWithFilter(accessToken, query, filter);
+      let res = await getTotalSearchAssetsWithFilter(accessToken, query, filter);
       let pages = pagesCount(res[0].count, LIMIT_PER_PAGE);
       setTotalPages(pages);
       setTotal(totalCount(res[0].count));
@@ -77,14 +81,14 @@ const AssetsTable = () => {
   }
 
   const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
-    fetchCustomers(searchQuery, filter, value);
+    fetchAssets(searchQuery, filter, value);
   }
 
   const handleSelectAll = () => {
-    if (selectedRows?.length === customers?.length) {
+    if (selectedRows?.length === assets?.length) {
       setSelectedRows([]);
     } else {
-      setSelectedRows(customers.map((row) => row.id));
+      setSelectedRows(assets.map((row) => row.id));
     }
   };
 
@@ -113,7 +117,7 @@ const AssetsTable = () => {
       return;
 
     setSearchQuery(query);
-    fetchCustomers(query, filter, 1);
+    fetchAssets(query, filter, 1);
     fetchTotal(query, filter);
   }
 
@@ -132,7 +136,7 @@ const AssetsTable = () => {
       result = { _or: statusesFilter };
     }
     setFilter(result);
-    fetchCustomers(searchQuery, result, 1);
+    fetchAssets(searchQuery, result, 1);
     fetchTotal(searchQuery, result);
     return;
   }
@@ -187,7 +191,7 @@ const AssetsTable = () => {
           <TableRow>
             <TableHead>
               <Checkbox
-                checked={selectedRows.length === customers.length || "indeterminate"}
+                checked={selectedRows.length === assets.length || "indeterminate"}
                 onCheckedChange={handleSelectAll}
               />
             </TableHead>
@@ -214,54 +218,70 @@ const AssetsTable = () => {
                   </Button>
                 </div>
               ) : (
-                "User"
+                "Item"
               )}
             </TableHead>
-            <TableHead>Title</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Status</TableHead>
+            <TableHead>Quantity</TableHead>
+            <TableHead>Total Value</TableHead>
+            <TableHead>Type</TableHead>
+            <TableHead>Lifetime/Expiry</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
 
         <TableBody>
-          {customers.map((customer:Customer) => (
+          {assets.map((asset:Asset, key) => (
             <TableRow
-              key={customer.email}
+              key={key}
               className="hover:bg-muted"
-              data-state={selectedRows.includes(customer.id) && "selected"}
+              data-state={selectedRows.includes(asset.id) && "selected"}
             >
               <TableCell>
                 <Checkbox
-                  checked={selectedRows.includes(customer.id)}
-                  onCheckedChange={() => handleRowSelect(customer.id)}
+                  checked={selectedRows.includes(asset.id)}
+                  onCheckedChange={() => handleRowSelect(asset.id)}
                 />
               </TableCell>
               <TableCell className="font-medium  text-card-foreground/80">
                 <div className="flex gap-3 items-center">
                   <Avatar className=" rounded-full">
-                    <AvatarImage src={customer.photo? imageHandler(customer.photo.id, customer.photo.filename_download) : "/images/avatar-256.jpg"} />
+                    <AvatarImage src={asset.photo? imageHandler(asset.photo.id, asset.photo.filename_download) : "/images/avatar-256.jpg"} />
                     <AvatarFallback>AB</AvatarFallback>
                   </Avatar>
                   <span className=" text-sm   text-card-foreground">
-                    {customer.name}
+                    {asset.item.name}
                   </span>
                 </div>
               </TableCell>
-
-              <TableCell>{customer.phone}</TableCell>
-              <TableCell>{customer.email}</TableCell>
-              <TableCell>
-                <Badge
-                  variant="soft"
-                  color={
-                    (customer.status === "blacklisted" && "destructive") ||
-                    (customer.status === "graduated" && "warning") ||
-                    (customer.status === "inactive" && "warning") || "default"
-                  }
-                  className=" capitalize"
+              <TableCell>{asset.quantity}</TableCell>
+              <TableCell>{currency(asset.total)}</TableCell>
+              <TableCell>{asset.type}</TableCell>
+              <TableCell>{moment(asset.lifetime).format("DD-MM-YYYY")}</TableCell>
+              <TableCell className="flex gap-3  justify-end">
+                <Button
+                  size="icon"
+                  variant="outline"
+                  className=" h-7 w-7"
+                  color="secondary"
                 >
-                  {translate(customer.status, trans)}
-                </Badge>
+                  <Icon icon="heroicons:pencil" className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="outline"
+                  className=" h-7 w-7"
+                  color="secondary"
+                >
+                  <Icon icon="heroicons:eye" className="h-4 w-4" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="outline"
+                  className=" h-7 w-7"
+                  color="secondary"
+                >
+                  <Icon icon="heroicons:trash" className="h-4 w-4" />
+                </Button>
               </TableCell>
             </TableRow>
           ))}
