@@ -99,6 +99,7 @@ const AddItem = ({ open, onClose }
     }
 
   const handleConfirm = async () => {
+    console.log(asset);
     asset.item = item;
     asset.total = asset.unit_cost * asset.quantity;
     setAssets([...assets, asset]);
@@ -113,9 +114,14 @@ const AddItem = ({ open, onClose }
     
     if (typeof(itm) === 'undefined')
         return;
-    
+
+    let type = itemTypes.find( itm => itm.value === value );
+    let code = '10800';
+    if (typeof(type) !== 'undefined')
+        code = type.code;
+
     setItem({ ...item, id: itm.id, name: itm.name, sku: itm.sku, unit: itm.unit, price: itm.price, type: itm.type });
-    setAsset({ ...asset, unit: itm.unit, unit_cost: itm.price, type: itm.type });
+    setAsset({ ...asset, unit: itm.unit, unit_cost: itm.price, type: itm.type, code: code });
   }
 
   return (
@@ -126,7 +132,7 @@ const AddItem = ({ open, onClose }
         aria-describedby="child-modal-description"
         >
         <h2 id="child-modal-title" className="mb-4 text-xl font-bold">Sales Payment</h2>
-        <form onSubmit={ e => { e.preventDefault(); startTransition(() => handleConfirm(item))} }>
+        <form onSubmit={ e => { e.preventDefault(); startTransition(() => handleConfirm())} }>
             <div className="grid-cols-1 gap-5 space-y-4 overflow-y-auto">
                 <div className="flex flex-col gap-2">
                     <Label>Name</Label>
@@ -204,8 +210,8 @@ const AddItem = ({ open, onClose }
                             isDisabled={inputDisabled}
                             className="react-select"
                             classNamePrefix="select"
-                            value={ { value: item.type, label: capitalize(item.type) } }
-                            onChange={ e => { setAsset({ ...asset, type: e?.value? e.value:'' }); setItem({ ...item, type: e?.value? e.value:'' }) } }
+                            value={ { value: item.type, label: capitalize(item.type), code: "" } }
+                            onChange={ e => { setAsset({ ...asset, type: e?.value? e.value:'', code: e?.code? e.code:'10800' }); setItem({ ...item, type: e?.value? e.value:'' }) } }
                             defaultValue={itemTypes[0]}
                             options={itemTypes}
                             styles={styles}

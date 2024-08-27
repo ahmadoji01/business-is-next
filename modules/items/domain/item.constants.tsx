@@ -10,57 +10,31 @@ export const itemTypes = [
     {
         value: "product",
         label: "Product",
-    },
-    {
-        value: "material",
-        label: "Material",
-    },
-    {
-        value: "service",
-        label: "Service",
+        code: "10220",
     },
     {
         value: "supply",
-        label: "Supply",
+        label: "Raw Material/Supply",
+        code: "10210",
     },
     {
-        value: "inventory",
-        label: "Inventory",
+        value: "ppe",
+        label: "Property, Plant, and Equipment",
+        code: "10400",
     },
     {
-        value: "machine",
-        label: "Machine",
+        value: "investment",
+        label: "Investment",
+        code: "10700",
     },
     {
-        value: "land",
-        label: "Land",
+        value: "intangible",
+        label: "Intangible",
+        code: "10600",
     },
     {
-        value: "building",
-        label: "Building",
-    },
-    {
-        value: "security",
-        label: "Security",
-    },
-    {
-        value: "equipment",
-        label: "Equipment",
-    },
-    {
-        value: "vehicle",
-        label: "Vehicle",
-    },
-    {
-        value: "patent",
-        label: "Patent",
-    },
-    {
-        value: "trademark",
-        label: "Trademark",
-    },
-    {
-        value: "goodwill",
-        label: "Goodwill",
+        value: "other",
+        label: "Other",
+        code: "10800",
     },
 ]

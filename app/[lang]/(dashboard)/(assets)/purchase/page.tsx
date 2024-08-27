@@ -34,7 +34,7 @@ import AddItem from "./components/add-item";
 import ItemTable from "./components/item-table";
 import { defaultSales, SalesCreator, salesCreatorMapper } from "@/modules/sales/domain/sales";
 import { ENTRIES, EntryAction } from "@/utils/accounting-dictionary";
-import { Account, mapAccounts } from "@/modules/accounts/domain/account";
+import { Account, defaultAccount, mapAccounts } from "@/modules/accounts/domain/account";
 import { getAccountsWithFilter } from "@/modules/accounts/domain/accounts.actions";
 import { accountsByCodes } from "@/modules/accounts/domain/account.specifications";
 import { createTransactionMapper, Transaction, TransactionCreator, transactionMapper } from "@/modules/transactions/domain/transaction";
@@ -130,14 +130,14 @@ const PurchasePage = () => {
     }
 
     let accounts:Account[] = [];
-    let entryCodes:string[] = [];
-    let entryTypes:string[] = [];
-    entries?.map( entry => {
-      entryCodes.push(entry.code);
-      entryTypes.push(entry.type);
+    let assetsLedger:LedgerEntry[] = [];
+    let assetCodes:string[] = [];
+    assets?.map( asset => {
+      assetCodes.push(asset.code);
     });
-    let filter = accountsByCodes(entryCodes);
-
+    assetCodes.push(entries[1].code);
+    let filter = accountsByCodes(assetCodes);
+    console.log(filter);
     try {
       let res = await getAccountsWithFilter(accessToken, filter);
       accounts = mapAccounts(res);
@@ -145,18 +145,26 @@ const PurchasePage = () => {
       toast.error(translate("something_wrong", trans));
       return;
     }
-    let ledgerEntries:LedgerEntry[] = [];
-    let ledgersToInsert:LedgerCreator[] = [];
 
-    accounts?.map( account => {
+    assets?.map( asset => {
       let ledger:LedgerEntry = {...defaultLedgerEntry};
-      let typeIndex = entries.findIndex( action => action.code === account.code);
-      ledger.type = entries[typeIndex]?.type?.toLowerCase();
-      ledger.account = account;
-      ledger.total = sales.total;
-      ledgerEntries.push(ledger);
-    });
-    
+      let type = entries[0].type;
+      ledger.type = type.toLowerCase();
+
+      let account = accounts.find( account => account.code === asset.code);
+      ledger.account = account? account:defaultAccount;
+      ledger.total = asset.unit_cost * asset.quantity;
+      assetsLedger.push(ledger);
+
+      ledger = {...defaultLedgerEntry};
+      ledger.type = entries[1].type;
+      account = accounts.find( account => account.code === entries[1].code );
+      ledger.account = account? account:defaultAccount;
+      ledger.total = asset.unit_cost * asset.quantity;
+      assetsLedger.push(ledger);
+    })
+
+    let ledgersToInsert:LedgerCreator[] = [];    
     let transactID = crypto.randomUUID();
     let transactDesc = desc;
     let transact = transactionMapper({
@@ -177,7 +185,7 @@ const PurchasePage = () => {
     let transactToCreate = createTransactionMapper(transact, transactionDate, organization.id);
     let purchaseToCreate = purchaseCreatorMapper(purchase, organization.id, transactID, suppl);  
 
-    ledgerEntries.map( ent => {
+    assetsLedger.map( ent => {
       let createLedger = ledgerCreatorMapper(ent, transactID, organization.id);
       createLedger.total = purchase.total;
       ledgersToInsert.push(createLedger);
