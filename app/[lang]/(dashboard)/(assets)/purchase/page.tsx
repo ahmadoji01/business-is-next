@@ -114,6 +114,8 @@ const PurchasePage = () => {
     let desc = "";
     let entries:EntryAction[] = [];
     purchase.assets = assets;
+    purchase.status = selected;
+    
     if (purchase.status === PURCHASE_STATUS.paid_delivered) {
       entries = ENTRIES.purchase_paid_and_delivered.actions;
       desc = ENTRIES.purchase_paid_and_delivered.description;
@@ -137,7 +139,7 @@ const PurchasePage = () => {
     });
     assetCodes.push(entries[1].code);
     let filter = accountsByCodes(assetCodes);
-    
+
     try {
       let res = await getAccountsWithFilter(accessToken, filter);
       accounts = mapAccounts(res);
