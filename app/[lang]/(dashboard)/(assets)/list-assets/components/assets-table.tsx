@@ -54,7 +54,7 @@ const AssetsTable = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
-  const [selectedAsset, setSelectedAsset] = useState<Asset>(defaultAsset);
+  const [selectedAssets, setSelectedAssets] = useState<Asset[]>([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const assetField = ['id', 'name', 'quantity', 'total', 'unit', 'unit_cost', 'type', 'status', 'lifetime', 'item.name', 'item.id', 'item.price', 'item.type', 'item.unit']
@@ -153,13 +153,13 @@ const AssetsTable = () => {
     return;
   }
 
-  const openAssetModal = (action:string, asset?:Asset) => {
+  const openAssetModal = (action:string, assets?:Asset[]) => {
     let title = "";
     let description = "";
     let assetName = "This asset";
 
-    if (typeof(asset) !== "undefined")
-      assetName = asset.name;
+    if (typeof(assets) !== "undefined" && assets.length === 1)
+      assetName = assets[0].name;
       
     switch (action) {
       case "throw_asset":
@@ -178,12 +178,16 @@ const AssetsTable = () => {
         setTitle(translate("do you want to report that this asset has been returned and reimbursed?", trans));
         setDescription(assetName + " will be deleted and a transaction record of reimbursement will be created");
         break;
+      case "asset_delivered":
+        setTitle(translate("do you want to report that this asset(s) has been delivered?", trans));
+        setDescription("The affected asset(s) status will be changed to delivered.");
+        break;
       default:
         break;
     }
 
     setModalOpen(true);
-    setSelectedAsset(asset? asset:defaultAsset);
+    setSelectedAssets(assets? assets:[]);
   }
 
   const closeAssetModal = () => {
@@ -200,7 +204,7 @@ const AssetsTable = () => {
         onConfirm={billCustomers} 
         showDetail={showAssetDetail}
         description={description}
-        asset={selectedAsset}
+        assets={selectedAssets}
         />
       <div className="flex flex-1 flex-wrap items-center gap-2 capitalize">
         <Input
@@ -240,21 +244,22 @@ const AssetsTable = () => {
               {selectedRows.length > 0 || (!isEmptyObject(filter) && total !== 0) ? (
                 <div className=" flex gap-2">
                   <Button
-                    onClick={openAssetModal}
+                    onClick={() => openAssetModal("asset_delivered")}
                     size="xs"
                     variant="outline"
                     className="text-xs"
                     color="secondary"
                   >
-                    Bill Customers
+                    Assets Delivered
                   </Button>
                   <Button
+                    onClick={() => openAssetModal("throw_asset")}
                     size="xs"
                     variant="outline"
                     className=" text-xs "
                     color="destructive"
                   >
-                    Delete all
+                    Throw Assets
                   </Button>
                 </div>
               ) : (
@@ -340,10 +345,12 @@ const AssetsTable = () => {
                       />
                       Asset Cancelled and Reimbursed
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Icon icon="heroicons:truck" className=" h-4 w-4 mr-2 " />
-                      Asset Delivered
-                    </DropdownMenuItem>
+                    { asset.status === ASSET_STATUS.undelivered &&
+                      <DropdownMenuItem onClick={() => openAssetModal("asset_delivered")}>
+                        <Icon icon="heroicons:truck" className=" h-4 w-4 mr-2 " />
+                        Report Asset Delivered
+                      </DropdownMenuItem> 
+                    }
                     <DropdownMenuSeparator />
                     <DropdownMenuItem className="text-red-500" onClick={() => openAssetModal("declare_asset_lost")}>
                       <Icon icon="heroicons:archive-box-x-mark" className=" h-4 w-4 mr-2 " />
