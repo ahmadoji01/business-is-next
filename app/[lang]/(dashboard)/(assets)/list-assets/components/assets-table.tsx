@@ -36,27 +36,31 @@ import { useRouter } from "next/navigation";
 import { useSalesContext } from "@/provider/sales.provider";
 import { ASSET_STATUS, assetStatuses } from "@/modules/assets/domain/assets.constants";
 import { getTotalSearchAssetsWithFilter, searchAssetsWithFilter } from "@/modules/assets/domain/assets.actions";
-import { Asset, mapAssets } from "@/modules/assets/domain/assets";
+import { Asset, defaultAsset, mapAssets } from "@/modules/assets/domain/assets";
 import moment from "moment";
 import { Icon } from "@iconify/react";
 import { Badge } from "@/components/ui/badge";
 import ActionDialog from "./action-dialog";
+import AssetModal from "./asset-modal";
 
 let activeTimeout:any = null;
 
 const AssetsTable = () => {
   const [selectedRows, setSelectedRows] = useState<string[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [showAssetDetail, setShowAssetDetail] = useState(false);
   const [assets, setAssets] = useState<Asset[]>([]);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
+  const [selectedAsset, setSelectedAsset] = useState<Asset>(defaultAsset);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
   const assetField = ['id', 'name', 'quantity', 'total', 'unit', 'unit_cost', 'type', 'status', 'lifetime', 'item.name', 'item.id', 'item.price', 'item.type', 'item.unit']
   const {trans} = useLanguageContext();
   const {accessToken} = useUserContext();
-  const {filter, setFilter, selectedCustomers, setSelectedCustomers} = useSalesContext();
+  const {filter, setFilter} = useSalesContext();
   const router = useRouter();
   
   useEffect(() => {
@@ -149,26 +153,54 @@ const AssetsTable = () => {
     return;
   }
 
-  const openBillDialog = () => {
+  const openAssetModal = (action:string, asset?:Asset) => {
+    let title = "";
+    let description = "";
+    let assetName = "This asset";
+
+    if (typeof(asset) !== "undefined")
+      assetName = asset.name;
+      
+    switch (action) {
+      case "throw_asset":
+        setTitle(translate("do you want to throw this asset?", trans));
+        setDescription(assetName + "'s value will be set to 0 and you will not be able to use it");
+        break;
+      case "declare_asset_lost":
+        setTitle(translate("do you want to declare that this asset is lost?", trans));
+        setDescription(assetName + "'s value will be set to 0 and you will not be able to use it");
+        break;
+      case "see_asset":
+        setTitle(translate("asset's detail", trans));
+        setShowAssetDetail(true);
+        break;
+      case "reimburse_asset":
+        setTitle(translate("do you want to report that this asset has been returned and reimbursed?", trans));
+        setDescription(assetName + " will be deleted and a transaction record of reimbursement will be created");
+        break;
+      default:
+        break;
+    }
+
     setModalOpen(true);
-    let custs:Customer[] = [];
-    selectedRows.map( (row) => {
-      let cust = customers.find( cust => cust.id === row );
-      if (typeof(cust) !== 'undefined')
-        custs.push(cust);
-    })
-    setSelectedCustomers(custs);
+    setSelectedAsset(asset? asset:defaultAsset);
+  }
+
+  const closeAssetModal = () => {
+    setShowAssetDetail(false);
+    setModalOpen(false);
   }
 
   return (
     <>
-      <ActionDialog 
-        title="do you want to throw this asset?"
+      <AssetModal 
+        title={title}
         open={modalOpen} 
-        onClose={() => setModalOpen(false)} 
+        onClose={closeAssetModal} 
         onConfirm={billCustomers} 
-        defaultToast={false} 
-        description="The asset value will be set to 0 and the status will change"
+        showDetail={showAssetDetail}
+        description={description}
+        asset={selectedAsset}
         />
       <div className="flex flex-1 flex-wrap items-center gap-2 capitalize">
         <Input
@@ -208,7 +240,7 @@ const AssetsTable = () => {
               {selectedRows.length > 0 || (!isEmptyObject(filter) && total !== 0) ? (
                 <div className=" flex gap-2">
                   <Button
-                    onClick={openBillDialog}
+                    onClick={openAssetModal}
                     size="xs"
                     variant="outline"
                     className="text-xs"
@@ -294,14 +326,14 @@ const AssetsTable = () => {
                   <DropdownMenuContent align="end" avoidCollisions>
                     <DropdownMenuLabel>Action Center</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => openAssetModal("see_asset", asset)}>
                       <Icon
                         icon="heroicons:eye"
                         className=" h-4 w-4 mr-2 "
                       />
                       See Asset Detail
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => openAssetModal("reimburse_asset")}>
                       <Icon
                         icon="heroicons:banknotes"
                         className=" h-4 w-4 mr-2 "
@@ -313,11 +345,11 @@ const AssetsTable = () => {
                       Asset Delivered
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem className="text-red-500" onClick={openBillDialog}>
+                    <DropdownMenuItem className="text-red-500" onClick={() => openAssetModal("declare_asset_lost")}>
                       <Icon icon="heroicons:archive-box-x-mark" className=" h-4 w-4 mr-2 " />
                       Declare Asset Lost
                     </DropdownMenuItem>
-                    <DropdownMenuItem className="text-red-500" onClick={openBillDialog}>
+                    <DropdownMenuItem className="text-red-500" onClick={() => openAssetModal("throw_asset")}>
                       <Icon icon="heroicons:trash" className=" h-4 w-4 mr-2 " />
                       Throw Asset Out
                     </DropdownMenuItem>
