@@ -12,15 +12,20 @@ import {
 } from "@/components/ui/table";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Badge } from "@/components/ui/badge";
-import { Customer, mapCustomers } from "@/modules/customers/domain/customer";
+import { Customer } from "@/modules/customers/domain/customer";
 import { imageHandler, pagesCount, totalCount } from "@/utils/request-handler";
 import { translate } from "@/lib/utils";
 import { useLanguageContext } from "@/provider/language.provider";
-import BillDialog from "./bill-dialog";
 import { Pagination } from "@mui/material";
 import { useUserContext } from "@/provider/user.provider";
-import { getTotalSearchCustomersWithFilter, searchCustomersWithFilter } from "@/modules/customers/domain/customers.actions";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import toast from "react-hot-toast";
 import { LIMIT_PER_PAGE } from "@/constants/request";
 import { Input } from "@/components/ui/input";
@@ -29,11 +34,13 @@ import { X } from "lucide-react";
 import { currency, isEmptyObject } from "@/utils/generic-functions";
 import { useRouter } from "next/navigation";
 import { useSalesContext } from "@/provider/sales.provider";
-import { assetStatuses } from "@/modules/assets/domain/assets.constants";
+import { ASSET_STATUS, assetStatuses } from "@/modules/assets/domain/assets.constants";
 import { getTotalSearchAssetsWithFilter, searchAssetsWithFilter } from "@/modules/assets/domain/assets.actions";
 import { Asset, mapAssets } from "@/modules/assets/domain/assets";
 import moment from "moment";
 import { Icon } from "@iconify/react";
+import { Badge } from "@/components/ui/badge";
+import ActionDialog from "./action-dialog";
 
 let activeTimeout:any = null;
 
@@ -46,7 +53,7 @@ const AssetsTable = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
-  const assetField = ['id', 'name', 'quantity', 'total', 'unit', 'unit_cost', 'type', 'lifetime', 'item.name', 'item.id', 'item.price', 'item.type', 'item.unit']
+  const assetField = ['id', 'name', 'quantity', 'total', 'unit', 'unit_cost', 'type', 'status', 'lifetime', 'item.name', 'item.id', 'item.price', 'item.type', 'item.unit']
   const {trans} = useLanguageContext();
   const {accessToken} = useUserContext();
   const {filter, setFilter, selectedCustomers, setSelectedCustomers} = useSalesContext();
@@ -155,13 +162,13 @@ const AssetsTable = () => {
 
   return (
     <>
-      <BillDialog 
+      <ActionDialog 
+        title="do you want to throw this asset?"
         open={modalOpen} 
         onClose={() => setModalOpen(false)} 
         onConfirm={billCustomers} 
         defaultToast={false} 
-        customers={selectedCustomers}
-        statuses={selectedStatus}
+        description="The asset value will be set to 0 and the status will change"
         />
       <div className="flex flex-1 flex-wrap items-center gap-2 capitalize">
         <Input
@@ -224,7 +231,7 @@ const AssetsTable = () => {
             </TableHead>
             <TableHead>Quantity</TableHead>
             <TableHead>Total Value</TableHead>
-            <TableHead>Type</TableHead>
+            <TableHead>Status</TableHead>
             <TableHead>Lifetime/Expiry</TableHead>
             <TableHead>Actions</TableHead>
           </TableRow>
@@ -256,33 +263,66 @@ const AssetsTable = () => {
               </TableCell>
               <TableCell>{asset.quantity} {asset.unit}</TableCell>
               <TableCell>{currency(asset.total)}</TableCell>
-              <TableCell>{asset.type}</TableCell>
+              <TableCell>
+                <Badge
+                  variant="soft"
+                  color={
+                    (asset.status === ASSET_STATUS.delivered && "success") ||
+                    (asset.status === ASSET_STATUS.undelivered && "warning") ||
+                    (asset.status === ASSET_STATUS.exist && "info") || "destructive"
+                  }
+                  className="capitalize"
+                >
+                  {translate(asset.status, trans)}
+                </Badge>
+              </TableCell>
               <TableCell>{moment(asset.lifetime).format("DD-MM-YYYY")}</TableCell>
-              <TableCell className="flex gap-3  justify-end">
-                <Button
-                  size="icon"
-                  variant="outline"
-                  className=" h-7 w-7"
-                  color="secondary"
-                >
-                  <Icon icon="heroicons:pencil" className="h-4 w-4" />
-                </Button>
-                <Button
-                  size="icon"
-                  variant="outline"
-                  className=" h-7 w-7"
-                  color="secondary"
-                >
-                  <Icon icon="heroicons:eye" className="h-4 w-4" />
-                </Button>
-                <Button
-                  size="icon"
-                  variant="outline"
-                  className=" h-7 w-7"
-                  color="secondary"
-                >
-                  <Icon icon="heroicons:trash" className="h-4 w-4" />
-                </Button>
+              <TableCell className="pr-5">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      size="icon"
+                      color="secondary"
+                      className=" h-7 rounded-full bg-transparent w-7 data-[state=open]:bg-primary data-[state=open]:text-primary-foreground  "
+                    >
+                      <Icon
+                        icon="heroicons:ellipsis-horizontal"
+                        className=" h-6 w-6 "
+                      />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" avoidCollisions>
+                    <DropdownMenuLabel>Action Center</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem>
+                      <Icon
+                        icon="heroicons:eye"
+                        className=" h-4 w-4 mr-2 "
+                      />
+                      See Asset Detail
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Icon
+                        icon="heroicons:banknotes"
+                        className=" h-4 w-4 mr-2 "
+                      />
+                      Asset Cancelled and Reimbursed
+                    </DropdownMenuItem>
+                    <DropdownMenuItem>
+                      <Icon icon="heroicons:truck" className=" h-4 w-4 mr-2 " />
+                      Asset Delivered
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="text-red-500" onClick={openBillDialog}>
+                      <Icon icon="heroicons:archive-box-x-mark" className=" h-4 w-4 mr-2 " />
+                      Declare Asset Lost
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="text-red-500" onClick={openBillDialog}>
+                      <Icon icon="heroicons:trash" className=" h-4 w-4 mr-2 " />
+                      Throw Asset Out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </TableCell>
             </TableRow>
           ))}
